@@ -1,471 +1,191 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Alien Tag AR Game</title>
+
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #f9f9f9;
-  font-family: system-ui, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 16px;
-  color: #111;
-}
-h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  text-align: center;
-}
-.subtitle {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 24px;
-  text-align: center;
-}
-.game-container {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 28px;
-  max-width: 560px;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.score-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: #f0f4ff;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-.score-bar span { font-family: monospace; font-size: 16px; font-weight: 700; color: #2563eb; }
-.clue-area {
-  margin-bottom: 20px;
-}
-.clue-area h3 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #666;
-  margin-bottom: 12px;
-}
-.clue-item {
-  padding: 10px 14px;
-  background: #f7f7f7;
-  border-left: 3px solid #2563eb;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #222;
-  line-height: 1.5;
-}
-.btn-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-}
-.btn-primary:hover { background: #1d4ed8; }
-.btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
-.btn-secondary {
-  background: #e5e7eb;
-  color: #333;
-}
-.btn-secondary:hover { background: #d1d5db; }
-.btn-success {
-  background: #15803d;
-  color: #fff;
-}
-.btn-success:hover { background: #166534; }
-.choices-area {
-  margin-bottom: 16px;
-}
-.choices-area label {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #666;
-  display: block;
-  margin-bottom: 10px;
-}
-.choices-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.choice-btn {
-  padding: 14px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: center;
-  color: #333;
-}
-.choice-btn:hover {
-  border-color: #2563eb;
-  background: #f0f4ff;
-  color: #2563eb;
-}
-.choice-btn.correct {
-  border-color: #15803d;
-  background: #dcfce7;
-  color: #15803d;
-  cursor: default;
-}
-.choice-btn.incorrect {
-  border-color: #dc2626;
-  background: #fef2f2;
-  color: #dc2626;
-  cursor: default;
-}
-.choice-btn.disabled {
-  opacity: 0.5;
-  cursor: default;
-  pointer-events: none;
-}
-.feedback {
-  padding: 14px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 16px;
-  display: none;
-}
-.feedback.correct {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
-  display: block;
-}
-.feedback.incorrect {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  display: block;
-}
-.feedback.reveal {
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fde68a;
-  display: block;
-}
-.feedback.gameover {
-  background: #f0f4ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-  display: block;
-  text-align: center;
-  font-size: 16px;
-}
-.character-count {
-  font-size: 12px;
-  color: #999;
-  text-align: center;
-  margin-top: 16px;
-}
+    html, body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+        font-family: Arial, sans-serif;
+    }
+
+    video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: 1;
+    }
+
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+
+    #hud {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        color: #00ff88;
+        font-size: 24px;
+        z-index: 3;
+        text-shadow: 0 0 10px #00ff88;
+    }
+
+    #crosshair {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: -20px;
+        margin-top: -20px;
+        border: 2px solid #00ff88;
+        border-radius: 50%;
+        z-index: 3;
+        pointer-events: none;
+    }
+
+    #shootBtn {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0,255,100,0.8);
+        color: black;
+        font-size: 24px;
+        font-weight: bold;
+        z-index: 4;
+    }
 </style>
 </head>
+
 <body>
-<h1>⛪ Biblical Characters</h1>
-<p class="subtitle">Guess the character from the clues — fewer clues = higher score!</p>
 
-<div class="game-container">
-  <div class="score-bar">
-    <div>Score: <span id="score">0</span></div>
-    <div>Round: <span id="round">1</span> / 10</div>
-    <div>Streak: <span id="streak">0</span> 🔥</div>
-  </div>
+<video id="camera" autoplay playsinline></video>
+<canvas id="gameCanvas"></canvas>
 
-  <div class="clue-area">
-    <h3>Clues</h3>
-    <div id="clues-container"></div>
-  </div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" id="next-clue-btn" onclick="showNextClue()">Show Next Clue</button>
-    <button class="btn btn-success" id="new-round-btn" onclick="newRound()" style="display:none;">Next Character →</button>
-  </div>
-
-  <div class="choices-area">
-    <label>Choose your answer</label>
-    <div class="choices-grid" id="choices-grid"></div>
-  </div>
-
-  <div class="feedback" id="feedback"></div>
-  <p class="character-count">20 characters in the game</p>
+<div id="hud">
+    Alien Tags: <span id="score">0</span>
 </div>
 
+<div id="crosshair"></div>
+
+<button id="shootBtn">TAG</button>
+
 <script>
-const characters = [
-  {
-    name: "Moses",
-    clues: ["I was found in a basket on a river.", "I spoke to God through a burning bush.", "I parted a great sea.", "I received commandments on a mountain.", "I led my people out of Egypt."]
-  },
-  {
-    name: "David",
-    clues: ["I was the youngest of many brothers.", "I was a skilled musician who played the harp.", "I defeated a giant with a sling and a stone.", "I was anointed king by the prophet Samuel.", "I wrote many of the Psalms."]
-  },
-  {
-    name: "Noah",
-    clues: ["God told me to build something massive.", "I gathered animals two by two.", "I survived a great flood.", "A dove brought me an olive branch.", "A rainbow was God's promise to me."]
-  },
-  {
-    name: "Abraham",
-    clues: ["God told me to leave my homeland.", "I was promised descendants as numerous as the stars.", "I was willing to sacrifice my son.", "My wife laughed at an impossible promise.", "I am called the father of many nations."]
-  },
-  {
-    name: "Joseph",
-    clues: ["I had a coat of many colors.", "My brothers were jealous of me.", "I could interpret dreams.", "I was sold into slavery but rose to power.", "I became second-in-command in Egypt."]
-  },
-  {
-    name: "Samson",
-    clues: ["My strength was legendary.", "I killed a lion with my bare hands.", "A woman betrayed my secret.", "My power was connected to my hair.", "I destroyed a temple with my final act."]
-  },
-  {
-    name: "Daniel",
-    clues: ["I was taken captive to Babylon.", "I refused to eat the king's food.", "I interpreted writing on a wall.", "I was thrown into a den of lions.", "God shut the mouths of the beasts."]
-  },
-  {
-    name: "Esther",
-    clues: ["I was an orphan raised by my cousin.", "I won a royal beauty contest.", "I kept my heritage a secret.", "I risked my life to approach the king.", "I saved my people from destruction."]
-  },
-  {
-    name: "Ruth",
-    clues: ["I was a foreigner who chose loyalty.", "I said 'Where you go, I will go.'", "I gleaned grain in a field.", "I married a man named Boaz.", "I became an ancestor of King David."]
-  },
-  {
-    name: "Jonah",
-    clues: ["God told me to go to a wicked city.", "I ran away on a ship instead.", "A great storm came because of me.", "I was swallowed by a great fish.", "I spent three days in darkness."]
-  },
-  {
-    name: "Solomon",
-    clues: ["I asked God for wisdom instead of riches.", "I built a magnificent temple.", "I judged a case between two mothers.", "I wrote thousands of proverbs.", "I was the son of David."]
-  },
-  {
-    name: "Peter",
-    clues: ["I was a fisherman by trade.", "I walked on water briefly.", "I denied knowing my master three times.", "I was called 'the rock.'", "I preached on the day of Pentecost."]
-  },
-  {
-    name: "Paul",
-    clues: ["I once persecuted believers.", "I was blinded on a road.", "I wrote many letters to churches.", "I was shipwrecked multiple times.", "I was formerly known by a different name."]
-  },
-  {
-    name: "Mary",
-    clues: ["An angel appeared to me with a message.", "I was told not to be afraid.", "I pondered things in my heart.", "I was present at a crucifixion.", "I am the mother of Jesus."]
-  },
-  {
-    name: "Elijah",
-    clues: ["I challenged 450 false prophets.", "Fire came down from heaven at my prayer.", "I was fed by ravens.", "I ran faster than a chariot.", "I was taken to heaven in a whirlwind."]
-  },
-  {
-    name: "Jacob",
-    clues: ["I tricked my brother out of his birthright.", "I wrestled with a mysterious being all night.", "I had a dream about a ladder to heaven.", "I worked 14 years to marry the woman I loved.", "I was renamed Israel."]
-  },
-  {
-    name: "Rahab",
-    clues: ["I lived in a city with great walls.", "I hid spies on my rooftop.", "I hung a scarlet cord from my window.", "My city was destroyed but I was spared.", "I am listed in the lineage of Jesus."]
-  },
-  {
-    name: "Gideon",
-    clues: ["An angel called me a mighty warrior.", "I put out a fleece to test God.", "I started with 32,000 soldiers.", "God reduced my army to just 300.", "We used torches and trumpets to win a battle."]
-  },
-  {
-    name: "Joshua",
-    clues: ["I was Moses' assistant.", "I was one of twelve spies sent to scout a land.", "I led my people across the Jordan River.", "I commanded the sun to stand still.", "I brought down the walls of Jericho."]
-  },
-  {
-    name: "Sarah",
-    clues: ["I laughed at a promise from God.", "I was very beautiful even in old age.", "I gave my servant to my husband.", "I became a mother at age 90.", "My son's name means 'laughter.'"]
-  }
-];
+const video = document.getElementById("camera");
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreEl = document.getElementById("score");
 
-let currentCharacter = null;
-let currentClueIndex = 0;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
 let score = 0;
-let round = 1;
-let streak = 0;
-let usedIndices = [];
-let roundOver = false;
-let choices = [];
+let effects = [];
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment"
+            },
+            audio: false
+        });
 
-function getRandomChoices(correctName) {
-  let options = characters.map(c => c.name).filter(n => n !== correctName);
-  shuffle(options);
-  let selected = options.slice(0, 3);
-  selected.push(correctName);
-  shuffle(selected);
-  return selected;
-}
-
-function startGame() {
-  usedIndices = [];
-  score = 0;
-  round = 1;
-  streak = 0;
-  updateDisplay();
-  loadCharacter();
-}
-
-function loadCharacter() {
-  if (usedIndices.length >= characters.length) {
-    usedIndices = [];
-  }
-  let idx;
-  do {
-    idx = Math.floor(Math.random() * characters.length);
-  } while (usedIndices.includes(idx));
-  usedIndices.push(idx);
-
-  currentCharacter = characters[idx];
-  currentClueIndex = 0;
-  roundOver = false;
-
-  choices = getRandomChoices(currentCharacter.name);
-
-  document.getElementById('clues-container').innerHTML = '';
-  document.getElementById('feedback').className = 'feedback';
-  document.getElementById('feedback').textContent = '';
-  document.getElementById('feedback').style.display = 'none';
-  document.getElementById('next-clue-btn').style.display = 'inline-block';
-  document.getElementById('next-clue-btn').disabled = false;
-  document.getElementById('new-round-btn').style.display = 'none';
-
-  renderChoices();
-  showNextClue();
-}
-
-function renderChoices() {
-  const grid = document.getElementById('choices-grid');
-  grid.innerHTML = '';
-  choices.forEach(function(name) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = name;
-    btn.onclick = function() { selectChoice(name, btn); };
-    grid.appendChild(btn);
-  });
-}
-
-function selectChoice(name, btn) {
-  if (roundOver) return;
-
-  const feedback = document.getElementById('feedback');
-  const allBtns = document.querySelectorAll('.choice-btn');
-
-  if (name === currentCharacter.name) {
-    const points = Math.max(1, 6 - currentClueIndex) * 10;
-    score += points;
-    streak++;
-    btn.classList.add('correct');
-    feedback.className = 'feedback correct';
-    feedback.textContent = '✅ Correct! It was ' + currentCharacter.name + '! +' + points + ' points';
-    feedback.style.display = 'block';
-    allBtns.forEach(function(b) {
-      if (b !== btn) b.classList.add('disabled');
-    });
-    endRound();
-  } else {
-    btn.classList.add('incorrect');
-    btn.classList.add('disabled');
-    btn.onclick = null;
-    streak = 0;
-    feedback.className = 'feedback incorrect';
-    feedback.textContent = '❌ Not ' + name + '! Try again or reveal another clue.';
-    feedback.style.display = 'block';
-  }
-  updateDisplay();
-}
-
-function showNextClue() {
-  if (roundOver) return;
-  if (currentClueIndex >= currentCharacter.clues.length) {
-    document.getElementById('next-clue-btn').disabled = true;
-    return;
-  }
-  const container = document.getElementById('clues-container');
-  const div = document.createElement('div');
-  div.className = 'clue-item';
-  div.textContent = (currentClueIndex + 1) + ". " + currentCharacter.clues[currentClueIndex];
-  container.appendChild(div);
-  currentClueIndex++;
-
-  if (currentClueIndex >= currentCharacter.clues.length) {
-    document.getElementById('next-clue-btn').disabled = true;
-  }
-}
-
-function endRound() {
-  roundOver = true;
-  document.getElementById('next-clue-btn').style.display = 'none';
-  document.getElementById('new-round-btn').style.display = 'inline-block';
-
-  // Highlight correct answer
-  const allBtns = document.querySelectorAll('.choice-btn');
-  allBtns.forEach(function(b) {
-    if (b.textContent === currentCharacter.name) {
-      b.classList.add('correct');
+        video.srcObject = stream;
+    } catch (err) {
+        alert("Camera access denied.");
     }
-    b.classList.add('disabled');
-  });
 }
 
-function newRound() {
-  round++;
-  if (round > 10) {
-    const feedback = document.getElementById('feedback');
-    feedback.className = 'feedback gameover';
-    feedback.textContent = '🎉 Game Over! Final Score: ' + score + ' / 500 points! Refresh to play again.';
-    feedback.style.display = 'block';
-    document.getElementById('new-round-btn').style.display = 'none';
-    document.getElementById('choices-grid').innerHTML = '';
-    return;
-  }
-  updateDisplay();
-  loadCharacter();
+function createAlienEffect(x, y) {
+    effects.push({
+        x,
+        y,
+        radius: 10,
+        alpha: 1
+    });
 }
 
-function updateDisplay() {
-  document.getElementById('score').textContent = score;
-  document.getElementById('round').textContent = round;
-  document.getElementById('streak').textContent = streak;
+function drawAlienOverlay() {
+    ctx.fillStyle = "rgba(0,255,120,0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = "#00ff88";
+    ctx.lineWidth = 3;
+
+    for (let i = 0; i < 10; i++) {
+        ctx.beginPath();
+        ctx.arc(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height,
+            Math.random() * 4,
+            0,
+            Math.PI * 2
+        );
+        ctx.stroke();
+    }
 }
 
-startGame();
+function updateEffects() {
+    for (let i = effects.length - 1; i >= 0; i--) {
+        const e = effects[i];
+
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+
+        ctx.fillStyle = `rgba(0,255,100,${e.alpha})`;
+        ctx.fill();
+
+        e.radius += 3;
+        e.alpha -= 0.03;
+
+        if (e.alpha <= 0) {
+            effects.splice(i, 1);
+        }
+    }
+}
+
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawAlienOverlay();
+    updateEffects();
+
+    requestAnimationFrame(gameLoop);
+}
+
+document.getElementById("shootBtn").addEventListener("click", () => {
+    const x = canvas.width / 2;
+    const y = canvas.height / 2;
+
+    createAlienEffect(x, y);
+
+    score++;
+    scoreEl.textContent = score;
+});
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+startCamera();
+gameLoop();
 </script>
+
 </body>
 </html>
