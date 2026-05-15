@@ -1044,6 +1044,7 @@ function joyStart(e){
     joystickActive=true;
 
     // Move joystick directly to touch point
+    joystickArea.style.position='fixed';
     joystickArea.style.left=(touch.clientX-60)+'px';
     joystickArea.style.top=(touch.clientY-60)+'px';
     joystickArea.style.bottom='auto';
@@ -1080,6 +1081,8 @@ function updateJoy(touch){
 function joyMove(e){
   if(!joystickActive) return;
 
+  e.preventDefault();
+
   for(const touch of e.touches){
     if(touch.identifier===joystickTouchId){
       updateJoy(touch);
@@ -1102,6 +1105,7 @@ function joyEnd(e){
       joystickKnob.style.transform='translate(-50%,-50%)';
       joystickKnob.classList.remove('active');
 
+      joystickArea.style.position='fixed';
       joystickArea.style.left='20px';
       joystickArea.style.bottom='140px';
       joystickArea.style.top='auto';
@@ -1112,7 +1116,7 @@ function joyEnd(e){
 }
 
 document.addEventListener('touchstart',joyStart,{passive:true});
-document.addEventListener('touchmove',joyMove,{passive:true});
+document.addEventListener('touchmove',joyMove,{passive:false});
 document.addEventListener('touchend',joyEnd,{passive:true});
 document.addEventListener('touchcancel',joyEnd,{passive:true});
 
