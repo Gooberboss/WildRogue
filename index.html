@@ -339,7 +339,7 @@ html, body {
 }
 
 /* Controls */
-#controls { z-index:30;
+#controls { position:fixed; z-index:40;
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 16px; padding-bottom: env(safe-area-inset-bottom, 16px);
   display: flex; justify-content: space-between; align-items: flex-end;
@@ -1047,6 +1047,11 @@ let joystickActive=false,joystickX=0,joystickY=0;
 let joystickTouchId=null;
 
 const joystickArea=document.getElementById('joystick-area');
+
+joystickArea.style.position='fixed';
+joystickArea.style.left='20px';
+joystickArea.style.bottom='140px';
+joystickArea.style.zIndex='15';
 const joystickKnob=document.getElementById('joystick-knob');
 
 function joyStart(e){
@@ -1064,11 +1069,14 @@ function joyStart(e){
     joystickTouchId=touch.identifier;
     joystickActive=true;
 
-    // Move joystick directly to touch point
+    // Move joystick visually without affecting layout
     joystickArea.style.position='fixed';
-    joystickArea.style.left=(touch.clientX-60)+'px';
-    joystickArea.style.top=(touch.clientY-60)+'px';
+    joystickArea.style.left='0px';
+    joystickArea.style.top='0px';
     joystickArea.style.bottom='auto';
+
+    joystickArea.style.transform =
+      `translate(${touch.clientX-60}px, ${touch.clientY-60}px)`;
 
     joystickKnob.classList.add('active');
 
@@ -1135,6 +1143,7 @@ function joyEnd(e){
       joystickArea.style.left='20px';
       joystickArea.style.bottom='140px';
       joystickArea.style.top='auto';
+      joystickArea.style.transform='translate(0px,0px)';
 
       break;
     }
