@@ -559,6 +559,23 @@ html, body {
 </head>
 <body>
 <div id="game-container">
+
+<div id="version-label" style="
+position:absolute;
+top:10px;
+right:10px;
+z-index:999;
+color:white;
+font-family:sans-serif;
+font-size:14px;
+background:rgba(0,0,0,0.45);
+padding:4px 8px;
+border-radius:8px;
+backdrop-filter:blur(4px);
+">
+v4
+</div>
+
   <canvas id="game-canvas"></canvas>
   <div id="hit-flash"></div>
   <div id="heal-flash"></div><div id="floor-fade" style="position:absolute;inset:0;background:black;opacity:0;pointer-events:none;transition:opacity 0.4s;z-index:50;"></div>
@@ -1033,6 +1050,10 @@ const joystickArea=document.getElementById('joystick-area');
 const joystickKnob=document.getElementById('joystick-knob');
 
 function joyStart(e){
+
+  // Prevent second touches from stealing joystick
+  if(joystickActive) return;
+
   for(const touch of e.changedTouches){
 
     // ONLY activate inside left 40% of screen
@@ -1083,7 +1104,12 @@ function joyMove(e){
 
   e.preventDefault();
 
+  // ONLY follow the original joystick finger
   for(const touch of e.touches){
+
+    if(touch.identifier !== joystickTouchId){
+      continue;
+    }
     if(touch.identifier===joystickTouchId){
       updateJoy(touch);
       break;
