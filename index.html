@@ -3,667 +3,469 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Missionary Quest</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); font-family: system-ui, sans-serif; color: #e0e0e0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; align-items: center; }
-
-.game-container { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; height: 100vh; position: relative; }
-
-.game-header { width: 100%; padding: 8px 12px; background: linear-gradient(180deg, rgba(15,52,96,0.9), rgba(15,52,96,0.4)); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; gap: 6px; border-bottom: 1px solid rgba(240,208,96,0.3); }
-.game-header h1 { font-size: 15px; color: #f0d060; letter-spacing: 1px; text-shadow: 0 0 10px rgba(240,208,96,0.5); }
-.game-header .rt-badge { font-size: 9px; background: linear-gradient(135deg, #f093fb, #f5576c); padding: 2px 6px; border-radius: 8px; color: #fff; font-weight: 700; }
-
-.stats-bar { display: flex; gap: 4px; padding: 6px 8px; width: 100%; justify-content: space-around; font-size: 10px; background: rgba(22,33,62,0.8); border-bottom: 1px solid rgba(15,52,96,0.6); flex-wrap: wrap; }
-.stat { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.3); padding: 3px 7px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-.stat-icon { font-size: 12px; }
-.stat-val { font-weight: 700; color: #f0d060; text-shadow: 0 0 6px rgba(240,208,96,0.4); }
-.stat-label { color: #888; font-size: 9px; }
-
-.hp-bar-container { width: 100%; padding: 2px 12px; background: rgba(0,0,0,0.3); }
-.hp-bar-bg { width: 100%; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-.hp-bar-fill { height: 100%; background: linear-gradient(90deg, #f5576c, #ff6b6b, #4ade80); border-radius: 3px; transition: width 0.3s ease; }
-.hp-bar-fill.low { background: linear-gradient(90deg, #f5576c, #ff6b6b); }
-.hp-bar-fill.mid { background: linear-gradient(90deg, #f5a623, #f7dc6f); }
-.hp-bar-fill.high { background: linear-gradient(90deg, #4ade80, #6dd5ed); }
-
-.map-container { position: relative; display: grid; gap: 1px; background: rgba(0,0,0,0.8); padding: 3px; border: 2px solid rgba(240,208,96,0.3); border-radius: 8px; margin: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3); }
-
-.tile { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 15px; border-radius: 3px; position: relative; transition: all 0.15s ease; }
-
-.t-floor { background: linear-gradient(135deg, #2a2a40, #33334d); }
-.t-floor::after { content: ''; position: absolute; width: 2px; height: 2px; background: rgba(255,255,255,0.05); border-radius: 50%; top: 50%; left: 50%; }
-.t-wall { background: linear-gradient(135deg, #1a1a2e, #16213e); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.03); }
-.t-player { background: radial-gradient(circle, rgba(74,222,128,0.4), rgba(45,74,45,0.8)); box-shadow: 0 0 12px rgba(74,222,128,0.4); border: 1px solid rgba(74,222,128,0.3); }
-.t-village { background: radial-gradient(circle, rgba(255,183,77,0.3), rgba(74,61,45,0.8)); box-shadow: 0 0 8px rgba(255,183,77,0.2); }
-.t-enemy { background: radial-gradient(circle, rgba(248,113,113,0.4), rgba(74,45,45,0.8)); box-shadow: 0 0 8px rgba(248,113,113,0.3); border: 1px solid rgba(248,113,113,0.2); }
-.t-item { background: radial-gradient(circle, rgba(96,165,250,0.3), rgba(45,61,74,0.8)); box-shadow: 0 0 8px rgba(96,165,250,0.3); }
-.t-exit { background: radial-gradient(circle, rgba(240,208,96,0.4), rgba(74,74,45,0.8)); box-shadow: 0 0 12px rgba(240,208,96,0.3); border: 1px solid rgba(240,208,96,0.3); }
-.t-shrine { background: radial-gradient(circle, rgba(192,132,252,0.4), rgba(61,45,74,0.8)); box-shadow: 0 0 10px rgba(192,132,252,0.3); }
-.t-water { background: radial-gradient(circle, rgba(56,189,248,0.3), rgba(26,45,74,0.8)); }
-.t-fog { background: linear-gradient(135deg, #0a0a14, #111122); }
-
-.enemy-hp-bar { position: absolute; bottom: 1px; left: 2px; right: 2px; height: 3px; background: rgba(0,0,0,0.6); border-radius: 2px; overflow: hidden; }
-.enemy-hp-fill { height: 100%; background: linear-gradient(90deg, #f5576c, #ff9a9e); border-radius: 2px; transition: width 0.2s; }
-
-.log-area { width: 100%; padding: 6px 10px; font-size: 10px; color: #aaa; background: linear-gradient(180deg, rgba(22,33,62,0.9), rgba(15,15,30,0.9)); border-top: 1px solid rgba(240,208,96,0.15); min-height: 50px; max-height: 65px; overflow-y: auto; line-height: 1.4; }
-.log-area p { margin-bottom: 2px; padding: 1px 0; }
-.log-good { color: #4ade80; text-shadow: 0 0 4px rgba(74,222,128,0.3); }
-.log-bad { color: #f87171; text-shadow: 0 0 4px rgba(248,113,113,0.3); }
-.log-info { color: #60a5fa; }
-.log-special { color: #f0d060; text-shadow: 0 0 6px rgba(240,208,96,0.4); font-weight: 600; }
-
-.controls { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); gap: 4px; margin: 6px auto; }
-.ctrl-btn { background: linear-gradient(145deg, #1e2a4a, #16213e); border: 2px solid rgba(96,165,250,0.2); border-radius: 12px; color: #e0e0e0; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
-.ctrl-btn:active { background: linear-gradient(145deg, #0f3460, #1a5276); transform: scale(0.92); box-shadow: 0 1px 3px rgba(0,0,0,0.3); border-color: rgba(96,165,250,0.5); }
-.ctrl-btn.center { background: linear-gradient(145deg, #2a1a4a, #1a1a3e); border-color: rgba(240,208,96,0.4); box-shadow: 0 0 12px rgba(240,208,96,0.15); }
-.ctrl-btn.center:active { border-color: rgba(240,208,96,0.8); box-shadow: 0 0 20px rgba(240,208,96,0.3); }
-.ctrl-btn.held { background: linear-gradient(145deg, #0f3460, #1a5276); border-color: rgba(96,165,250,0.6); box-shadow: 0 0 12px rgba(96,165,250,0.3); }
-
-.action-bar { display: flex; gap: 6px; padding: 6px; width: 100%; justify-content: center; flex-wrap: wrap; }
-.action-btn { background: linear-gradient(145deg, #1e2a4a, #0f3460); border: 1px solid rgba(96,165,250,0.2); border-radius: 8px; color: #e0e0e0; padding: 8px 12px; font-size: 11px; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-.action-btn:active { transform: scale(0.95); background: linear-gradient(145deg, #0f3460, #1a5276); border-color: rgba(96,165,250,0.5); }
-
-.screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); z-index: 10; padding: 20px; text-align: center; }
-.screen h2 { color: #f0d060; font-size: 24px; margin-bottom: 12px; text-shadow: 0 0 20px rgba(240,208,96,0.5); }
-.screen p { color: #aaa; font-size: 13px; margin-bottom: 8px; max-width: 300px; line-height: 1.6; }
-.screen .start-btn { background: linear-gradient(145deg, #0f3460, #1a5276); border: 2px solid #f0d060; border-radius: 12px; color: #f0d060; padding: 14px 32px; font-size: 16px; cursor: pointer; margin-top: 16px; font-weight: 600; box-shadow: 0 0 20px rgba(240,208,96,0.2), 0 4px 12px rgba(0,0,0,0.4); transition: all 0.15s; }
-.screen .start-btn:active { transform: scale(0.95); box-shadow: 0 0 30px rgba(240,208,96,0.4); }
-
-.screen-icon { font-size: 56px; margin-bottom: 12px; filter: drop-shadow(0 0 12px rgba(240,208,96,0.4)); }
-
-.hidden { display: none !important; }
-
-.inventory-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(145deg, #16213e, #0f1a2e); border: 2px solid rgba(240,208,96,0.5); border-radius: 16px; padding: 18px; z-index: 20; width: 90%; max-width: 350px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
-.inventory-panel h3 { color: #f0d060; margin-bottom: 12px; text-shadow: 0 0 8px rgba(240,208,96,0.3); }
-.inv-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-.inv-item span:last-child { color: #f0d060; font-weight: 600; }
-.inv-close { background: linear-gradient(145deg, #4a2d2d, #3a1d1d); border: 1px solid rgba(248,113,113,0.3); color: #fff; padding: 8px 18px; border-radius: 8px; margin-top: 12px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
-.inv-close:active { transform: scale(0.95); }
-
-.level-badge { background: linear-gradient(135deg, #667eea, #764ba2); padding: 3px 8px; border-radius: 10px; font-size: 10px; color: #fff; font-weight: 600; box-shadow: 0 2px 6px rgba(102,126,234,0.3); }
-
-.floor-transition { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5; display: flex; align-items: center; justify-content: center; color: #f0d060; font-size: 20px; font-weight: 600; }
-
-.damage-flash { border: 2px solid rgba(248,113,113,0.8) !important; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .t-exit { animation: exitPulse 2s ease-in-out infinite; }
-  @keyframes exitPulse { 0%,100%{ box-shadow: 0 0 8px rgba(240,208,96,0.3); } 50%{ box-shadow: 0 0 18px rgba(240,208,96,0.6); } }
-
-  .t-shrine { animation: shrinePulse 3s ease-in-out infinite; }
-  @keyframes shrinePulse { 0%,100%{ box-shadow: 0 0 6px rgba(192,132,252,0.2); } 50%{ box-shadow: 0 0 14px rgba(192,132,252,0.5); } }
-
-  .t-player { animation: playerGlow 1.5s ease-in-out infinite; }
-  @keyframes playerGlow { 0%,100%{ box-shadow: 0 0 8px rgba(74,222,128,0.3); } 50%{ box-shadow: 0 0 16px rgba(74,222,128,0.6); } }
-
-  .t-item { animation: itemBob 2s ease-in-out infinite; }
-  @keyframes itemBob { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-2px); } }
-
-  .t-water { animation: waterShimmer 3s ease-in-out infinite; }
-  @keyframes waterShimmer { 0%,100%{ opacity: 0.9; } 50%{ opacity: 1; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #f9f9f9;
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  color: #111;
 }
-
-.particle { position: absolute; pointer-events: none; border-radius: 50%; z-index: 3; }
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-align: center;
+}
+.subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.game-container {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 560px;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.score-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+.score-bar span { font-family: monospace; font-size: 16px; font-weight: 700; color: #2563eb; }
+.clue-area {
+  margin-bottom: 20px;
+}
+.clue-area h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+  margin-bottom: 12px;
+}
+.clue-item {
+  padding: 10px 14px;
+  background: #f7f7f7;
+  border-left: 3px solid #2563eb;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #222;
+  line-height: 1.5;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-primary:hover { background: #1d4ed8; }
+.btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+.btn-secondary {
+  background: #e5e7eb;
+  color: #333;
+}
+.btn-secondary:hover { background: #d1d5db; }
+.btn-success {
+  background: #15803d;
+  color: #fff;
+}
+.btn-success:hover { background: #166534; }
+.choices-area {
+  margin-bottom: 16px;
+}
+.choices-area label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+  display: block;
+  margin-bottom: 10px;
+}
+.choices-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.choice-btn {
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  color: #333;
+}
+.choice-btn:hover {
+  border-color: #2563eb;
+  background: #f0f4ff;
+  color: #2563eb;
+}
+.choice-btn.correct {
+  border-color: #15803d;
+  background: #dcfce7;
+  color: #15803d;
+  cursor: default;
+}
+.choice-btn.incorrect {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: default;
+}
+.choice-btn.disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+.feedback {
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 16px;
+  display: none;
+}
+.feedback.correct {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  display: block;
+}
+.feedback.incorrect {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  display: block;
+}
+.feedback.reveal {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  display: block;
+}
+.feedback.gameover {
+  background: #f0f4ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  display: block;
+  text-align: center;
+  font-size: 16px;
+}
+.character-count {
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  margin-top: 16px;
+}
 </style>
 </head>
 <body>
-<div class="game-container" id="game">
-  <!-- Title Screen -->
-  <div class="screen" id="title-screen">
-    <div class="screen-icon">✝️</div>
-    <h2>Missionary Quest</h2>
-    <p>You are a missionary called to spread the Gospel across dangerous lands. Navigate through wilderness, convert villages, heal the sick, and survive bandits and wild beasts.</p>
-    <p style="font-size: 11px; color: #888;">⚡ Real-time roguelike • Permadeath • Procedural maps</p>
-    <p style="font-size: 10px; color: #555;">Hold direction buttons to move. Enemies move on their own!</p>
-    <div class="start-btn" id="start-btn">Begin Your Journey</div>
+<h1>⛪ Biblical Characters</h1>
+<p class="subtitle">Guess the character from the clues — fewer clues = higher score!</p>
+
+<div class="game-container">
+  <div class="score-bar">
+    <div>Score: <span id="score">0</span></div>
+    <div>Round: <span id="round">1</span> / 10</div>
+    <div>Streak: <span id="streak">0</span> 🔥</div>
   </div>
 
-  <!-- Game Over Screen -->
-  <div class="screen hidden" id="gameover-screen">
-    <div class="screen-icon">🕊️</div>
-    <h2 id="go-title">Your Journey Ends</h2>
-    <p id="go-message"></p>
-    <p id="go-stats"></p>
-    <div class="start-btn" id="restart-btn">New Mission</div>
+  <div class="clue-area">
+    <h3>Clues</h3>
+    <div id="clues-container"></div>
   </div>
 
-  <!-- Inventory Panel -->
-  <div class="inventory-panel hidden" id="inv-panel">
-    <h3>📜 Inventory & Stats</h3>
-    <div id="inv-list"></div>
-    <div class="inv-close" id="inv-close">Close</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="next-clue-btn" onclick="showNextClue()">Show Next Clue</button>
+    <button class="btn btn-success" id="new-round-btn" onclick="newRound()" style="display:none;">Next Character →</button>
   </div>
 
-  <!-- HUD -->
-  <div class="game-header">
-    <h1>✝️ Missionary Quest</h1>
-    <span class="rt-badge">LIVE</span>
+  <div class="choices-area">
+    <label>Choose your answer</label>
+    <div class="choices-grid" id="choices-grid"></div>
   </div>
 
-  <div class="stats-bar" id="stats-bar">
-    <div class="stat"><span class="stat-icon">❤️</span><span class="stat-val" id="hp">12</span></div>
-    <div class="stat"><span class="stat-icon">🍞</span><span class="stat-val" id="food">15</span></div>
-    <div class="stat"><span class="stat-icon">📖</span><span class="stat-val" id="scrolls">3</span></div>
-    <div class="stat"><span class="stat-icon">💊</span><span class="stat-val" id="medicine">2</span></div>
-    <div class="stat"><span class="stat-icon">⛪</span><span class="stat-val" id="converts">0</span></div>
-    <div class="stat"><span class="level-badge">Lv<span id="level-num">1</span> • F<span id="floor-num">1</span></span></div>
-  </div>
-
-  <div class="hp-bar-container">
-    <div class="hp-bar-bg"><div class="hp-bar-fill high" id="hp-bar"></div></div>
-  </div>
-
-  <!-- Map -->
-  <div class="map-container" id="map" style="grid-template-columns: repeat(11, 28px);"></div>
-
-  <!-- Log -->
-  <div class="log-area" id="log"></div>
-
-  <!-- Controls -->
-  <div class="controls" id="controls">
-    <div class="ctrl-btn" data-dir="nw">↖</div>
-    <div class="ctrl-btn" data-dir="n">⬆</div>
-    <div class="ctrl-btn" data-dir="ne">↗</div>
-    <div class="ctrl-btn" data-dir="w">⬅</div>
-    <div class="ctrl-btn center" data-dir="wait">🙏</div>
-    <div class="ctrl-btn" data-dir="e">➡</div>
-    <div class="ctrl-btn" data-dir="sw">↙</div>
-    <div class="ctrl-btn" data-dir="s">⬇</div>
-    <div class="ctrl-btn" data-dir="se">↘</div>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="action-bar">
-    <div class="action-btn" id="btn-inv">📜 Items</div>
-    <div class="action-btn" id="btn-heal">💊 Heal</div>
-    <div class="action-btn" id="btn-holy">💧 Holy Water</div>
-  </div>
+  <div class="feedback" id="feedback"></div>
+  <p class="character-count">20 characters in the game</p>
 </div>
 
 <script>
-const COLS = 11, ROWS = 11;
-const DIRS = { n:[0,-1], s:[0,1], e:[1,0], w:[-1,0], nw:[-1,-1], ne:[1,-1], sw:[-1,1], se:[1,1], wait:[0,0] };
-
-const PLAYER_MOVE_INTERVAL = 170;
-const ENEMY_MOVE_INTERVAL = 850;
-const FOOD_INTERVAL = 5500;
-
-let state = null;
-let gameLoop = null;
-let foodLoop = null;
-let heldDirection = null;
-let lastPlayerMove = 0;
-let isPaused = false;
-
-const ENEMIES = [
-  { name: 'Bandit', icon: '🗡️', hp: 3, atk: 2, xp: 5, speed: 1 },
-  { name: 'Wolf', icon: '🐺', hp: 2, atk: 1, xp: 3, speed: 1.5 },
-  { name: 'Snake', icon: '🐍', hp: 1, atk: 1, xp: 2, speed: 1.2 },
-  { name: 'Bear', icon: '🐻', hp: 5, atk: 3, xp: 8, speed: 0.6 },
-  { name: 'Raider', icon: '⚔️', hp: 4, atk: 2, xp: 6, speed: 1 },
-  { name: 'Scorpion', icon: '🦂', hp: 2, atk: 2, xp: 4, speed: 1.3 },
+const characters = [
+  {
+    name: "Moses",
+    clues: ["I was found in a basket on a river.", "I spoke to God through a burning bush.", "I parted a great sea.", "I received commandments on a mountain.", "I led my people out of Egypt."]
+  },
+  {
+    name: "David",
+    clues: ["I was the youngest of many brothers.", "I was a skilled musician who played the harp.", "I defeated a giant with a sling and a stone.", "I was anointed king by the prophet Samuel.", "I wrote many of the Psalms."]
+  },
+  {
+    name: "Noah",
+    clues: ["God told me to build something massive.", "I gathered animals two by two.", "I survived a great flood.", "A dove brought me an olive branch.", "A rainbow was God's promise to me."]
+  },
+  {
+    name: "Abraham",
+    clues: ["God told me to leave my homeland.", "I was promised descendants as numerous as the stars.", "I was willing to sacrifice my son.", "My wife laughed at an impossible promise.", "I am called the father of many nations."]
+  },
+  {
+    name: "Joseph",
+    clues: ["I had a coat of many colors.", "My brothers were jealous of me.", "I could interpret dreams.", "I was sold into slavery but rose to power.", "I became second-in-command in Egypt."]
+  },
+  {
+    name: "Samson",
+    clues: ["My strength was legendary.", "I killed a lion with my bare hands.", "A woman betrayed my secret.", "My power was connected to my hair.", "I destroyed a temple with my final act."]
+  },
+  {
+    name: "Daniel",
+    clues: ["I was taken captive to Babylon.", "I refused to eat the king's food.", "I interpreted writing on a wall.", "I was thrown into a den of lions.", "God shut the mouths of the beasts."]
+  },
+  {
+    name: "Esther",
+    clues: ["I was an orphan raised by my cousin.", "I won a royal beauty contest.", "I kept my heritage a secret.", "I risked my life to approach the king.", "I saved my people from destruction."]
+  },
+  {
+    name: "Ruth",
+    clues: ["I was a foreigner who chose loyalty.", "I said 'Where you go, I will go.'", "I gleaned grain in a field.", "I married a man named Boaz.", "I became an ancestor of King David."]
+  },
+  {
+    name: "Jonah",
+    clues: ["God told me to go to a wicked city.", "I ran away on a ship instead.", "A great storm came because of me.", "I was swallowed by a great fish.", "I spent three days in darkness."]
+  },
+  {
+    name: "Solomon",
+    clues: ["I asked God for wisdom instead of riches.", "I built a magnificent temple.", "I judged a case between two mothers.", "I wrote thousands of proverbs.", "I was the son of David."]
+  },
+  {
+    name: "Peter",
+    clues: ["I was a fisherman by trade.", "I walked on water briefly.", "I denied knowing my master three times.", "I was called 'the rock.'", "I preached on the day of Pentecost."]
+  },
+  {
+    name: "Paul",
+    clues: ["I once persecuted believers.", "I was blinded on a road.", "I wrote many letters to churches.", "I was shipwrecked multiple times.", "I was formerly known by a different name."]
+  },
+  {
+    name: "Mary",
+    clues: ["An angel appeared to me with a message.", "I was told not to be afraid.", "I pondered things in my heart.", "I was present at a crucifixion.", "I am the mother of Jesus."]
+  },
+  {
+    name: "Elijah",
+    clues: ["I challenged 450 false prophets.", "Fire came down from heaven at my prayer.", "I was fed by ravens.", "I ran faster than a chariot.", "I was taken to heaven in a whirlwind."]
+  },
+  {
+    name: "Jacob",
+    clues: ["I tricked my brother out of his birthright.", "I wrestled with a mysterious being all night.", "I had a dream about a ladder to heaven.", "I worked 14 years to marry the woman I loved.", "I was renamed Israel."]
+  },
+  {
+    name: "Rahab",
+    clues: ["I lived in a city with great walls.", "I hid spies on my rooftop.", "I hung a scarlet cord from my window.", "My city was destroyed but I was spared.", "I am listed in the lineage of Jesus."]
+  },
+  {
+    name: "Gideon",
+    clues: ["An angel called me a mighty warrior.", "I put out a fleece to test God.", "I started with 32,000 soldiers.", "God reduced my army to just 300.", "We used torches and trumpets to win a battle."]
+  },
+  {
+    name: "Joshua",
+    clues: ["I was Moses' assistant.", "I was one of twelve spies sent to scout a land.", "I led my people across the Jordan River.", "I commanded the sun to stand still.", "I brought down the walls of Jericho."]
+  },
+  {
+    name: "Sarah",
+    clues: ["I laughed at a promise from God.", "I was very beautiful even in old age.", "I gave my servant to my husband.", "I became a mother at age 90.", "My son's name means 'laughter.'"]
+  }
 ];
 
-const ITEMS = [
-  { name: 'Bread', icon: '🍞', type: 'food', val: 3 },
-  { name: 'Fish', icon: '🐟', type: 'food', val: 2 },
-  { name: 'Scripture Scroll', icon: '📜', type: 'scroll', val: 1 },
-  { name: 'Medicine Herb', icon: '🌿', type: 'medicine', val: 1 },
-  { name: 'Holy Water', icon: '💧', type: 'holywater', val: 1 },
-  { name: 'Cross Amulet', icon: '✝️', type: 'amulet', val: 2 },
-  { name: 'Golden Chalice', icon: '🏆', type: 'xp', val: 5 },
-];
+let currentCharacter = null;
+let currentClueIndex = 0;
+let score = 0;
+let round = 1;
+let streak = 0;
+let usedIndices = [];
+let roundOver = false;
+let choices = [];
 
-function rng(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function pick(arr) { return arr[rng(0, arr.length - 1)]; }
-
-function initState() {
-  state = {
-    hp: 12, maxHp: 12, food: 15, scrolls: 3, medicine: 2,
-    converts: 0, floor: 1, xp: 0, level: 1, holyWater: 1,
-    map: [], entities: [], items: [],
-    px: 5, py: 5, gameOver: false, logs: [],
-    visited: Array(ROWS).fill(null).map(() => Array(COLS).fill(false)),
-    damageFlash: false
-  };
-  generateMap();
-  revealAround(state.px, state.py);
-  addLog('You arrive in a new land. Spread the Word!', 'special');
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
-function generateMap() {
-  state.map = [];
-  state.entities = [];
-  state.items = [];
-  state.visited = Array(ROWS).fill(null).map(() => Array(COLS).fill(false));
-
-  for (let y = 0; y < ROWS; y++) {
-    state.map[y] = [];
-    for (let x = 0; x < COLS; x++) {
-      state.map[y][x] = Math.random() < 0.18 ? 'wall' : 'floor';
-    }
-  }
-
-  state.px = 5; state.py = 5;
-  state.map[5][5] = 'floor';
-  for (let dy = -1; dy <= 1; dy++)
-    for (let dx = -1; dx <= 1; dx++)
-      if (state.map[5+dy] && state.map[5+dy][5+dx] !== undefined)
-        state.map[5+dy][5+dx] = 'floor';
-
-  // Exit
-  let ex, ey;
-  do { ex = rng(0, COLS-1); ey = rng(0, ROWS-1); }
-  while ((Math.abs(ex-5) + Math.abs(ey-5)) < 5 || state.map[ey][ex] === 'wall');
-  state.map[ey][ex] = 'exit';
-
-  // Villages
-  for (let i = 0; i < rng(2, 3); i++) {
-    let vx, vy;
-    do { vx = rng(0, COLS-1); vy = rng(0, ROWS-1); }
-    while (state.map[vy][vx] !== 'floor' || (vx === 5 && vy === 5));
-    state.map[vy][vx] = 'village';
-  }
-
-  // Shrine
-  if (Math.random() < 0.5) {
-    let sx, sy;
-    do { sx = rng(0, COLS-1); sy = rng(0, ROWS-1); }
-    while (state.map[sy][sx] !== 'floor' || (sx === 5 && sy === 5));
-    state.map[sy][sx] = 'shrine';
-  }
-
-  // Water
-  for (let i = 0; i < rng(2, 3); i++) {
-    let wx, wy;
-    do { wx = rng(0, COLS-1); wy = rng(0, ROWS-1); }
-    while (state.map[wy][wx] !== 'floor' || (wx === 5 && wy === 5));
-    state.map[wy][wx] = 'water';
-  }
-
-  // Enemies
-  let numEnemies = rng(3, 5) + Math.floor(state.floor * 0.5);
-  for (let i = 0; i < numEnemies; i++) {
-    let ex2, ey2;
-    do { ex2 = rng(0, COLS-1); ey2 = rng(0, ROWS-1); }
-    while (state.map[ey2][ex2] !== 'floor' || (Math.abs(ex2-5) + Math.abs(ey2-5)) < 3 || state.entities.find(e => e.x === ex2 && e.y === ey2));
-    let template = pick(ENEMIES);
-    let scaledHp = template.hp + Math.floor(state.floor * 0.5);
-    let scaledAtk = template.atk + Math.floor(state.floor * 0.3);
-    state.entities.push({ ...template, x: ex2, y: ey2, hp: scaledHp, maxHp: scaledHp, atk: scaledAtk, lastMove: 0 });
-  }
-
-  // Items
-  for (let i = 0; i < rng(4, 6); i++) {
-    let ix, iy;
-    do { ix = rng(0, COLS-1); iy = rng(0, ROWS-1); }
-    while (state.map[iy][ix] !== 'floor' || (ix === 5 && iy === 5) || state.items.find(it => it.x === ix && it.y === iy));
-    state.items.push({ ...pick(ITEMS), x: ix, y: iy });
-  }
+function getRandomChoices(correctName) {
+  let options = characters.map(c => c.name).filter(n => n !== correctName);
+  shuffle(options);
+  let selected = options.slice(0, 3);
+  selected.push(correctName);
+  shuffle(selected);
+  return selected;
 }
 
-function revealAround(px, py) {
-  for (let dy = -2; dy <= 2; dy++)
-    for (let dx = -2; dx <= 2; dx++) {
-      let ny = py + dy, nx = px + dx;
-      if (ny >= 0 && ny < ROWS && nx >= 0 && nx < COLS)
-        state.visited[ny][nx] = true;
-    }
+function startGame() {
+  usedIndices = [];
+  score = 0;
+  round = 1;
+  streak = 0;
+  updateDisplay();
+  loadCharacter();
 }
 
-function addLog(msg, type) {
-  state.logs.unshift({ msg, type });
-  if (state.logs.length > 20) state.logs.pop();
+function loadCharacter() {
+  if (usedIndices.length >= characters.length) {
+    usedIndices = [];
+  }
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * characters.length);
+  } while (usedIndices.includes(idx));
+  usedIndices.push(idx);
+
+  currentCharacter = characters[idx];
+  currentClueIndex = 0;
+  roundOver = false;
+
+  choices = getRandomChoices(currentCharacter.name);
+
+  document.getElementById('clues-container').innerHTML = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('next-clue-btn').style.display = 'inline-block';
+  document.getElementById('next-clue-btn').disabled = false;
+  document.getElementById('new-round-btn').style.display = 'none';
+
+  renderChoices();
+  showNextClue();
 }
 
-function tryMovePlayer(dx, dy) {
-  if (state.gameOver || isPaused) return;
-  let now = performance.now();
-  if (now - lastPlayerMove < PLAYER_MOVE_INTERVAL) return;
-  lastPlayerMove = now;
-
-  if (dx === 0 && dy === 0) {
-    if (Math.random() < 0.15) {
-      state.hp = Math.min(state.maxHp, state.hp + 1);
-      addLog('Prayer restores you. +1 HP 🙏', 'good');
-    }
-    render();
-    return;
-  }
-
-  let nx = state.px + dx, ny = state.py + dy;
-  if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) return;
-  if (state.map[ny][nx] === 'wall') return;
-
-  // Enemy = attack
-  let enemy = state.entities.find(e => e.x === nx && e.y === ny && e.hp > 0);
-  if (enemy) {
-    let dmg = rng(2, 4) + Math.floor(state.level * 0.5);
-    enemy.hp -= dmg;
-    addLog(`⚔️ Strike ${enemy.name} for ${dmg}!`, 'info');
-    if (enemy.hp <= 0) {
-      addLog(`💀 ${enemy.name} defeated! +${enemy.xp} XP`, 'good');
-      state.xp += enemy.xp;
-      state.entities = state.entities.filter(e => e !== enemy);
-      checkLevelUp();
-    }
-    render();
-    return;
-  }
-
-  state.px = nx; state.py = ny;
-  revealAround(nx, ny);
-
-  let tile = state.map[ny][nx];
-  if (tile === 'village') {
-    if (state.scrolls > 0) {
-      state.scrolls--;
-      let gained = rng(2, 5);
-      state.converts += gained;
-      state.map[ny][nx] = 'floor';
-      addLog(`📖 Shared the Gospel! +${gained} souls! ⛪`, 'special');
-    } else {
-      addLog('A village, but no scrolls...', 'bad');
-    }
-  } else if (tile === 'shrine') {
-    state.hp = state.maxHp;
-    state.map[ny][nx] = 'floor';
-    addLog('✨ Holy shrine! Fully restored!', 'special');
-  } else if (tile === 'exit') {
-    state.floor++;
-    addLog(`🚪 Entering Floor ${state.floor}...`, 'special');
-    generateMap();
-    revealAround(state.px, state.py);
-  }
-
-  let item = state.items.find(it => it.x === nx && it.y === ny);
-  if (item) {
-    if (item.type === 'food') { state.food += item.val; addLog(`🍞 +${item.val} food`, 'good'); }
-    else if (item.type === 'scroll') { state.scrolls += item.val; addLog(`📜 +${item.val} scroll`, 'good'); }
-    else if (item.type === 'medicine') { state.medicine += item.val; addLog(`🌿 +${item.val} medicine`, 'good'); }
-    else if (item.type === 'holywater') { state.holyWater++; addLog(`💧 +1 Holy Water`, 'good'); }
-    else if (item.type === 'amulet') { state.maxHp += item.val; state.hp += item.val; addLog(`✝️ Max HP +${item.val}!`, 'special'); }
-    else if (item.type === 'xp') { state.xp += item.val; addLog(`🏆 +${item.val} XP!`, 'good'); checkLevelUp(); }
-    state.items = state.items.filter(it => it !== item);
-  }
-
-  render();
-}
-
-function enemyTick(now) {
-  if (state.gameOver || isPaused) return;
-  state.entities.forEach(e => {
-    if (e.hp <= 0) return;
-    let interval = ENEMY_MOVE_INTERVAL / e.speed;
-    if (now - (e.lastMove || 0) < interval) return;
-    e.lastMove = now;
-
-    let dist = Math.abs(e.x - state.px) + Math.abs(e.y - state.py);
-    if (dist <= 4) {
-      let dx = Math.sign(state.px - e.x);
-      let dy = Math.sign(state.py - e.y);
-      if (Math.random() < 0.15) { dx = rng(-1,1); dy = rng(-1,1); }
-      let nx = e.x + dx, ny = e.y + dy;
-
-      if (nx === state.px && ny === state.py) {
-        let dmg = rng(1, e.atk);
-        state.hp -= dmg;
-        state.damageFlash = true;
-        setTimeout(() => { state.damageFlash = false; }, 200);
-        addLog(`${e.icon} ${e.name} hits you for ${dmg}!`, 'bad');
-        checkDeath();
-      } else if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS && state.map[ny][nx] !== 'wall' && state.map[ny][nx] !== 'water' && !state.entities.find(o => o.x === nx && o.y === ny && o !== e)) {
-        e.x = nx; e.y = ny;
-      }
-    } else if (dist <= 6) {
-      let dx = rng(-1, 1), dy = rng(-1, 1);
-      let nx = e.x + dx, ny = e.y + dy;
-      if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS && state.map[ny][nx] === 'floor' && !state.entities.find(o => o.x === nx && o.y === ny && o !== e)) {
-        e.x = nx; e.y = ny;
-      }
-    }
+function renderChoices() {
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  choices.forEach(function(name) {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = name;
+    btn.onclick = function() { selectChoice(name, btn); };
+    grid.appendChild(btn);
   });
 }
 
-function foodTick() {
-  if (state.gameOver || isPaused) return;
-  state.food--;
-  if (state.food <= 0) {
-    state.food = 0;
-    state.hp -= 2;
-    addLog('⚠️ Starving! -2 HP!', 'bad');
-    checkDeath();
-  }
-  render();
-}
+function selectChoice(name, btn) {
+  if (roundOver) return;
 
-function checkDeath() {
-  if (state.hp <= 0 && !state.gameOver) {
-    state.gameOver = true;
-    state.hp = 0;
-    stopLoops();
-    document.getElementById('go-message').textContent = `You fell on Floor ${state.floor}.`;
-    document.getElementById('go-stats').textContent = `Souls converted: ${state.converts} | Level: ${state.level} | Floors: ${state.floor - 1}`;
-    document.getElementById('gameover-screen').classList.remove('hidden');
-    render();
-  }
-}
+  const feedback = document.getElementById('feedback');
+  const allBtns = document.querySelectorAll('.choice-btn');
 
-function checkLevelUp() {
-  let needed = state.level * 12;
-  if (state.xp >= needed) {
-    state.level++;
-    state.xp -= needed;
-    state.maxHp += 3;
-    state.hp = Math.min(state.hp + 5, state.maxHp);
-    addLog(`🌟 Level ${state.level}! HP increased!`, 'special');
-  }
-}
-
-function useMedicine() {
-  if (state.gameOver) return;
-  if (state.medicine > 0 && state.hp < state.maxHp) {
-    state.medicine--;
-    let heal = rng(4, 7);
-    state.hp = Math.min(state.maxHp, state.hp + heal);
-    addLog(`💊 Healed +${heal} HP`, 'good');
-    render();
-  } else if (state.hp >= state.maxHp) {
-    addLog('Already full health.', 'info'); render();
+  if (name === currentCharacter.name) {
+    const points = Math.max(1, 6 - currentClueIndex) * 10;
+    score += points;
+    streak++;
+    btn.classList.add('correct');
+    feedback.className = 'feedback correct';
+    feedback.textContent = '✅ Correct! It was ' + currentCharacter.name + '! +' + points + ' points';
+    feedback.style.display = 'block';
+    allBtns.forEach(function(b) {
+      if (b !== btn) b.classList.add('disabled');
+    });
+    endRound();
   } else {
-    addLog('No medicine!', 'bad'); render();
+    btn.classList.add('incorrect');
+    btn.classList.add('disabled');
+    btn.onclick = null;
+    streak = 0;
+    feedback.className = 'feedback incorrect';
+    feedback.textContent = '❌ Not ' + name + '! Try again or reveal another clue.';
+    feedback.style.display = 'block';
+  }
+  updateDisplay();
+}
+
+function showNextClue() {
+  if (roundOver) return;
+  if (currentClueIndex >= currentCharacter.clues.length) {
+    document.getElementById('next-clue-btn').disabled = true;
+    return;
+  }
+  const container = document.getElementById('clues-container');
+  const div = document.createElement('div');
+  div.className = 'clue-item';
+  div.textContent = (currentClueIndex + 1) + ". " + currentCharacter.clues[currentClueIndex];
+  container.appendChild(div);
+  currentClueIndex++;
+
+  if (currentClueIndex >= currentCharacter.clues.length) {
+    document.getElementById('next-clue-btn').disabled = true;
   }
 }
 
-function useHolyWater() {
-  if (state.gameOver) return;
-  if (state.holyWater > 0) {
-    state.holyWater--;
-    let killed = 0;
-    state.entities.forEach(e => { e.hp -= 5; });
-    state.entities = state.entities.filter(e => { if (e.hp <= 0) { killed++; state.xp += e.xp; return false; } return true; });
-    addLog(`💧 Holy Water! ${killed} enemies smited!`, 'special');
-    checkLevelUp();
-    render();
-  } else {
-    addLog('No Holy Water!', 'bad'); render();
-  }
-}
+function endRound() {
+  roundOver = true;
+  document.getElementById('next-clue-btn').style.display = 'none';
+  document.getElementById('new-round-btn').style.display = 'inline-block';
 
-function render() {
-  if (!state) return;
-  document.getElementById('hp').textContent = state.hp;
-  document.getElementById('food').textContent = state.food;
-  document.getElementById('scrolls').textContent = state.scrolls;
-  document.getElementById('medicine').textContent = state.medicine;
-  document.getElementById('converts').textContent = state.converts;
-  document.getElementById('floor-num').textContent = state.floor;
-  document.getElementById('level-num').textContent = state.level;
-
-  // HP bar
-  let hpPct = (state.hp / state.maxHp) * 100;
-  let hpBar = document.getElementById('hp-bar');
-  hpBar.style.width = hpPct + '%';
-  hpBar.className = 'hp-bar-fill ' + (hpPct > 60 ? 'high' : hpPct > 30 ? 'mid' : 'low');
-
-  // Map
-  let mapEl = document.getElementById('map');
-  mapEl.innerHTML = '';
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      let div = document.createElement('div');
-      div.className = 'tile';
-
-      if (!state.visited[y][x]) {
-        div.classList.add('t-fog');
-      } else if (x === state.px && y === state.py) {
-        div.classList.add('t-player');
-        if (state.damageFlash) div.classList.add('damage-flash');
-        div.textContent = '⛪';
-      } else {
-        let entity = state.entities.find(e => e.x === x && e.y === y && e.hp > 0);
-        let item = state.items.find(it => it.x === x && it.y === y);
-
-        if (entity) {
-          div.classList.add('t-enemy');
-          div.textContent = entity.icon;
-          // Enemy HP bar
-          let ehpBar = document.createElement('div');
-          ehpBar.className = 'enemy-hp-bar';
-          let ehpFill = document.createElement('div');
-          ehpFill.className = 'enemy-hp-fill';
-          ehpFill.style.width = ((entity.hp / entity.maxHp) * 100) + '%';
-          ehpBar.appendChild(ehpFill);
-          div.appendChild(ehpBar);
-        } else if (item) {
-          div.classList.add('t-item');
-          div.textContent = item.icon;
-        } else {
-          let tile = state.map[y][x];
-          switch(tile) {
-            case 'wall': div.classList.add('t-wall'); div.textContent = '🪨'; break;
-            case 'floor': div.classList.add('t-floor'); div.textContent = '·'; break;
-            case 'village': div.classList.add('t-village'); div.textContent = '🏘️'; break;
-            case 'exit': div.classList.add('t-exit'); div.textContent = '🚪'; break;
-            case 'shrine': div.classList.add('t-shrine'); div.textContent = '⛩️'; break;
-            case 'water': div.classList.add('t-water'); div.textContent = '🌊'; break;
-            default: div.classList.add('t-floor'); div.textContent = '·';
-          }
-        }
-      }
-      mapEl.appendChild(div);
+  // Highlight correct answer
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(function(b) {
+    if (b.textContent === currentCharacter.name) {
+      b.classList.add('correct');
     }
+    b.classList.add('disabled');
+  });
+}
+
+function newRound() {
+  round++;
+  if (round > 10) {
+    const feedback = document.getElementById('feedback');
+    feedback.className = 'feedback gameover';
+    feedback.textContent = '🎉 Game Over! Final Score: ' + score + ' / 500 points! Refresh to play again.';
+    feedback.style.display = 'block';
+    document.getElementById('new-round-btn').style.display = 'none';
+    document.getElementById('choices-grid').innerHTML = '';
+    return;
   }
-
-  let logEl = document.getElementById('log');
-  logEl.innerHTML = state.logs.slice(0, 5).map(l => `<p class="log-${l.type}">${l.msg}</p>`).join('');
+  updateDisplay();
+  loadCharacter();
 }
 
-// Game loop
-function mainLoop(now) {
-  if (state && !state.gameOver && !isPaused) {
-    if (heldDirection) {
-      let [dx, dy] = DIRS[heldDirection];
-      tryMovePlayer(dx, dy);
-    }
-    enemyTick(now);
-    render();
-  }
-  gameLoop = requestAnimationFrame(mainLoop);
+function updateDisplay() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('round').textContent = round;
+  document.getElementById('streak').textContent = streak;
 }
 
-function startLoops() {
-  gameLoop = requestAnimationFrame(mainLoop);
-  foodLoop = setInterval(foodTick, FOOD_INTERVAL);
-}
-
-function stopLoops() {
-  if (gameLoop) cancelAnimationFrame(gameLoop);
-  if (foodLoop) clearInterval(foodLoop);
-  gameLoop = null; foodLoop = null;
-}
-
-// Controls
-let activeBtn = null;
-function startHold(dir, btn) {
-  heldDirection = dir;
-  activeBtn = btn;
-  if (btn) btn.classList.add('held');
-  let [dx, dy] = DIRS[dir];
-  lastPlayerMove = 0;
-  tryMovePlayer(dx, dy);
-}
-function stopHold() {
-  heldDirection = null;
-  if (activeBtn) activeBtn.classList.remove('held');
-  activeBtn = null;
-}
-
-document.getElementById('controls').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  let btn = e.target.closest('.ctrl-btn');
-  if (!btn) return;
-  startHold(btn.dataset.dir, btn);
-});
-document.getElementById('controls').addEventListener('touchend', (e) => { e.preventDefault(); stopHold(); });
-document.getElementById('controls').addEventListener('touchcancel', () => { stopHold(); });
-document.getElementById('controls').addEventListener('mousedown', (e) => {
-  let btn = e.target.closest('.ctrl-btn');
-  if (!btn) return;
-  startHold(btn.dataset.dir, btn);
-});
-document.addEventListener('mouseup', () => { stopHold(); });
-
-// Keyboard
-let keysHeld = new Set();
-const KEY_MAP = { 'ArrowUp':'n','ArrowDown':'s','ArrowLeft':'w','ArrowRight':'e','w':'n','s':'s','a':'w','d':'e','q':'nw','e':'ne','z':'sw','c':'se',' ':'wait' };
-document.addEventListener('keydown', (e) => {
-  if (state && !state.gameOver && KEY_MAP[e.key]) {
-    e.preventDefault();
-    if (!keysHeld.has(e.key)) { keysHeld.add(e.key); heldDirection = KEY_MAP[e.key]; lastPlayerMove = 0; let [dx,dy] = DIRS[heldDirection]; tryMovePlayer(dx,dy); }
-  }
-});
-document.addEventListener('keyup', (e) => {
-  keysHeld.delete(e.key);
-  if (keysHeld.size === 0) heldDirection = null;
-  else { let last = [...keysHeld].pop(); if (KEY_MAP[last]) heldDirection = KEY_MAP[last]; }
-});
-
-// Swipe on map
-let touchStartX=0, touchStartY=0, swiping=false;
-document.getElementById('map').addEventListener('touchstart', (e) => { touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY; swiping=true; });
-document.getElementById('map').addEventListener('touchmove', (e) => {
-  if (!swiping) return; e.preventDefault();
-  let dx=e.touches[0].clientX-touchStartX, dy=e.touches[0].clientY-touchStartY, t=25;
-  if (Math.abs(dx)>t||Math.abs(dy)>t) { tryMovePlayer(Math.abs(dx)>t?Math.sign(dx):0, Math.abs(dy)>t?Math.sign(dy):0); touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY; }
-});
-document.getElementById('map').addEventListener('touchend', () => { swiping=false; });
-
-// Buttons
-document.getElementById('start-btn').addEventListener('click', () => { document.getElementById('title-screen').classList.add('hidden'); initState(); render(); startLoops(); });
-document.getElementById('restart-btn').addEventListener('click', () => { document.getElementById('gameover-screen').classList.add('hidden'); initState(); render(); startLoops(); });
-document.getElementById('btn-heal').addEventListener('click', useMedicine);
-document.getElementById('btn-holy').addEventListener('click', useHolyWater);
-document.getElementById('btn-inv').addEventListener('click', () => {
-  isPaused = true;
-  let panel = document.getElementById('inv-panel');
-  let list = document.getElementById('inv-list');
-  list.innerHTML = `
-    <div class="inv-item"><span>❤️ Health</span><span>${state.hp}/${state.maxHp}</span></div>
-    <div class="inv-item"><span>📖 Scripture Scrolls</span><span>${state.scrolls}</span></div>
-    <div class="inv-item"><span>💊 Medicine</span><span>${state.medicine}</span></div>
-    <div class="inv-item"><span>💧 Holy Water</span><span>${state.holyWater}</span></div>
-    <div class="inv-item"><span>🍞 Food</span><span>${state.food}</span></div>
-    <div class="inv-item"><span>⭐ XP</span><span>${state.xp}/${state.level*12}</span></div>
-    <div class="inv-item"><span>⚔️ Level</span><span>${state.level}</span></div>
-    <div class="inv-item"><span>⛪ Converts</span><span>${state.converts}</span></div>
-    <div class="inv-item"><span>🏔️ Floor</span><span>${state.floor}</span></div>
-  `;
-  panel.classList.remove('hidden');
-});
-document.getElementById('inv-close').addEventListener('click', () => { document.getElementById('inv-panel').classList.add('hidden'); isPaused = false; });
+startGame();
 </script>
 </body>
 </html>
