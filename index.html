@@ -1023,60 +1023,137 @@ function isWall(px,py,size){
   return false;
 }
 
+
 // ===== JOYSTICK =====
 let joystickActive=false,joystickX=0,joystickY=0;
+let joystickTouchId=null;
+
 const joystickArea=document.getElementById('joystick-area');
 const joystickKnob=document.getElementById('joystick-knob');
 
+function getTouchById(touches,id){
+  for(const t of touches){
+    if(t.identifier===id) return t;
+  }
+  return null;
+}
+
 function joyStart(e){
+  const touch=e.changedTouches[0];
+
+  // Only left side of screen
+  if(touch.clientX > window.innerWidth * 0.5) return;
+
   e.preventDefault();
+
+  joystickTouchId=touch.identifier;
   joystickActive=true;
 
-  const touch=e.touches?e.touches[0]:e;
-
-  // Move joystick base to wherever user touches on left side
-  const controls=document.getElementById('controls');
-  const base=document.getElementById('joystick-base');
-
-  const x=touch.clientX;
-  const y=touch.clientY;
-
   joystickArea.style.position='fixed';
-  joystickArea.style.left=(x-60)+'px';
-  joystickArea.style.top=(y-60)+'px';
+  joystickArea.style.left=(touch.clientX-60)+'px';
+  joystickArea.style.top=(touch.clientY-60)+'px';
 
   joystickKnob.classList.add('active');
 
-  joyMove(e);
+  updateJoystickPosition(touch);
 }
 
-function joyMove(e){if(!joystickActive)return;e.preventDefault();const touch=e.touches?e.touches[0]:e;const rect=joystickArea.getBoundingClientRect();let dx=touch.clientX-(rect.left+rect.width/2),dy=touch.clientY-(rect.top+rect.height/2);const dist=Math.sqrt(dx*dx+dy*dy),max=45;if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}joystickKnob.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;joystickX=dx/max;joystickY=dy/max;}
+function updateJoystickPosition(touch){
+  const rect=joystickArea.getBoundingClientRect();
+
+  let dx=touch.clientX-(rect.left+rect.width/2);
+  let dy=touch.clientY-(rect.top+rect.height/2);
+
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const max=45;
+
+  if(dist>max){
+    dx=dx/dist*max;
+    dy=dy/dist*max;
+  }
+
+  joystickKnob.style.transform=
+    `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+  joystickX=dx/max;
+  joystickY=dy/max;
+}
+
+function joyMove(e){
+  if(!joystickActive) return;
+
+  const touch=getTouchById(e.touches, joystickTouchId);
+
+  if(!touch) return;
+
+  e.preventDefault();
+
+  updateJoystickPosition(touch);
+}
 
 function joyEnd(e){
+  const ended=getTouchById(e.changedTouches, joystickTouchId);
+
+  if(!ended) return;
+
   e.preventDefault();
 
   joystickActive=false;
+  joystickTouchId=null;
+
   joystickX=0;
   joystickY=0;
 
   joystickKnob.style.transform='translate(-50%,-50%)';
   joystickKnob.classList.remove('active');
 
-  // Return joystick to default position
-  joystickArea.style.left='';
+  joystickArea.style.left='20px';
   joystickArea.style.top='';
+  joystickArea.style.bottom='20px';
 }
 
+document.addEventListener('touchstart', joyStart, {passive:false});
+document.addEventListener('touchmove', joyMove, {passive:false});
+document.addEventListener('touchend', joyEnd, {passive:false});
+document.addEventListener('touchcancel', joyEnd, {passive:false});
 
-document.addEventListener('touchstart',(e)=>{
-  const touch=e.touches[0];
+// Desktop mouse controls
+joystickArea.addEventListener('mousedown',(e)=>{
+  joystickActive=true;
+  joystickKnob.classList.add('active');
+});
 
-  if(touch.clientX < window.innerWidth * 0.5){
-    joyStart(e);
+document.addEventListener('mousemove',(e)=>{
+  if(!joystickActive) return;
+
+  const rect=joystickArea.getBoundingClientRect();
+
+  let dx=e.clientX-(rect.left+rect.width/2);
+  let dy=e.clientY-(rect.top+rect.height/2);
+
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const max=45;
+
+  if(dist>max){
+    dx=dx/dist*max;
+    dy=dy/dist*max;
   }
-},{passive:false});
-joystickArea.addEventListener('touchmove',joyMove,{passive:false});joystickArea.addEventListener('touchend',joyEnd,{passive:false});
-joystickArea.addEventListener('mousedown',joyStart);document.addEventListener('mousemove',joyMove);document.addEventListener('mouseup',joyEnd);
+
+  joystickKnob.style.transform=
+    `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+  joystickX=dx/max;
+  joystickY=dy/max;
+});
+
+document.addEventListener('mouseup',()=>{
+  joystickActive=false;
+  joystickX=0;
+  joystickY=0;
+  joystickKnob.style.transform='translate(-50%,-50%)';
+  joystickKnob.classList.remove('active');
+});
+
 
 // ===== BUTTONS =====
 let attackPressed=false,skillPressed=false,dodgePressed=false;
