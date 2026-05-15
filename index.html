@@ -560,6 +560,24 @@ html, body {
 <body>
 <div id="game-container">
 
+<div id="version-badge" style="
+position:fixed;
+top:12px;
+right:12px;
+z-index:99999;
+background:#ff4757;
+color:white;
+padding:8px 14px;
+border-radius:12px;
+font-size:20px;
+font-weight:bold;
+font-family:sans-serif;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+">
+v7
+</div>
+
+
 <div id="version-label" style="
 position:absolute;
 top:10px;
@@ -573,7 +591,7 @@ padding:4px 8px;
 border-radius:8px;
 backdrop-filter:blur(4px);
 ">
-v4
+v7
 </div>
 
   <canvas id="game-canvas"></canvas>
@@ -618,7 +636,32 @@ z-index:20;
 <div style="width:48px;height:48px;border:2px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(0,0,0,0.5);"></div>
 </div>
 
-<div id="controls">
+<div id="controls" style="
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+height:240px;
+pointer-events:none;
+z-index:50;
+">
+
+<div id="left-controls" style="
+position:absolute;
+left:0;
+bottom:0;
+width:50%;
+height:100%;
+pointer-events:none;
+"></div>
+
+<div id="right-controls-wrapper" style="
+position:absolute;
+right:20px;
+bottom:20px;
+pointer-events:auto;
+z-index:60;
+">
 
     <div id="joystick-area">
       <div id="joystick-base">
@@ -630,7 +673,7 @@ z-index:20;
       <div class="action-btn" id="attack-btn">⚔️<div class="cd-overlay"></div></div>
       <div class="action-btn" id="dodge-btn">💨<div class="cd-overlay"></div></div>
     </div>
-  </div>
+  </div></div>
 
   <div id="message"></div>
   <div id="level-msg"></div>
@@ -1051,6 +1094,12 @@ const joystickArea=document.getElementById('joystick-area');
 joystickArea.style.position='fixed';
 joystickArea.style.left='20px';
 joystickArea.style.bottom='140px';
+joystickArea.style.zIndex='55';
+joystickArea.style.pointerEvents='auto';
+
+joystickArea.style.position='fixed';
+joystickArea.style.left='20px';
+joystickArea.style.bottom='140px';
 joystickArea.style.zIndex='15';
 const joystickKnob=document.getElementById('joystick-knob');
 
@@ -1076,7 +1125,9 @@ function joyStart(e){
     joystickArea.style.bottom='auto';
 
     joystickArea.style.transform =
-      `translate(${touch.clientX-60}px, ${touch.clientY-60}px)`;
+      'translate3d(' +
+      (touch.clientX-20) + 'px,' +
+      (touch.clientY-200) + 'px,0px)';
 
     joystickKnob.classList.add('active');
 
@@ -1143,7 +1194,7 @@ function joyEnd(e){
       joystickArea.style.left='20px';
       joystickArea.style.bottom='140px';
       joystickArea.style.top='auto';
-      joystickArea.style.transform='translate(0px,0px)';
+      joystickArea.style.transform='translate3d(0px,0px,0px)';
 
       break;
     }
