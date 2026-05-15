@@ -899,6 +899,7 @@ function initGame() {
       dodgeCooldown:0, dodging:0,
       statusEffects:[], perks:[], allies:[],
       trail: [], // motion trail
+      inventory:[null,null,null],
     },
     map:[], enemies:[], items:[], particles:[], projectiles:[], slashEffects:[], traps:[],
     ambientParticles: [],
@@ -920,6 +921,16 @@ function getBiomeColors(){
   };
   return biomeColors[game.biome]||biomeColors.forest;
 }
+
+
+// ===== TREE TYPES =====
+const TREE_TYPES = [
+  { trunk:'#5c3b22', leaves:'#2f7d32', size:1.0 },
+  { trunk:'#4a2f1a', leaves:'#3f9b3f', size:1.3 },
+  { trunk:'#6b4423', leaves:'#1f5f2a', size:0.9 },
+  { trunk:'#704214', leaves:'#4caf50', size:1.15 },
+  { trunk:'#3e2723', leaves:'#66bb6a', size:0.8 }
+];
 
 // ===== MAP GENERATION =====
 function generateMap() {
@@ -950,7 +961,18 @@ function generateMap() {
   const ponds=2+Math.floor(Math.random()*3);
   for(let p=0;p<ponds;p++){const px=5+Math.floor(Math.random()*(MAP_W-10)),py=5+Math.floor(Math.random()*(MAP_H-10)),pr=2+Math.floor(Math.random()*2);for(let y=py-pr;y<=py+pr;y++)for(let x=px-pr;x<=px+pr;x++){if(y>0&&y<MAP_H-1&&x>0&&x<MAP_W-1&&Math.sqrt((x-px)**2+(y-py)**2)<=pr&&map[y][x]!==2)map[y][x]=3;}}
 
-  for(let y=1;y<MAP_H-1;y++)for(let x=1;x<MAP_W-1;x++){if(map[y][x]===0&&Math.random()<0.03)map[y][x]=4;}
+  
+for(let y=1;y<MAP_H-1;y++){
+  for(let x=1;x<MAP_W-1;x++){
+    if(map[y][x]===0&&Math.random()<0.03){
+      map[y][x]={
+        type:4,
+        treeType:Math.floor(Math.random()*TREE_TYPES.length)
+      };
+    }
+  }
+}
+
 
   game.player.x=rooms[0].cx*TILE; game.player.y=rooms[0].cy*TILE;
   const lastRoom=rooms[rooms.length-1]; game.stairsX=lastRoom.cx; game.stairsY=lastRoom.cy; map[game.stairsY][game.stairsX]=5;
@@ -1005,10 +1027,55 @@ function isWall(px,py,size){
 let joystickActive=false,joystickX=0,joystickY=0;
 const joystickArea=document.getElementById('joystick-area');
 const joystickKnob=document.getElementById('joystick-knob');
-function joyStart(e){e.preventDefault();joystickActive=true;joystickKnob.classList.add('active');joyMove(e);}
+
+function joyStart(e){
+  e.preventDefault();
+  joystickActive=true;
+
+  const touch=e.touches?e.touches[0]:e;
+
+  // Move joystick base to wherever user touches on left side
+  const controls=document.getElementById('controls');
+  const base=document.getElementById('joystick-base');
+
+  const x=touch.clientX;
+  const y=touch.clientY;
+
+  joystickArea.style.position='fixed';
+  joystickArea.style.left=(x-60)+'px';
+  joystickArea.style.top=(y-60)+'px';
+
+  joystickKnob.classList.add('active');
+
+  joyMove(e);
+}
+
 function joyMove(e){if(!joystickActive)return;e.preventDefault();const touch=e.touches?e.touches[0]:e;const rect=joystickArea.getBoundingClientRect();let dx=touch.clientX-(rect.left+rect.width/2),dy=touch.clientY-(rect.top+rect.height/2);const dist=Math.sqrt(dx*dx+dy*dy),max=45;if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}joystickKnob.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;joystickX=dx/max;joystickY=dy/max;}
-function joyEnd(e){e.preventDefault();joystickActive=false;joystickX=0;joystickY=0;joystickKnob.style.transform='translate(-50%,-50%)';joystickKnob.classList.remove('active');}
-joystickArea.addEventListener('touchstart',joyStart,{passive:false});joystickArea.addEventListener('touchmove',joyMove,{passive:false});joystickArea.addEventListener('touchend',joyEnd,{passive:false});
+
+function joyEnd(e){
+  e.preventDefault();
+
+  joystickActive=false;
+  joystickX=0;
+  joystickY=0;
+
+  joystickKnob.style.transform='translate(-50%,-50%)';
+  joystickKnob.classList.remove('active');
+
+  // Return joystick to default position
+  joystickArea.style.left='';
+  joystickArea.style.top='';
+}
+
+
+document.addEventListener('touchstart',(e)=>{
+  const touch=e.touches[0];
+
+  if(touch.clientX < window.innerWidth * 0.5){
+    joyStart(e);
+  }
+},{passive:false});
+joystickArea.addEventListener('touchmove',joyMove,{passive:false});joystickArea.addEventListener('touchend',joyEnd,{passive:false});
 joystickArea.addEventListener('mousedown',joyStart);document.addEventListener('mousemove',joyMove);document.addEventListener('mouseup',joyEnd);
 
 // ===== BUTTONS =====
@@ -1062,6 +1129,14 @@ window.addEventListener('keydown', (e)=>{
   if(k === 'q') skillPressed = true;
 });
 
+
+// Prevent movement drift during touch attacks
+document.getElementById('attack-btn').addEventListener('touchstart', ()=>{
+  if(Math.abs(joystickX) < 0.05) joystickX = 0;
+  if(Math.abs(joystickY) < 0.05) joystickY = 0;
+}, {passive:true});
+
+
 window.addEventListener('keyup', (e)=>{
   const k = e.key.toLowerCase();
 
@@ -1079,6 +1154,47 @@ window.addEventListener('keydown', (e)=>{
     showMsg(game.paused ? '⏸️ Paused' : '▶️ Resume', 50);
   }
 });
+
+
+// ===== INVENTORY CONTROLS =====
+for(let i=0;i<3;i++){
+  const slot=document.getElementById('slot'+i);
+
+  if(slot){
+    slot.addEventListener('click', ()=>useInventoryItem(i));
+    slot.addEventListener('touchstart', (e)=>{
+      e.preventDefault();
+      useInventoryItem(i);
+    }, {passive:false});
+  }
+}
+
+function useInventoryItem(index){
+  if(!game || !game.player || !game.player.inventory) return;
+
+  const item=game.player.inventory[index];
+  if(!item) return;
+
+  const p=game.player;
+  const t=item.template;
+
+  if(t.stat==='hp'){
+    p.hp=Math.min(p.maxHp,p.hp+item.value);
+    triggerHealFlash();
+    showMsg(`❤️ Used ${item.name}`,40);
+  }
+
+  if(t.stat==='skill'){
+    p.skillCooldown=0;
+    showMsg(`📜 Skill Refreshed!`,40);
+  }
+
+  spawnExplosion(p.x,p.y,item.color||'#fff',10);
+
+  p.inventory[index]=null;
+
+  updateInventoryUI();
+}
 
 // ===== UTILITIES =====
 function showMsg(text,dur){const el=document.getElementById('message');el.textContent=text;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');game.msgTimer=dur||60;}
@@ -1124,6 +1240,26 @@ function saveBestStats(){
   const bestKills = parseInt(localStorage.getItem('wr_best_kills')||'0');
   if(game.kills > bestKills){
     localStorage.setItem('wr_best_kills', game.kills);
+  }
+}
+
+
+function updateInventoryUI(){
+  if(!game || !game.player || !game.player.inventory) return;
+
+  for(let i=0;i<3;i++){
+    const slot=document.getElementById('slot'+i);
+    if(!slot) continue;
+
+    const item=game.player.inventory[i];
+
+    if(item){
+      slot.textContent=item.emoji;
+      slot.style.borderColor=item.color || '#ffffff';
+    }else{
+      slot.textContent='';
+      slot.style.borderColor='rgba(255,255,255,0.3)';
+    }
   }
 }
 
@@ -1254,7 +1390,9 @@ function update(){
   if(attackPressed&&p.attackCooldown<=0){
     p.attackCooldown=16;p.attackAnim=10;
 
-    const atkAngle=Math.atan2(p.dy||0,p.dx||1);
+    const attackDx = (Math.abs(p.dx) > 0.01) ? p.dx : 0;
+      const attackDy = (Math.abs(p.dy) > 0.01) ? p.dy : 0;
+      const atkAngle=Math.atan2(attackDy, attackDx || 0.001);
     game.slashEffects.push({
       x:p.x,
       y:p.y,
@@ -1297,7 +1435,9 @@ function update(){
     }
     game.enemies=game.enemies.filter(e=>e.hp>0);
     if(!hitSomething){
-      const atkAngle=Math.atan2(p.dy||0,p.dx||1);
+      const attackDx = (Math.abs(p.dx) > 0.01) ? p.dx : 0;
+      const attackDy = (Math.abs(p.dy) > 0.01) ? p.dy : 0;
+      const atkAngle=Math.atan2(attackDy, attackDx || 0.001);
       spawnParticle(p.x+Math.cos(atkAngle)*25,p.y+Math.sin(atkAngle)*25,'#ffa502',3,{angle:atkAngle,spread:0.5,speed:2});
     }
   }
@@ -1698,7 +1838,7 @@ function renderMinimap(){
   const scale=80/MAP_W;
   for(let y=0;y<MAP_H;y++)for(let x=0;x<MAP_W;x++){
     if(!game.explored[y][x])continue;const t=game.map[y][x];
-    if(t===0||t===2||t===4)mc.fillStyle='#333';else if(t===1)mc.fillStyle='#1a3d12';else if(t===3)mc.fillStyle='#1a4a7a';else if(t===5)mc.fillStyle='#ffd700';else continue;
+    if(t===0||t===2||t===4)mc.fillStyle='#333';else if(t===1)mc.fillStyle='#1a3d12';else if(t===3)mc.fillStyle='#1a4a7a';else if(typeof t==='object' && t.type===4)mc.fillStyle='#1f5f2a';else if(t===5)mc.fillStyle='#ffd700';else continue;
     mc.fillRect(x*scale,y*scale,scale+0.5,scale+0.5);
   }
   mc.fillStyle='#f44';for(const e of game.enemies){mc.fillRect((e.x/TILE)*scale-1,(e.y/TILE)*scale-1,2,2);}
@@ -1748,6 +1888,7 @@ function startGame(){
   generateMap();
   resize();
   skillBtn.textContent=game.player.skill.emoji;
+  updateInventoryUI();
   comboCount=0;killStreak=0;
 
   if(game.player.essence>=25 && !localStorage.getItem('wildrogue_upgrade_hint')){
