@@ -339,7 +339,7 @@ html, body {
 }
 
 /* Controls */
-#controls {
+#controls { z-index:30;
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 16px; padding-bottom: env(safe-area-inset-bottom, 16px);
   display: flex; justify-content: space-between; align-items: flex-end;
@@ -1044,6 +1044,21 @@ function joyStart(e){
   // Only left side of screen
   if(touch.clientX > window.innerWidth * 0.5) return;
 
+  // Prevent action buttons from activating joystick
+  const controlsWidth = 220;
+  const controlsHeight = 260;
+
+  const inBottomControls =
+    touch.clientY > (window.innerHeight - controlsHeight);
+
+  const nearRightButtons =
+    touch.clientX > (window.innerWidth - controlsWidth);
+
+  // Ignore touches near attack buttons
+  if(inBottomControls && nearRightButtons){
+    return;
+  }
+
   e.preventDefault();
 
   joystickTouchId=touch.identifier;
@@ -1109,7 +1124,7 @@ function joyEnd(e){
 
   joystickArea.style.left='20px';
   joystickArea.style.top='';
-  joystickArea.style.bottom='20px';
+  joystickArea.style.bottom='140px';
 }
 
 document.addEventListener('touchstart', joyStart, {passive:false});
