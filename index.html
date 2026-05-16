@@ -221,7 +221,7 @@ body { background: var(--color-bg); }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Mission of Light</title>
+<title>Mission Quest</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { 
@@ -339,7 +339,7 @@ html, body {
 }
 
 /* Controls */
-#controls {
+#controls { position:fixed; z-index:40;
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 16px; padding-bottom: env(safe-area-inset-bottom, 16px);
   display: flex; justify-content: space-between; align-items: flex-end;
@@ -502,7 +502,7 @@ html, body {
 /* Start Screen */
 #start-screen {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, #3b2a14 0%, #0f0b08 100%);
+  background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a0a15 100%);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   z-index: 100; gap: 10px;
@@ -558,10 +558,52 @@ html, body {
 </style>
 </head>
 <body>
+
+<div id="title-version-badge"
+style="
+position:fixed;
+top:90px;
+right:20px;
+z-index:999999;
+color:white;
+background:red;
+padding:8px 14px;
+font-size:28px;
+font-weight:bold;
+border-radius:12px;
+font-family:Arial;
+">
+V15
+</div>
+
 <div id="game-container">
+
+
+
+
+<div id="version-badge" style="display:none;
+position:fixed;
+top:12px;
+right:12px;
+z-index:99999;
+background:#ff4757;
+color:white;
+padding:8px 14px;
+border-radius:12px;
+font-size:20px;
+font-weight:bold;
+font-family:sans-serif;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+">
+
+</div>
+
+
+
+
   <canvas id="game-canvas"></canvas>
   <div id="hit-flash"></div>
-  <div id="heal-flash"></div>
+  <div id="heal-flash"></div><div id="floor-fade" style="position:absolute;inset:0;background:black;opacity:0;pointer-events:none;transition:opacity 0.4s;z-index:50;"></div>
   
   <div id="hud">
     <div class="hud-item">
@@ -574,11 +616,11 @@ html, body {
       <div id="xp-bar"><div id="xp-fill" style="width:0%"></div></div>
       <span id="hud-lvl">Lv1</span>
     </div>
-    <div class="hud-item"><span class="icon">📖</span><span id="hud-atk">5</span></div>
+    <div class="hud-item"><span class="icon">⚔️</span><span id="hud-atk">5</span></div>
     <div class="hud-item"><span class="icon">🛡️</span><span id="hud-def">0</span></div>
     <div class="hud-item"><span class="icon">🏔️</span>F<span id="hud-floor">1</span></div>
     <div class="hud-item"><span class="icon">💀</span><span id="hud-kills">0</span></div>
-    <div class="hud-item"><span class="icon">🪙</span><span id="hud-gold">0</span></div>
+    <div class="hud-item"><span class="icon">🪙</span><span id="hud-gold">0</span></div><div class="hud-item"><span class="icon">✨</span><span id="hud-essence">0</span></div>
   </div>
 
   <div id="status-effects"></div>
@@ -586,51 +628,83 @@ html, body {
   <div id="combo"></div>
   <div id="killstreak"></div>
 
-  <div id="controls">
+  
+<div id="inventory-bar" style="pointer-events:auto;
+position:absolute;
+bottom:140px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:8px;
+z-index:20;
+">
+<div style="width:48px;height:48px;border:2px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(0,0,0,0.5);"></div>
+<div style="width:48px;height:48px;border:2px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(0,0,0,0.5);"></div>
+<div style="width:48px;height:48px;border:2px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(0,0,0,0.5);"></div>
+</div>
+
+<div id="controls" style="
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+height:240px;
+pointer-events:none;
+z-index:50;
+">
+
+<div id="left-controls" style="
+position:absolute;
+left:0;
+bottom:0;
+width:50%;
+height:100%;
+pointer-events:none;
+"></div>
+
+<div id="right-controls-wrapper" style="
+position:absolute;
+right:20px;
+bottom:20px;
+pointer-events:auto;
+z-index:60;
+">
+
     <div id="joystick-area">
       <div id="joystick-base">
         <div id="joystick-knob"></div>
       </div>
     </div>
-    
-<div id="right-controls">
-  <div class="action-btn" id="skill-btn">✝️<div class="cd-overlay"></div></div>
-  <div class="action-btn" id="attack-btn">📖<div class="cd-overlay"></div></div>
-  <div class="action-btn" id="dodge-btn">🙏<div class="cd-overlay"></div></div>
-</div>
-</div>
-
-      <div class="action-btn" id="attack-btn">📖<div class="cd-overlay"></div></div>
-      <div class="action-btn" id="dodge-btn">🙏<div class="cd-overlay"></div></div>
+    <div id="right-controls">
+      <div class="action-btn" id="skill-btn">🌀<div class="cd-overlay"></div></div>
+      <div class="action-btn" id="attack-btn">⚔️<div class="cd-overlay"></div></div>
+      <div class="action-btn" id="dodge-btn">💨<div class="cd-overlay"></div></div>
     </div>
-  </div>
+  </div></div>
 
   <div id="message"></div>
   <div id="level-msg"></div>
 
   <div id="death-screen">
-    <h1>☠️ YOU DIED</h1>
+    <h1>☠️ MISSION FAILED</h1>
     <div class="stats-grid" id="death-stats"></div>
     <p id="death-cause"></p>
-    <button onclick="startGame()">Try Again</button>
+    <button onclick="startGame()">Continue the Mission</button>
   </div>
 
   <div id="levelup-screen">
-    <h2>⬆️ LEVEL UP!</h2>
-    <p>Choose a perk:</p>
+    <h2>⬆️ MINISTRY GROWTH!</h2>
+    <p>Choose a blessing:</p>
     <div class="perk-options" id="perk-options"></div>
   </div>
 
   <div id="start-screen">
-<div style="position:absolute;top:12px;right:16px;color:#bbb;font-size:12px;font-weight:600;opacity:0.8;">
-v16
-</div>
-
-    <h1>🌲 Mission of Light</h1>
-    <div class="subtitle">~ Journey of Faith ~</div>
-    <p>Travel through dangerous lands, protect villagers, spread hope, and stand against darkness.</p>
-    <p style="color:#555;font-size:11px;">🕹️ Joystick to move • 📖 Attack • ✝️ Skill • 🙏 Dodge<br>Permadeath — progress resets on death</p>
-    <button onclick="startGame()">Begin Mission</button>
+    <h1>🌲 Mission Quest</h1>
+    <div class="subtitle">~ ~ Light Into the Nations ~ ~</div>
+    <p>Travel through dangerous lands, share hope, rescue villagers, gather supplies, grow in faith, and bring light to every region.</p>
+    <p style="color:#555;font-size:11px;">🕹️ Joystick to move • ⚔️ Attack • 🌀 Skill • 💨 Dodge<br>Now includes permanent Essence progression!</p>
+    <p style="color:#d8d8d8;font-size:12px;max-width:320px;text-align:center;">“Let your light shine before others.” – Matthew 5:16</p>
+    <button onclick="startGame()">Begin the Mission</button>
   </div>
 </div>
 
@@ -802,14 +876,14 @@ function rollRarity(floor) {
 }
 
 const ITEM_TEMPLATES = [
-  { type: 'weapon', names: ['Dagger','Sword','Axe','Spear','Mace'], emoji: '📖', stat: 'atk', base: 2 },
-  { type: 'armor', names: ['Leather','Chainmail','Plate','Hide','Scale'], emoji: '🛡️', stat: 'def', base: 1 },
-  { type: 'potion_hp', names: ['Holy Water'], emoji: '🙏', stat: 'hp', base: 30 },
-  { type: 'potion_speed', names: ['Pilgrim Tonic'], emoji: '🙏', stat: 'speed', base: 0.3 },
-  { type: 'ring', names: ['Ring of Faith','Ring of Grace','Ring of Courage'], emoji: '💍', stat: 'mixed', base: 1 },
-  { type: 'food', names: ['Berries','Mushroom','Rabbit Meat','Fish','Herbs'], emoji: '🍖', stat: 'hp', base: 15 },
-  { type: 'gold', names: ['Gold Coins'], emoji: '🪙', stat: 'gold', base: 10 },
-  { type: 'scroll', names: ['Scripture of Fire','Scripture of Wisdom','Scripture of Judgment'], emoji: '📜', stat: 'skill', base: 1 },
+  { type: 'weapon', names: ['Travel Staff','Messenger Staff','Banner Pole','Pilgrim Spear','Defender Rod'], emoji: '⚔️', stat: 'atk', base: 2 },
+  { type: 'armor', names: ['Traveler Cloak','Faith Vest','Guardian Armor','Mission Robe','Hope Mantle'], emoji: '🛡️', stat: 'def', base: 1 },
+  { type: 'potion_hp', names: ['Healing Bread'], emoji: '❤️‍🩹', stat: 'hp', base: 30 },
+  { type: 'potion_speed', names: ['Joyful Drink'], emoji: '💨', stat: 'speed', base: 0.3 },
+  { type: 'ring', names: ['Ring of Grace','Ring of Hope','Ring of Mercy'], emoji: '💍', stat: 'mixed', base: 1 },
+  { type: 'food', names: ['Bread','Loaves','Fruit Basket','Loaves','Olives'], emoji: '🍖', stat: 'hp', base: 15 },
+  { type: 'gold', names: ['Donations'], emoji: '🪙', stat: 'gold', base: 10 },
+  { type: 'scroll', names: ['Scripture Scroll','Mercy Scroll','Praise Scroll'], emoji: '📜', stat: 'skill', base: 1 },
 ];
 
 function generateLoot(floor, x, y) {
@@ -817,54 +891,58 @@ function generateLoot(floor, x, y) {
   const rarity = rollRarity(floor);
   const mult = RARITY[rarity].mult;
   const name = template.names[Math.floor(Math.random() * template.names.length)];
-  return { x, y, template, rarity, name, emoji: template.emoji, value: Math.ceil(template.base * mult * (1+floor*0.1)), color: RARITY[rarity].color, bobOffset: Math.random()*Math.PI*2 };
+  const modifiers=['Radiant','Peaceful','Redeemed','Merciful','Blessed'];
+  const modifier=template.type==='weapon' ? modifiers[Math.floor(Math.random()*modifiers.length)] : null;
+  return { 
+    x, y, template, rarity, name: modifier ? `${modifier} ${name}` : name,
+    modifier,
+    emoji: template.emoji,
+    value: Math.ceil(template.base * mult * (1+floor*0.1)),
+    color: RARITY[rarity].color,
+    bobOffset: Math.random()*Math.PI*2
+  };
 }
 
 // ===== SKILLS =====
 const SKILLS = [
-  { id:'fireball', name:'Holy Light', emoji:'🔥', desc:'Explosive fireball', cooldown:120, dmgMult:3, range:200, aoe:60 },
-  { id:'heal', name:'Divine Healing', emoji:'🌿', desc:'Restore 30% HP', cooldown:180, healPct:0.3 },
-  { id:'lightning', name:'Judgment Strike', emoji:'⚡', desc:'Strike all nearby', cooldown:150, dmgMult:2, range:120 },
-  { id:'freeze', name:'Sacred Freeze', emoji:'❄️', desc:'Freeze enemies 3s', cooldown:200, range:100, duration:180 },
-  { id:'berserk', name:'Zeal', emoji:'😡', desc:'2x damage, +50% taken', cooldown:240, duration:300 },
-  { id:'summon', name:'Guardian Shepherd', emoji:'🐺', desc:'Summon a raider ally', cooldown:300, duration:600 },
+  { id:'fireball', name:'Truth Beacon', emoji:'🔥', desc:'Explosive fireball', cooldown:120, dmgMult:3, range:200, aoe:60 },
+  { id:'heal', name:'Prayer of Healing', emoji:'🌿', desc:'Restore 30% HP', cooldown:180, healPct:0.3 },
+  { id:'lightning', name:'Heavenly Light', emoji:'⚡', desc:'Strike all nearby', cooldown:150, dmgMult:2, range:120 },
+  { id:'freeze', name:'Peace Wave', emoji:'❄️', desc:'Freeze enemies 3s', cooldown:200, range:100, duration:180 },
+  { id:'berserk', name:'Bold Faith', emoji:'😡', desc:'2x damage, +50% taken', cooldown:240, duration:300 },
+  { id:'summon', name:'Call Companion', emoji:'🐺', desc:'Summon a bandit ally', cooldown:300, duration:600 },
 ];
 
 // ===== PERKS =====
 const PERKS = [
-  { id:'hp_up', name:'Vitality', emoji:'❤️', desc:'+25 Max HP', apply:(p)=>{p.maxHp+=25;p.hp+=25;} },
-  { id:'atk_up', name:'Strength', emoji:'💪', desc:'+3 Attack', apply:(p)=>{p.atk+=3;} },
-  { id:'def_up', name:'Toughness', emoji:'🛡️', desc:'+2 Defense', apply:(p)=>{p.def+=2;} },
-  { id:'speed_up', name:'Agility', emoji:'🏃', desc:'+0.4 Speed', apply:(p)=>{p.speed+=0.4;} },
-  { id:'crit', name:'Critical Eye', emoji:'🎯', desc:'+10% Crit', apply:(p)=>{p.critChance=Math.min(0.8,(p.critChance||0.05)+0.1);} },
-  { id:'lifesteal', name:'Vampiric', emoji:'🧛', desc:'Heal 15% of dmg', apply:(p)=>{p.lifesteal=(p.lifesteal||0)+0.15;} },
-  { id:'thorns', name:'Thorns', emoji:'🌹', desc:'Reflect 30% dmg', apply:(p)=>{p.thorns=(p.thorns||0)+0.3;} },
-  { id:'dodge_up', name:'Evasion', emoji:'🙏', desc:'+12% Dodge', apply:(p)=>{p.dodgeChance=Math.min(0.6,(p.dodgeChance||0)+0.12);} },
-  { id:'aoe', name:'Cleave', emoji:'✝️', desc:'+20% Atk Range', apply:(p)=>{p.atkRange=(p.atkRange||40)*1.2;} },
-  { id:'xp_up', name:'Wisdom', emoji:'📖', desc:'+30% XP', apply:(p)=>{p.xpMult=(p.xpMult||1)*1.3;} },
+  { id:'hp_up', name:'Endurance', emoji:'❤️', desc:'+25 Max HP', apply:(p)=>{p.maxHp+=25;p.hp+=25;} },
+  { id:'atk_up', name:'Conviction', emoji:'💪', desc:'+3 Attack', apply:(p)=>{p.atk+=3;} },
+  { id:'def_up', name:'Faith Shield', emoji:'🛡️', desc:'+2 Defense', apply:(p)=>{p.def+=2;} },
+  { id:'speed_up', name:'Quick Steps', emoji:'🏃', desc:'+0.4 Speed', apply:(p)=>{p.speed+=0.4;} },
+  { id:'crit', name:'Discernment', emoji:'🎯', desc:'+10% Crit', apply:(p)=>{p.critChance=Math.min(0.8,(p.critChance||0.05)+0.1);} },
+  { id:'lifesteal', name:'Merciful', emoji:'🧛', desc:'Heal 15% of dmg', apply:(p)=>{p.lifesteal=(p.lifesteal||0)+0.15;} },
+  { id:'thorns', name:'Armor of Faith', emoji:'🌹', desc:'Reflect 30% dmg', apply:(p)=>{p.thorns=(p.thorns||0)+0.3;} },
+  { id:'dodge_up', name:'Scripture Study', emoji:'💨', desc:'+12% Dodge', apply:(p)=>{p.dodgeChance=Math.min(0.6,(p.dodgeChance||0)+0.12);} },
+  { id:'aoe', name:'Inspiration', emoji:'🌀', desc:'+20% Atk Range', apply:(p)=>{p.atkRange=(p.atkRange||40)*1.2;} },
+  { id:'xp_up', name:'Scripture Study', emoji:'📖', desc:'+30% XP', apply:(p)=>{p.xpMult=(p.xpMult||1)*1.3;} },
 ];
-
-
-// Missionary Theme Update:
-// Raider enemies now visually use desert turbans and robes.
-// Player uses missionary clothing and Bible-themed attacks.
 
 // ===== ENEMY/BOSS/TRAP DEFS =====
 const ENEMY_DEFS = [
-  { type:'raider', hp:20, atk:4, speed:1.8, size:12, xp:10, color:'#8b8b8b', behavior:'chase' },
-  { type:'guard', hp:50, atk:8, speed:0.9, size:18, xp:25, color:'#6b3a1e', behavior:'charge' },
-  { type:'cultist', hp:15, atk:3, speed:2.4, size:10, xp:8, color:'#4a1a4a', behavior:'swarm' },
-  { type:'assassin', hp:18, atk:5, speed:2.0, size:11, xp:12, color:'#1a6b3a', behavior:'ambush' },
-  { type:'mercenary', hp:35, atk:6, speed:1.5, size:14, xp:18, color:'#5a3a2a', behavior:'charge' },
+  { type:'bandit', hp:20, atk:4, speed:1.8, size:12, xp:10, color:'#8b8b8b', behavior:'chase' },
+  { type:'warlord', hp:50, atk:8, speed:0.9, size:18, xp:25, color:'#6b3a1e', behavior:'charge' },
+  { type:'doubt', hp:15, atk:3, speed:2.4, size:10, xp:8, color:'#4a1a4a', behavior:'swarm' },
+  { type:'tempter', hp:18, atk:5, speed:2.0, size:11, xp:12, color:'#1a6b3a', behavior:'ambush' },
+  { type:'raider', hp:35, atk:6, speed:1.5, size:14, xp:18, color:'#5a3a2a', behavior:'charge' },
   { type:'scout', hp:12, atk:4, speed:3.0, size:10, xp:14, color:'#6b5a3a', behavior:'swoop' },
-  { type:'treeEnt', hp:80, atk:10, speed:0.5, size:22, xp:40, color:'#2a4a1a', behavior:'guard' },
-  { type:'wisp', hp:8, atk:7, speed:2.5, size:8, xp:15, color:'#7af', behavior:'teleport' },
-  { type:'false_priest', hp:25, atk:6, speed:1.0, size:13, xp:30, color:'#6a3a8a', behavior:'ranged' },
+  { type:'idol', hp:80, atk:10, speed:0.5, size:22, xp:40, color:'#2a4a1a', behavior:'guard' },
+  { type:'spirit', hp:8, atk:7, speed:2.5, size:8, xp:15, color:'#7af', behavior:'teleport' },
+  { type:'false_teacher', hp:25, atk:6, speed:1.0, size:13, xp:30, color:'#6a3a8a', behavior:'ranged' },
 ];
 const BOSS_DEFS = [
-  { type:'alpha_raider', name:'Desert Raider Chief', hp:150, atk:12, speed:2.0, size:24, xp:100, color:'#ccc' },
-  { type:'ancient_guard', name:'Corrupt Warlord', hp:250, atk:18, speed:0.7, size:28, xp:150, color:'#4a2a0a' },
-  { type:'forest_king', name:'False Prophet', hp:400, atk:22, speed:1.2, size:30, xp:250, color:'#1a5a1a' },
+  { type:'alpha_bandit', name:'Bandit Chief', hp:150, atk:12, speed:2.0, size:24, xp:100, color:'#ccc' },
+  { type:'ancient_warlord', name:'Iron Tyrant', hp:250, atk:18, speed:0.7, size:28, xp:150, color:'#4a2a0a' },
+  { type:'forest_king', name:'Shadow King', hp:400, atk:22, speed:1.2, size:30, xp:250, color:'#1a5a1a' },
 ];
 const TRAP_TYPES = [
   { type:'spike', emoji:'⬆️', dmg:10, color:'#888' },
@@ -882,15 +960,16 @@ function initGame() {
     player: {
       x:0, y:0, hp:100, maxHp:100, atk:5, def:0, speed:2.5,
       invuln:0, attackCooldown:0, attackAnim:0, dx:0, dy:0,
-      level:1, xp:0, xpToNext:30, gold:0,
+      level:1, xp:0, xpToNext:30, gold:0, essence: parseInt(localStorage.getItem('wildrogue_essence')||'0'),
       critChance:0.05, lifesteal:0, thorns:0, dodgeChance:0,
       atkRange:40, xpMult:1,
       skill:SKILLS[0], skillCooldown:0,
       dodgeCooldown:0, dodging:0,
       statusEffects:[], perks:[], allies:[],
       trail: [], // motion trail
+      inventory:[null,null,null],
     },
-    map:[], enemies:[], items:[], particles:[], projectiles:[], traps:[],
+    map:[], enemies:[], items:[], particles:[], projectiles:[], slashEffects:[], traps:[],
     ambientParticles: [],
     explored:[],
     floor:1, kills:0, totalDmgDealt:0,
@@ -899,6 +978,27 @@ function initGame() {
     gameOver:false, paused:false, msgTimer:0, deathCause:'', biome:'forest',
   };
 }
+
+
+function getBiomeColors(){
+  const biomeColors={
+    forest:{floor:'#1f3d1f',wall:'#0f1f0f'},
+    swamp:{floor:'#2f3f25',wall:'#182010'},
+    cave:{floor:'#333333',wall:'#151515'},
+    ruins:{floor:'#4a4030',wall:'#2a241a'}
+  };
+  return biomeColors[game.biome]||biomeColors.forest;
+}
+
+
+// ===== TREE TYPES =====
+const TREE_TYPES = [
+  { trunk:'#5c3b22', leaves:'#2f7d32', size:1.0 },
+  { trunk:'#4a2f1a', leaves:'#3f9b3f', size:1.3 },
+  { trunk:'#6b4423', leaves:'#1f5f2a', size:0.9 },
+  { trunk:'#704214', leaves:'#4caf50', size:1.15 },
+  { trunk:'#3e2723', leaves:'#66bb6a', size:0.8 }
+];
 
 // ===== MAP GENERATION =====
 function generateMap() {
@@ -929,15 +1029,36 @@ function generateMap() {
   const ponds=2+Math.floor(Math.random()*3);
   for(let p=0;p<ponds;p++){const px=5+Math.floor(Math.random()*(MAP_W-10)),py=5+Math.floor(Math.random()*(MAP_H-10)),pr=2+Math.floor(Math.random()*2);for(let y=py-pr;y<=py+pr;y++)for(let x=px-pr;x<=px+pr;x++){if(y>0&&y<MAP_H-1&&x>0&&x<MAP_W-1&&Math.sqrt((x-px)**2+(y-py)**2)<=pr&&map[y][x]!==2)map[y][x]=3;}}
 
-  for(let y=1;y<MAP_H-1;y++)for(let x=1;x<MAP_W-1;x++){if(map[y][x]===0&&Math.random()<0.03)map[y][x]=4;}
+  
+for(let y=1;y<MAP_H-1;y++){
+  for(let x=1;x<MAP_W-1;x++){
+    if(map[y][x]===0&&Math.random()<0.03){
+      map[y][x]={
+        type:4,
+        treeType:Math.floor(Math.random()*TREE_TYPES.length)
+      };
+    }
+  }
+}
+
 
   game.player.x=rooms[0].cx*TILE; game.player.y=rooms[0].cy*TILE;
   const lastRoom=rooms[rooms.length-1]; game.stairsX=lastRoom.cx; game.stairsY=lastRoom.cy; map[game.stairsY][game.stairsX]=5;
 
-  // Enemies
+  
   game.enemies=[];
   const numEnemies=8+floor*4;
-  const availableEnemies=ENEMY_DEFS.filter((_,i)=>i<3+Math.floor(floor/2));
+  
+  let availableEnemies = ENEMY_DEFS;
+
+  if(game.biome==='forest'){
+    availableEnemies = ENEMY_DEFS.filter(e=>['bandit','raider','false_teacher'].includes(e.type));
+  }else if(game.biome==='swamp'){
+    availableEnemies = ENEMY_DEFS.filter(e=>['tempter','doubt','spirit'].includes(e.type));
+  }else if(game.biome==='cave'){
+    availableEnemies = ENEMY_DEFS.filter(e=>['warlord','doubt','spirit'].includes(e.type));
+  }
+
   for(let i=0;i<numEnemies;i++){
     const room=rooms[1+Math.floor(Math.random()*(rooms.length-2))]; if(!room)continue;
     const def=availableEnemies[Math.floor(Math.random()*availableEnemies.length)];
@@ -970,29 +1091,255 @@ function isWall(px,py,size){
   return false;
 }
 
+
+
+
 // ===== JOYSTICK =====
 let joystickActive=false,joystickX=0,joystickY=0;
+let joystickTouchId=null;
+
 const joystickArea=document.getElementById('joystick-area');
 const joystickKnob=document.getElementById('joystick-knob');
-function joyStart(e){e.preventDefault();joystickActive=true;joystickKnob.classList.add('active');joyMove(e);}
-function joyMove(e){if(!joystickActive)return;e.preventDefault();const touch=e.touches?e.touches[0]:e;const rect=joystickArea.getBoundingClientRect();let dx=touch.clientX-(rect.left+rect.width/2),dy=touch.clientY-(rect.top+rect.height/2);const dist=Math.sqrt(dx*dx+dy*dy),max=45;if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}joystickKnob.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;joystickX=dx/max;joystickY=dy/max;}
-function joyEnd(e){e.preventDefault();joystickActive=false;joystickX=0;joystickY=0;joystickKnob.style.transform='translate(-50%,-50%)';joystickKnob.classList.remove('active');}
-joystickArea.addEventListener('touchstart',joyStart,{passive:false});joystickArea.addEventListener('touchmove',joyMove,{passive:false});joystickArea.addEventListener('touchend',joyEnd,{passive:false});
-joystickArea.addEventListener('mousedown',joyStart);document.addEventListener('mousemove',joyMove);document.addEventListener('mouseup',joyEnd);
+
+// Stable anchor position
+let joystickBaseX=80;
+let joystickBaseY=window.innerHeight-180;
+
+joystickArea.style.position='fixed';
+joystickArea.style.left='0px';
+joystickArea.style.top='0px';
+joystickArea.style.transform=
+  `translate3d(${joystickBaseX-60}px,${joystickBaseY-60}px,0px)`;
+
+function placeJoystick(x,y){
+  joystickBaseX=x;
+  joystickBaseY=y;
+
+  joystickArea.style.transform=
+    `translate3d(${x-60}px,${y-60}px,0px)`;
+}
+
+function joyStart(e){
+
+  // Prevent second finger stealing joystick
+  if(joystickActive) return;
+
+  for(const touch of e.changedTouches){
+
+    // Only left side of screen
+    if(touch.clientX > window.innerWidth * 0.45){
+      continue;
+    }
+
+    joystickTouchId=touch.identifier;
+    joystickActive=true;
+
+    placeJoystick(touch.clientX,touch.clientY);
+
+    joystickKnob.classList.add('active');
+
+    updateJoystick(touch);
+
+    break;
+  }
+}
+
+function updateJoystick(touch){
+
+  let dx=touch.clientX-joystickBaseX;
+  let dy=touch.clientY-joystickBaseY;
+
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const max=45;
+
+  if(dist>max){
+    dx=(dx/dist)*max;
+    dy=(dy/dist)*max;
+  }
+
+  joystickKnob.style.transform=
+    `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+  joystickX=dx/max;
+  joystickY=dy/max;
+}
+
+function joyMove(e){
+
+  if(!joystickActive) return;
+
+  for(const touch of e.touches){
+
+    if(touch.identifier===joystickTouchId){
+      updateJoystick(touch);
+      break;
+    }
+  }
+}
+
+function joyEnd(e){
+
+  for(const touch of e.changedTouches){
+
+    if(touch.identifier===joystickTouchId){
+
+      joystickActive=false;
+      joystickTouchId=null;
+
+      joystickX=0;
+      joystickY=0;
+
+      joystickKnob.style.transform='translate(-50%,-50%)';
+      joystickKnob.classList.remove('active');
+
+      // Return to default corner smoothly
+      placeJoystick(80, window.innerHeight-180);
+
+      break;
+    }
+  }
+}
+
+document.addEventListener('touchstart',joyStart,{passive:true});
+document.addEventListener('touchmove',joyMove,{passive:true});
+document.addEventListener('touchend',joyEnd,{passive:true});
+document.addEventListener('touchcancel',joyEnd,{passive:true});
+
+window.addEventListener('resize',()=>{
+  if(!joystickActive){
+    placeJoystick(80, window.innerHeight-180);
+  }
+});
+
 
 // ===== BUTTONS =====
 let attackPressed=false,skillPressed=false,dodgePressed=false;
 const attackBtn=document.getElementById('attack-btn'),skillBtn=document.getElementById('skill-btn'),dodgeBtn=document.getElementById('dodge-btn');
-function btnEvents(el,flag){el.addEventListener('touchstart',(e)=>{e.preventDefault();window[flag]=true;},{passive:false});el.addEventListener('touchend',(e)=>{e.preventDefault();window[flag]=false;},{passive:false});el.addEventListener('mousedown',()=>window[flag]=true);el.addEventListener('mouseup',()=>window[flag]=false);}
+function setButtonState(flag, value){
+  if(flag==='attackPressed') attackPressed=value;
+  if(flag==='skillPressed') skillPressed=value;
+  if(flag==='dodgePressed') dodgePressed=value;
+}
 
-btnEvents(attackBtn,'attackPressed');
-btnEvents(skillBtn,'skillPressed');
-btnEvents(dodgeBtn,'dodgePressed');
+function btnEvents(el,flag){
+  el.addEventListener('touchstart',(e)=>{
+    e.preventDefault();
+    setButtonState(flag,true);
+  },{passive:false});
 
-attackBtn.style.pointerEvents = 'all';
-skillBtn.style.pointerEvents = 'all';
-dodgeBtn.style.pointerEvents = 'all';
+  el.addEventListener('touchend',(e)=>{
+    e.preventDefault();
+    setButtonState(flag,false);
+  },{passive:false});
 
+  el.addEventListener('touchcancel',()=>{
+    setButtonState(flag,false);
+  },{passive:false});
+
+  el.addEventListener('mousedown',()=>{
+    setButtonState(flag,true);
+  });
+
+  el.addEventListener('mouseup',()=>{
+    setButtonState(flag,false);
+  });
+}
+btnEvents(attackBtn,'attackPressed');btnEvents(skillBtn,'skillPressed');btnEvents(dodgeBtn,'dodgePressed');
+
+
+// ===== KEYBOARD SUPPORT =====
+const keys = {};
+
+window.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+
+  if(k === 'w' || k === 'arrowup') joystickY = -1;
+  if(k === 's' || k === 'arrowdown') joystickY = 1;
+  if(k === 'a' || k === 'arrowleft') joystickX = -1;
+  if(k === 'd' || k === 'arrowright') joystickX = 1;
+
+  if(k === ' ') attackPressed = true;
+  if(k === 'q') skillPressed = true;
+});
+
+
+// Prevent movement drift during touch attacks
+document.getElementById('attack-btn').addEventListener('touchstart', ()=>{
+  if(Math.abs(joystickX) < 0.05) joystickX = 0;
+  if(Math.abs(joystickY) < 0.05) joystickY = 0;
+}, {passive:true});
+
+
+window.addEventListener('keyup', (e)=>{
+  const k = e.key.toLowerCase();
+
+  if(k === 'w' || k === 'arrowup' || k === 's' || k === 'arrowdown') joystickY = 0;
+  if(k === 'a' || k === 'arrowleft' || k === 'd' || k === 'arrowright') joystickX = 0;
+
+  if(k === ' ') attackPressed = false;
+  if(k === 'q') skillPressed = false;
+});
+
+
+window.addEventListener('keydown', (e)=>{
+  if(e.key.toLowerCase()==='p' && game){
+    game.paused = !game.paused;
+    showMsg(game.paused ? '⏸️ Paused' : '▶️ Resume', 50);
+  }
+});
+
+
+// ===== INVENTORY CONTROLS =====
+for(let i=0;i<3;i++){
+  const slot=document.getElementById('slot'+i);
+
+  if(slot){
+    slot.addEventListener('click', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      useInventoryItem(i);
+    });
+    slot.addEventListener('touchstart', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      useInventoryItem(i);
+
+      slot.style.transform='scale(0.9)';
+      setTimeout(()=>{
+        slot.style.transform='scale(1)';
+      },100);
+
+    }, {passive:false});
+  }
+}
+
+function useInventoryItem(index){
+  if(!game || !game.player || !game.player.inventory) return;
+
+  const item=game.player.inventory[index];
+  if(!item) return;
+
+  const p=game.player;
+  const t=item.template;
+
+  if(t.stat==='hp'){
+    p.hp=Math.min(p.maxHp,p.hp+item.value);
+    triggerHealFlash();
+    showMsg(`❤️ Used ${item.name}`,40);
+  }
+
+  if(t.stat==='skill'){
+    p.skillCooldown=0;
+    showMsg(`📜 Skill Refreshed!`,40);
+  }
+
+  spawnExplosion(p.x,p.y,item.color||'#fff',10);
+
+  p.inventory[index]=null;
+
+  updateInventoryUI();
+}
 
 // ===== UTILITIES =====
 function showMsg(text,dur){const el=document.getElementById('message');el.textContent=text;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');game.msgTimer=dur||60;}
@@ -1025,6 +1372,41 @@ function spawnDmgNumber(x,y,text,color,isCrit){
 
 function dist(a,b){return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2);}
 function addStatusEffect(target,type,duration,value){const e=target.statusEffects.find(s=>s.type===type);if(e){e.duration=Math.max(e.duration,duration);}else{target.statusEffects.push({type,duration,value});}}
+
+
+function saveBestStats(){
+  if(!game) return;
+
+  const bestFloor = parseInt(localStorage.getItem('wr_best_floor')||'0');
+  if(game.floor > bestFloor){
+    localStorage.setItem('wr_best_floor', game.floor);
+  }
+
+  const bestKills = parseInt(localStorage.getItem('wr_best_kills')||'0');
+  if(game.kills > bestKills){
+    localStorage.setItem('wr_best_kills', game.kills);
+  }
+}
+
+
+function updateInventoryUI(){
+  if(!game || !game.player || !game.player.inventory) return;
+
+  for(let i=0;i<3;i++){
+    const slot=document.getElementById('slot'+i);
+    if(!slot) continue;
+
+    const item=game.player.inventory[i];
+
+    if(item){
+      slot.textContent=item.emoji;
+      slot.style.borderColor=item.color || '#ffffff';
+    }else{
+      slot.textContent='';
+      slot.style.borderColor='rgba(255,255,255,0.3)';
+    }
+  }
+}
 
 // ===== XP & LEVELING =====
 function grantXP(amount){
@@ -1068,7 +1450,7 @@ function useSkill(){
     game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.kills++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
     triggerScreenShake(5,10);playSound('explosion');
   }else if(skill.id==='freeze'){
-    for(const e of game.enemies){if(dist(p,e)<skill.range){e.frozen=skill.duration;spawnParticle(e.x,e.y,'#88f',8);}}showMsg('❄️ Frozen!',40);
+    for(const e of game.enemies){if(dist(p,e)<skill.range){e.frozen=skill.duration;spawnParticle(e.x,e.y,'#88f',8);}}showMsg('❄️ Peaceful!',40);
   }else if(skill.id==='berserk'){
     addStatusEffect(p,'berserk',skill.duration,2);spawnExplosion(p.x,p.y,'#f00',20);showMsg('😡 BERSERK!',40);triggerScreenShake(4,8);
   }else if(skill.id==='summon'){
@@ -1152,6 +1534,17 @@ function update(){
   // Attack
   if(attackPressed&&p.attackCooldown<=0){
     p.attackCooldown=16;p.attackAnim=10;
+
+    const attackDx = (Math.abs(p.dx) > 0.01) ? p.dx : 0;
+      const attackDy = (Math.abs(p.dy) > 0.01) ? p.dy : 0;
+      const atkAngle=Math.atan2(attackDy, attackDx || 0.001);
+    game.slashEffects.push({
+      x:p.x,
+      y:p.y,
+      angle:atkAngle,
+      life:10,
+      maxLife:10
+    });
     const range=p.atkRange||40;
     const berserkMult=p.statusEffects.find(s=>s.type==='berserk')?2:1;
     let hitSomething=false;
@@ -1176,7 +1569,10 @@ function update(){
         if(p.lifesteal>0){const heal=Math.ceil(dmg*p.lifesteal);p.hp=Math.min(p.maxHp,p.hp+heal);}
         
         if(enemy.hp<=0){
-          spawnExplosion(enemy.x,enemy.y,enemy.color,18);game.kills++;grantXP(enemy.xp);addKillStreak();playSound('kill');
+          spawnExplosion(enemy.x,enemy.y,enemy.color,18);game.kills++;
+          game.player.essence += enemy.isBoss ? 10 : 1;
+          localStorage.setItem('wildrogue_essence', game.player.essence);
+          grantXP(enemy.xp);addKillStreak();playSound('kill');
           if(Math.random()<0.3||enemy.isBoss)game.items.push(generateLoot(game.floor,enemy.x,enemy.y));
           if(enemy.isBoss){game.items.push(generateLoot(game.floor+2,enemy.x+20,enemy.y));game.items.push(generateLoot(game.floor+2,enemy.x-20,enemy.y));showMsg('👑 BOSS DEFEATED!',90);triggerScreenShake(8,15);slowMotion=20;}
         }
@@ -1184,7 +1580,9 @@ function update(){
     }
     game.enemies=game.enemies.filter(e=>e.hp>0);
     if(!hitSomething){
-      const atkAngle=Math.atan2(p.dy||0,p.dx||1);
+      const attackDx = (Math.abs(p.dx) > 0.01) ? p.dx : 0;
+      const attackDy = (Math.abs(p.dy) > 0.01) ? p.dy : 0;
+      const atkAngle=Math.atan2(attackDy, attackDx || 0.001);
       spawnParticle(p.x+Math.cos(atkAngle)*25,p.y+Math.sin(atkAngle)*25,'#ffa502',3,{angle:atkAngle,spread:0.5,speed:2});
     }
   }
@@ -1241,6 +1639,41 @@ function update(){
     if(enemy.hitAnim>0)enemy.hitAnim--;
   }
   game.enemies=game.enemies.filter(e=>e.hp>0);
+
+  
+  // Slash Effects
+  if(game.slashEffects){
+    for(let i=game.slashEffects.length-1;i>=0;i--){
+      const s=game.slashEffects[i];
+
+      // Safe camera fallback
+      const camX = game.camera ? game.camera.x : 0;
+      const camY = game.camera ? game.camera.y : 0;
+
+      const sx=s.x-camX;
+      const sy=s.y-camY;
+
+      ctx.save();
+      ctx.translate(sx,sy);
+      ctx.rotate(s.angle || 0);
+      ctx.globalAlpha=Math.max(0, s.life/s.maxLife);
+
+      ctx.strokeStyle='#ffffff';
+      ctx.lineWidth=6;
+
+      ctx.beginPath();
+      ctx.arc(0,0,40,-0.5,0.5);
+      ctx.stroke();
+
+      ctx.restore();
+
+      s.life--;
+
+      if(s.life<=0){
+        game.slashEffects.splice(i,1);
+      }
+    }
+  }
 
   // Projectiles
   for(let i=game.projectiles.length-1;i>=0;i--){
@@ -1306,6 +1739,10 @@ function update(){
   for(let i=game.particles.length-1;i>=0;i--){const pt=game.particles[i];pt.x+=pt.vx;pt.y+=pt.vy;pt.vx*=0.92;pt.vy*=0.92;if(pt.gravity)pt.vy+=pt.gravity;pt.life--;if(pt.life<=0)game.particles.splice(i,1);}
 
   if(game.msgTimer>0){game.msgTimer--;if(game.msgTimer<=0)document.getElementById('message').classList.remove('show');}
+
+  const essenceEl=document.getElementById('hud-essence');
+  if(essenceEl) essenceEl.textContent=game.player.essence;
+
 
   // Camera (smooth follow)
   const targetCamX=p.x-canvas.width/2;
@@ -1388,7 +1825,7 @@ function render(){
     ctx.fillStyle=item.color;ctx.globalAlpha=0.7;ctx.beginPath();ctx.arc(sx,sy+12,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
   }
 
-  // Enemies
+  
   for(const e of game.enemies){
     const sx=e.x-cam.x,sy=e.y-cam.y;
     if(sx<-50||sx>canvas.width+50||sy<-50||sy>canvas.height+50)continue;
@@ -1399,6 +1836,12 @@ function render(){
     // Shadow
     ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(sx,sy+e.size,e.size*0.8,e.size*0.3,0,0,Math.PI*2);ctx.fill();
     
+    if(game && game.player && typeof dist==='function' && dist(game.player,e)<50){
+      ctx.strokeStyle='rgba(255,0,0,0.5)';
+      ctx.beginPath();
+      ctx.arc(sx,sy,e.size+8,0,Math.PI*2);
+      ctx.stroke();
+    }
     ctx.fillStyle=e.color;ctx.beginPath();ctx.arc(sx,sy,e.size,0,Math.PI*2);ctx.fill();
     // Lighter spot
     ctx.fillStyle='rgba(255,255,255,0.1)';ctx.beginPath();ctx.arc(sx-e.size*0.3,sy-e.size*0.3,e.size*0.4,0,Math.PI*2);ctx.fill();
@@ -1406,6 +1849,9 @@ function render(){
     ctx.fillStyle=e.isBoss?'#ff0':'#fff';ctx.beginPath();ctx.arc(sx-e.size*0.3,sy-e.size*0.2,e.size*0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(sx+e.size*0.3,sy-e.size*0.2,e.size*0.2,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#000';ctx.beginPath();ctx.arc(sx-e.size*0.3,sy-e.size*0.2,e.size*0.1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(sx+e.size*0.3,sy-e.size*0.2,e.size*0.1,0,Math.PI*2);ctx.fill();
     if(e.isBoss){ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText('👑',sx,sy-e.size-5);}
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    ctx.fillRect(sx-e.size, sy-e.size-12, e.size*2, 5);
+
     if(e.hp<e.maxHp){const bw=e.size*2;ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(sx-bw/2,sy-e.size-10,bw,4);ctx.fillStyle=e.isBoss?'#ff0':'#ff4757';ctx.fillRect(sx-bw/2,sy-e.size-10,bw*(e.hp/e.maxHp),4);}
     if(e.frozen>0){ctx.font='12px sans-serif';ctx.fillText('❄️',sx,sy-e.size-14);}
     ctx.restore();
@@ -1467,6 +1913,41 @@ function render(){
   }
   ctx.restore();
 
+  
+  // Slash Effects
+  if(game.slashEffects){
+    for(let i=game.slashEffects.length-1;i>=0;i--){
+      const s=game.slashEffects[i];
+
+      // Safe camera fallback
+      const camX = game.camera ? game.camera.x : 0;
+      const camY = game.camera ? game.camera.y : 0;
+
+      const sx=s.x-camX;
+      const sy=s.y-camY;
+
+      ctx.save();
+      ctx.translate(sx,sy);
+      ctx.rotate(s.angle || 0);
+      ctx.globalAlpha=Math.max(0, s.life/s.maxLife);
+
+      ctx.strokeStyle='#ffffff';
+      ctx.lineWidth=6;
+
+      ctx.beginPath();
+      ctx.arc(0,0,40,-0.5,0.5);
+      ctx.stroke();
+
+      ctx.restore();
+
+      s.life--;
+
+      if(s.life<=0){
+        game.slashEffects.splice(i,1);
+      }
+    }
+  }
+
   // Projectiles
   for(const pr of game.projectiles){
     const sx=pr.x-cam.x,sy=pr.y-cam.y;
@@ -1502,7 +1983,7 @@ function renderMinimap(){
   const scale=80/MAP_W;
   for(let y=0;y<MAP_H;y++)for(let x=0;x<MAP_W;x++){
     if(!game.explored[y][x])continue;const t=game.map[y][x];
-    if(t===0||t===2||t===4)mc.fillStyle='#333';else if(t===1)mc.fillStyle='#1a3d12';else if(t===3)mc.fillStyle='#1a4a7a';else if(t===5)mc.fillStyle='#ffd700';else continue;
+    if(t===0||t===2||t===4)mc.fillStyle='#333';else if(t===1)mc.fillStyle='#1a3d12';else if(t===3)mc.fillStyle='#1a4a7a';else if(typeof t==='object' && t.type===4)mc.fillStyle='#1f5f2a';else if(t===5)mc.fillStyle='#ffd700';else continue;
     mc.fillRect(x*scale,y*scale,scale+0.5,scale+0.5);
   }
   mc.fillStyle='#f44';for(const e of game.enemies){mc.fillRect((e.x/TILE)*scale-1,(e.y/TILE)*scale-1,2,2);}
@@ -1516,10 +1997,15 @@ function nextFloor(){
   el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2500);
   spawnExplosion(game.player.x,game.player.y,'#2ed573',20);
+
+  const fade=document.getElementById('floor-fade');
+  fade.style.opacity='1';
+  setTimeout(()=>{ fade.style.opacity='0'; }, 350);
 }
 
 function gameOver(){
   game.gameOver=true;
+  saveBestStats();
   triggerScreenShake(10,20);slowMotion=30;
   setTimeout(()=>{
     document.getElementById('death-stats').innerHTML=`
@@ -1534,14 +2020,38 @@ function gameOver(){
   },500);
 }
 
+
+// Failsafe remove version badge during gameplay
+setTimeout(()=>{
+  const vb=document.getElementById('title-version-badge');
+  const ts=document.getElementById('title-screen');
+
+  if(vb && ts && ts.style.display==='none'){
+    vb.remove();
+  }
+},500);
+
+
 function startGame(){
   initAudio();
   document.getElementById('start-screen').style.display='none';
   document.getElementById('death-screen').classList.remove('show');
   document.getElementById('levelup-screen').classList.remove('show');
-  game=initGame();generateMap();resize();
+  game=initGame();
+  if(!game.slashEffects) game.slashEffects=[];
+  const permanentHp=parseInt(localStorage.getItem('wildrogue_perm_hp')||'0');
+  game.player.maxHp+=permanentHp;
+  game.player.hp=game.player.maxHp;
+  generateMap();
+  resize();
   skillBtn.textContent=game.player.skill.emoji;
+  updateInventoryUI();
   comboCount=0;killStreak=0;
+
+  if(game.player.essence>=25 && !localStorage.getItem('wildrogue_upgrade_hint')){
+    localStorage.setItem('wildrogue_upgrade_hint','1');
+    showMsg('✨ You can now earn permanent upgrades!',120);
+  }
 }
 
 function loop(){update();render();requestAnimationFrame(loop);}
