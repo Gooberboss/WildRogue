@@ -22,160 +22,91 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
-h1 {
-  font-size: 16px;
-  color: #f0c040;
-  margin: 6px 0 4px;
-  text-align: center;
-  letter-spacing: 2px;
-}
+h1 { font-size: 14px; color: #f0c040; margin: 4px 0 2px; letter-spacing: 2px; }
 .hud {
-  display: flex;
-  gap: 10px;
-  font-size: 11px;
-  padding: 4px 10px;
-  background: #16213e;
-  border-radius: 4px;
-  margin-bottom: 4px;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: flex; gap: 6px; font-size: 10px; padding: 3px 8px;
+  background: #16213e; border-radius: 4px; margin-bottom: 2px;
+  flex-wrap: wrap; justify-content: center;
 }
 .hud span { color: #aaa; }
-.hud .val { color: #f0c040; font-weight: bold; }
+.hud .val { font-weight: bold; }
 .hud .hp-val { color: #e74c3c; }
 .hud .faith-val { color: #9b59b6; }
 .hud .souls-val { color: #2ecc71; }
-#game-canvas {
-  border: 2px solid #333;
-  background: #0f0f23;
-  image-rendering: pixelated;
-  max-width: 100vw;
-}
-.msg {
-  font-size: 11px;
-  color: #aaa;
-  margin-top: 4px;
-  height: 16px;
-  text-align: center;
-  transition: color 0.3s;
-  padding: 0 8px;
-}
-.touch-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  width: 100%;
-  max-width: 360px;
-}
-.touch-row {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  width: 100%;
-}
+.hud .gold-val { color: #f1c40f; }
+.hud .xp-val { color: #f39c12; }
+.bar-wrap { display: inline-flex; align-items: center; gap: 2px; }
+.bar { width: 40px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.2s; }
+.bar-fill.hp { background: #e74c3c; }
+.bar-fill.xp { background: #f39c12; }
+.bar-fill.faith { background: #9b59b6; }
+#game-canvas { border: 2px solid #333; background: #0f0f23; image-rendering: pixelated; max-width: 100vw; }
+.msg { font-size: 10px; color: #aaa; margin-top: 2px; min-height: 14px; text-align: center; padding: 0 8px; }
+.touch-controls { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 4px; width: 100%; max-width: 380px; }
+.touch-row { display: flex; gap: 3px; justify-content: center; width: 100%; }
 .touch-btn {
-  width: 60px;
-  height: 52px;
-  background: #2a2a4e;
-  border: 2px solid #444;
-  border-radius: 8px;
-  color: #f0c040;
-  font-size: 20px;
-  font-family: monospace;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.1s;
+  width: 54px; height: 46px; background: #2a2a4e; border: 2px solid #444;
+  border-radius: 8px; color: #f0c040; font-size: 18px; font-family: monospace;
+  font-weight: bold; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.touch-btn:active, .touch-btn.active {
-  background: #f0c040;
-  color: #1a1a2e;
-  border-color: #f5d060;
+.touch-btn:active, .touch-btn.active { background: #f0c040; color: #1a1a2e; border-color: #f5d060; }
+.touch-btn.action { background: #1e3a5f; border-color: #3498db; color: #3498db; font-size: 9px; width: 58px; }
+.touch-btn.action:active, .touch-btn.action.active { background: #3498db; color: #fff; }
+.touch-btn.pray { background: #3d1e5f; border-color: #9b59b6; color: #9b59b6; font-size: 9px; width: 58px; }
+.touch-btn.pray:active, .touch-btn.pray.active { background: #9b59b6; color: #fff; }
+.touch-btn.heal { background: #1e5f3d; border-color: #2ecc71; color: #2ecc71; font-size: 9px; width: 58px; }
+.touch-btn.heal:active, .touch-btn.heal.active { background: #2ecc71; color: #fff; }
+.spacer { width: 54px; height: 46px; }
+.inv { display: flex; gap: 3px; margin-bottom: 2px; justify-content: center; }
+.inv-slot { width: 20px; height: 20px; background: #16213e; border: 1px solid #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+#overlay, #shop-overlay, #levelup-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.92); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 100; padding: 16px;
 }
-.touch-btn.action {
-  background: #1e3a5f;
-  border-color: #3498db;
-  color: #3498db;
-  font-size: 11px;
-  width: 72px;
+#shop-overlay, #levelup-overlay { display: none; }
+#overlay h2 { color: #f0c040; font-size: 20px; margin-bottom: 8px; }
+#overlay p { color: #ccc; font-size: 12px; margin-bottom: 5px; text-align: center; max-width: 320px; line-height: 1.4; }
+.start-btn {
+  margin-top: 12px; padding: 12px 28px; background: #f0c040; color: #1a1a2e;
+  border: none; border-radius: 8px; font-family: monospace; font-size: 15px;
+  font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.touch-btn.action:active, .touch-btn.action.active {
-  background: #3498db;
-  color: #fff;
+.start-btn:active { background: #f5d060; transform: scale(0.95); }
+.shop-title { color: #e67e22; font-size: 16px; margin-bottom: 10px; }
+.shop-item {
+  background: #16213e; border: 1px solid #444; border-radius: 6px;
+  padding: 8px 14px; margin: 3px; color: #eee; font-family: monospace;
+  font-size: 11px; cursor: pointer; min-width: 180px; text-align: center;
 }
-.touch-btn.pray {
-  background: #3d1e5f;
-  border-color: #9b59b6;
-  color: #9b59b6;
-  font-size: 11px;
-  width: 72px;
-}
-.touch-btn.pray:active, .touch-btn.pray.active {
-  background: #9b59b6;
-  color: #fff;
-}
-.spacer { width: 60px; height: 52px; }
-.legend {
-  display: flex;
-  gap: 8px;
-  font-size: 10px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 360px;
-  padding: 0 8px;
-}
-.legend-item { display: flex; align-items: center; gap: 3px; }
-.legend-color {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  display: inline-block;
-}
-#overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
-}
-#overlay h2 { color: #f0c040; font-size: 22px; margin-bottom: 12px; }
-#overlay p { color: #ccc; font-size: 13px; margin-bottom: 8px; text-align: center; max-width: 340px; line-height: 1.5; }
-#overlay .start-btn {
-  margin-top: 16px;
-  padding: 14px 32px;
-  background: #f0c040;
-  color: #1a1a2e;
-  border: none;
-  border-radius: 8px;
-  font-family: monospace;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-#overlay .start-btn:active { background: #f5d060; transform: scale(0.95); }
+.shop-item:active { background: #2a3a5e; border-color: #f0c040; }
+.shop-close { margin-top: 10px; padding: 8px 18px; background: #444; color: #eee; border: none; border-radius: 6px; font-family: monospace; cursor: pointer; }
+.lu-option { background: #16213e; border: 1px solid #f0c040; border-radius: 6px; padding: 10px 16px; margin: 4px; color: #f0c040; font-family: monospace; font-size: 12px; cursor: pointer; min-width: 200px; text-align: center; }
+.lu-option:active { background: #f0c040; color: #1a1a2e; }
+.minimap { position: absolute; top: 3px; right: 3px; border: 1px solid #444; border-radius: 2px; opacity: 0.75; }
+@keyframes floatUp { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-18px); } }
+.float-txt { position:absolute; font-size:11px; font-weight:bold; font-family:monospace; pointer-events:none; animation: floatUp 0.7s ease-out forwards; }
 </style>
 </head>
 <body>
 <h1>✝ THE GREAT COMMISSION ✝</h1>
 <div class="hud">
-  <span>HP:<span class="val hp-val" id="hp">10</span></span>
-  <span>Faith:<span class="val faith-val" id="faith">5</span></span>
+  <span class="bar-wrap">HP:<span class="val hp-val" id="hp">12</span><span class="bar"><span class="bar-fill hp" id="hp-bar" style="width:100%"></span></span></span>
+  <span class="bar-wrap">Faith:<span class="val faith-val" id="faith">5</span><span class="bar"><span class="bar-fill faith" id="faith-bar" style="width:62%"></span></span></span>
   <span>Souls:<span class="val souls-val" id="souls">0</span></span>
-  <span>Lv:<span class="val" id="level">1</span></span>
-  <span>Scrolls:<span class="val" id="scrolls">0</span></span>
+  <span>Gold:<span class="val gold-val" id="gold">0</span></span>
+  <span class="bar-wrap">Lv:<span class="val xp-val" id="plevel">1</span><span class="bar"><span class="bar-fill xp" id="xp-bar" style="width:0%"></span></span></span>
+  <span>Floor:<span class="val" id="level">1</span></span>
 </div>
-<canvas id="game-canvas"></canvas>
-<div class="msg" id="msg">Tap buttons to move. Spread the Word!</div>
+<div class="inv" id="inventory"></div>
+<div style="position:relative;display:inline-block;">
+  <canvas id="game-canvas"></canvas>
+  <canvas class="minimap" id="minimap" width="56" height="42"></canvas>
+  <div id="floats" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;"></div>
+</div>
+<div class="msg" id="msg">Swipe or use D-pad to move!</div>
 <div class="touch-controls">
   <div class="touch-row">
     <div class="spacer"></div>
@@ -190,526 +121,501 @@ h1 {
   <div class="touch-row">
     <div class="touch-btn pray" id="btn-pray">PRAY</div>
     <div class="touch-btn action" id="btn-preach">PREACH</div>
-    <div class="touch-btn action" id="btn-restart" style="background:#5a1e1e;border-color:#e74c3c;color:#e74c3c;display:none;">RESTART</div>
+    <div class="touch-btn heal" id="btn-heal">HEAL</div>
+    <div class="touch-btn action" id="btn-restart" style="background:#5a1e1e;border-color:#e74c3c;color:#e74c3c;display:none;">RETRY</div>
   </div>
-</div>
-<div class="legend">
-  <div class="legend-item"><span class="legend-color" style="background:#f0c040"></span>You</div>
-  <div class="legend-item"><span class="legend-color" style="background:#2ecc71"></span>Villager</div>
-  <div class="legend-item"><span class="legend-color" style="background:#e74c3c"></span>Enemy</div>
-  <div class="legend-item"><span class="legend-color" style="background:#9b59b6"></span>Scroll</div>
-  <div class="legend-item"><span class="legend-color" style="background:#3498db"></span>Well</div>
-  <div class="legend-item"><span class="legend-color" style="background:#e67e22"></span>Church</div>
-  <div class="legend-item"><span class="legend-color" style="background:#ecf0f1"></span>Exit</div>
 </div>
 
 <div id="overlay">
   <h2>✝ THE GREAT COMMISSION ✝</h2>
-  <p>You are a missionary sent to spread the Gospel across dangerous lands.</p>
-  <p>Convert villagers, collect Scripture scrolls, avoid wolves & bandits, and find churches for healing.</p>
-  <p>Reach the exit ▣ to advance to new territories!</p>
+  <p>You are a missionary called to spread the Gospel across dangerous lands.</p>
+  <p>⚔️ Fight enemies | 📜 Collect scrolls | 🙏 Pray to smite evil</p>
+  <p>💬 Preach to save souls | 💰 Earn gold | 🏪 Visit merchants</p>
+  <p>⬆️ Level up & choose upgrades | 🚪 Find the exit to advance</p>
   <button class="start-btn" id="start-btn">Begin Your Mission</button>
+</div>
+
+<div id="shop-overlay">
+  <div class="shop-title">🏪 Traveling Merchant</div>
+  <div id="shop-items"></div>
+  <button class="shop-close" id="shop-close">Leave</button>
+</div>
+
+<div id="levelup-overlay">
+  <div class="shop-title" style="color:#f0c040;">⬆️ LEVEL UP!</div>
+  <div id="lu-options"></div>
 </div>
 
 <script>
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
+const mmCanvas = document.getElementById('minimap');
+const mmCtx = mmCanvas.getContext('2d');
 
-// Responsive canvas sizing
 function resizeCanvas() {
   const maxW = Math.min(window.innerWidth - 4, 640);
-  const tileSize = Math.floor(maxW / 32);
-  canvas.width = tileSize * 32;
-  canvas.height = tileSize * 24;
-  canvas.style.width = canvas.width + 'px';
-  canvas.style.height = canvas.height + 'px';
-  return tileSize;
+  const t = Math.floor(maxW / 32);
+  canvas.width = t * 32; canvas.height = t * 24;
+  canvas.style.width = canvas.width + 'px'; canvas.style.height = canvas.height + 'px';
+  return t;
 }
 let TILE = resizeCanvas();
 window.addEventListener('resize', () => { TILE = resizeCanvas(); });
 
-const COLS = 32;
-const ROWS = 24;
+const COLS = 32, ROWS = 24;
 const overlay = document.getElementById('overlay');
 const startBtn = document.getElementById('start-btn');
 const msgEl = document.getElementById('msg');
 const restartBtn = document.getElementById('btn-restart');
+const shopOverlay = document.getElementById('shop-overlay');
+const shopItemsEl = document.getElementById('shop-items');
+const shopClose = document.getElementById('shop-close');
+const luOverlay = document.getElementById('levelup-overlay');
+const luOptions = document.getElementById('lu-options');
+const floatsEl = document.getElementById('floats');
 
-let game = null;
-let keys = {};
-let lastMove = 0;
-const MOVE_DELAY = 150;
-let animFrame = null;
-let touchDir = null;
-let touchInterval = null;
+let game = null, keys = {}, lastMove = 0, animFrame = null, touchDir = null;
+let particles = [], screenShake = 0;
 
-function rng(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function rng(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+const ITEMS = {
+  wooden_cross: { name:'Wooden Cross', sym:'✝', color:'#e67e22', desc:'+1 faith regen', passive:true },
+  iron_staff: { name:'Iron Staff', sym:'⚚', color:'#95a5a6', desc:'+1 ATK', atkBonus:1, passive:true },
+  holy_water: { name:'Holy Water', sym:'💧', color:'#3498db', desc:'Heal 6 HP', heal:6 },
+  bible: { name:'Bible', sym:'📖', color:'#8e44ad', desc:'+1 preach range', preachBonus:1, passive:true },
+  shield_faith: { name:'Shield of Faith', sym:'🛡', color:'#f39c12', desc:'-1 DMG taken', defBonus:1, passive:true },
+  bread: { name:'Bread', sym:'🍞', color:'#d4a574', desc:'Heal 4 HP', heal:4 },
+  chalice: { name:'Golden Chalice', sym:'🏆', color:'#f1c40f', desc:'+3 max faith', maxFaith:3, passive:true },
+  sandals: { name:'Sandals of Peace', sym:'👡', color:'#a0522d', desc:'Move faster', speed:true, passive:true },
+  incense: { name:'Incense', sym:'🌿', color:'#27ae60', desc:'+2 pray radius', prayBonus:2, passive:true },
+};
+const SHOP_POOL = Object.keys(ITEMS);
+const BIOMES = ['plains','forest','desert','swamp','mountain'];
+const BIOME_COLORS = {
+  plains: { floor:'#2a2a3e', wall:'#4a4a5e', tree:'#1e4d2b', water:'#1a3a5c' },
+  forest: { floor:'#1e2e1e', wall:'#3a5a3a', tree:'#145a20', water:'#1a3a5c' },
+  desert: { floor:'#3d3520', wall:'#6b5b3a', tree:'#5a7a2b', water:'#1a4a6c' },
+  swamp: { floor:'#1e2a1e', wall:'#3a4a3a', tree:'#2a5a2a', water:'#2a4a3a' },
+  mountain: { floor:'#2e2e3e', wall:'#6a6a7e', tree:'#3a5a4a', water:'#1a3a5c' },
+};
+const NAMES = ['Matthew','Mark','Luke','John','Peter','Paul','Mary','Ruth','Sarah','David','Samuel','Daniel','Esther','Naomi','Lydia','Timothy','Silas','Barnabas','Martha','Miriam'];
+
+function getBiome(lv) { return BIOMES[(lv-1) % BIOMES.length]; }
+function xpNeeded(lv) { return 15 + lv * 12; }
 
 function generateMap(level) {
+  const biome = getBiome(level);
   const map = [];
-  for (let y = 0; y < ROWS; y++) {
-    map[y] = [];
-    for (let x = 0; x < COLS; x++) {
-      if (x === 0 || x === COLS-1 || y === 0 || y === ROWS-1) {
-        map[y][x] = 'wall';
-      } else {
-        map[y][x] = Math.random() < 0.15 + level * 0.01 ? 'tree' : 'floor';
-      }
-    }
+  const treeDensity = biome==='forest'?0.22:biome==='desert'?0.06:0.13;
+  for (let y=0;y<ROWS;y++) { map[y]=[]; for (let x=0;x<COLS;x++) {
+    if (x===0||x===COLS-1||y===0||y===ROWS-1) map[y][x]='wall';
+    else map[y][x] = Math.random()<treeDensity+level*0.003?'tree':'floor';
+  }}
+  // rooms
+  const rooms = [];
+  for (let i=0;i<rng(4,6+Math.floor(level/2));i++) {
+    const rw=rng(3,7),rh=rng(3,5),rx=rng(2,COLS-rw-2),ry=rng(2,ROWS-rh-2);
+    rooms.push({x:rx,y:ry,w:rw,h:rh});
+    for (let dy=0;dy<rh;dy++) for (let dx=0;dx<rw;dx++) map[ry+dy][rx+dx]='floor';
   }
-  const rooms = rng(3, 5 + level);
-  for (let i = 0; i < rooms; i++) {
-    const rw = rng(3, 6);
-    const rh = rng(3, 5);
-    const rx = rng(2, COLS - rw - 2);
-    const ry = rng(2, ROWS - rh - 2);
-    for (let dy = 0; dy < rh; dy++)
-      for (let dx = 0; dx < rw; dx++)
-        map[ry+dy][rx+dx] = 'floor';
+  // corridors
+  for (let i=1;i<rooms.length;i++) {
+    let cx=Math.floor(rooms[i-1].x+rooms[i-1].w/2), cy=Math.floor(rooms[i-1].y+rooms[i-1].h/2);
+    const tx=Math.floor(rooms[i].x+rooms[i].w/2), ty=Math.floor(rooms[i].y+rooms[i].h/2);
+    while(cx!==tx){if(cy>0&&cy<ROWS-1&&cx>0&&cx<COLS-1)map[cy][cx]='floor';cx+=cx<tx?1:-1;}
+    while(cy!==ty){if(cy>0&&cy<ROWS-1&&cx>0&&cx<COLS-1)map[cy][cx]='floor';cy+=cy<ty?1:-1;}
   }
-  for (let i = 0; i < 4; i++) {
-    const horizontal = Math.random() > 0.5;
-    if (horizontal) {
-      const y = rng(2, ROWS-3);
-      for (let x = 1; x < COLS-1; x++) map[y][x] = 'floor';
-    } else {
-      const x = rng(2, COLS-3);
-      for (let y = 1; y < ROWS-1; y++) map[y][x] = 'floor';
-    }
-  }
-  const pools = rng(1, 2);
-  for (let i = 0; i < pools; i++) {
-    const px = rng(3, COLS-4);
-    const py = rng(3, ROWS-4);
-    for (let dy = -1; dy <= 1; dy++)
-      for (let dx = -1; dx <= 1; dx++)
-        if (map[py+dy] && map[py+dy][px+dx] === 'floor' && Math.random() > 0.3)
-          map[py+dy][px+dx] = 'water';
-  }
+  // water pools
+  if (biome==='swamp') { for(let i=0;i<4;i++){const px=rng(3,COLS-4),py=rng(3,ROWS-4);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(map[py+dy]&&map[py+dy][px+dx]==='floor'&&Math.random()>0.2)map[py+dy][px+dx]='water';}}
+  else { const px=rng(4,COLS-5),py=rng(4,ROWS-5);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(map[py+dy]&&map[py+dy][px+dx]==='floor'&&Math.random()>0.4)map[py+dy][px+dx]='water';}
   return map;
 }
 
-function findFloor(map) {
-  let attempts = 0;
-  while (attempts < 1000) {
-    const x = rng(1, COLS-2);
-    const y = rng(1, ROWS-2);
-    if (map[y][x] === 'floor') return {x, y};
-    attempts++;
-  }
-  return {x: 2, y: 2};
+function findFloor(map, avoid) {
+  for(let i=0;i<2000;i++){const x=rng(2,COLS-3),y=rng(2,ROWS-3);if(map[y][x]==='floor'){if(avoid&&avoid.some(a=>Math.abs(a.x-x)+Math.abs(a.y-y)<4))continue;return{x,y};}}
+  return{x:3,y:3};
 }
 
 function spawnEntities(map, level) {
-  const entities = [];
-  const numVillagers = rng(4, 6 + level);
-  const numEnemies = rng(2, 3 + level * 2);
-  const numScrolls = rng(2, 4);
-  const numWells = rng(1, 2);
-
-  for (let i = 0; i < numVillagers; i++) {
-    const pos = findFloor(map);
-    entities.push({type: 'villager', x: pos.x, y: pos.y, converted: false});
+  const ents=[], placed=[];
+  // villagers
+  for(let i=0;i<rng(4,6+Math.floor(level/2));i++){const p=findFloor(map,placed);placed.push(p);ents.push({type:'villager',x:p.x,y:p.y,converted:false,name:NAMES[rng(0,NAMES.length-1)]});}
+  // enemies
+  for(let i=0;i<rng(3,3+level*2);i++){
+    const p=findFloor(map,placed);placed.push(p);
+    const r=Math.random();
+    let t,hp,atk,xpR,gd;
+    if(level>=5&&r>0.8){t='demon';hp=5+level;atk=3;xpR=18;gd=rng(3,6);}
+    else if(level>=2&&r>0.45){t='bandit';hp=3+Math.floor(level/2);atk=2;xpR=10;gd=rng(2,4);}
+    else{t='wolf';hp=2+Math.floor(level/3);atk=1;xpR=6;gd=rng(1,3);}
+    ents.push({type:t,x:p.x,y:p.y,hp,maxHp:hp,atk,xpR,gd,stunned:0});
   }
-  for (let i = 0; i < numEnemies; i++) {
-    const pos = findFloor(map);
-    const etype = Math.random() > 0.5 ? 'wolf' : 'bandit';
-    entities.push({type: etype, x: pos.x, y: pos.y, hp: etype === 'wolf' ? 2 : 3});
-  }
-  for (let i = 0; i < numScrolls; i++) {
-    const pos = findFloor(map);
-    entities.push({type: 'scroll', x: pos.x, y: pos.y});
-  }
-  for (let i = 0; i < numWells; i++) {
-    const pos = findFloor(map);
-    entities.push({type: 'well', x: pos.x, y: pos.y, used: false});
-  }
-  if (level > 1) {
-    const pos = findFloor(map);
-    entities.push({type: 'church', x: pos.x, y: pos.y});
-  }
-  const exitPos = findFloor(map);
-  entities.push({type: 'exit', x: exitPos.x, y: exitPos.y});
-  return entities;
+  // boss every 5
+  if(level%5===0){const p=findFloor(map,placed);placed.push(p);ents.push({type:'boss',x:p.x,y:p.y,hp:12+level*3,maxHp:12+level*3,atk:4,xpR:60,gd:rng(10,20),stunned:0,name:'False Prophet'});}
+  // scrolls
+  for(let i=0;i<rng(2,4);i++){const p=findFloor(map,placed);placed.push(p);ents.push({type:'scroll',x:p.x,y:p.y});}
+  // wells
+  for(let i=0;i<rng(1,2);i++){const p=findFloor(map,placed);placed.push(p);ents.push({type:'well',x:p.x,y:p.y,used:false});}
+  // church
+  if(level>1){const p=findFloor(map,placed);placed.push(p);ents.push({type:'church',x:p.x,y:p.y});}
+  // merchant
+  if(level%3===0||level===2){const p=findFloor(map,placed);placed.push(p);ents.push({type:'merchant',x:p.x,y:p.y});}
+  // chests
+  for(let i=0;i<rng(1,2);i++){const p=findFloor(map,placed);placed.push(p);ents.push({type:'chest',x:p.x,y:p.y,opened:false,loot:SHOP_POOL[rng(0,SHOP_POOL.length-1)]});}
+  // exit
+  const ep=findFloor(map,placed);ents.push({type:'exit',x:ep.x,y:ep.y,locked:level%5===0});
+  return ents;
 }
 
 function initGame() {
-  const level = 1;
-  const map = generateMap(level);
-  const playerPos = findFloor(map);
-  const entities = spawnEntities(map, level);
-  game = {
-    map, level,
-    player: { x: playerPos.x, y: playerPos.y, hp: 10, maxHp: 10, faith: 5, souls: 0, scrolls: 0 },
-    entities,
-    gameOver: false,
-    prayAnim: 0
+  const map=generateMap(1), pp=findFloor(map,[]);
+  game={
+    map, level:1, biome:getBiome(1),
+    player:{x:pp.x,y:pp.y,hp:12,maxHp:12,faith:5,maxFaith:8,souls:0,scrolls:0,gold:0,xp:0,plevel:1,atk:1,def:0,inventory:[],regenT:0},
+    entities:spawnEntities(map,1), gameOver:false, prayAnim:0, turn:0,
+    explored:Array.from({length:ROWS},()=>Array(COLS).fill(false)),
+    visible:Array.from({length:ROWS},()=>Array(COLS).fill(false))
   };
-  restartBtn.style.display = 'none';
+  restartBtn.style.display='none';
+  updateInv(); computeFOV();
 }
 
-function nextLevel() {
-  game.level++;
-  game.map = generateMap(game.level);
-  const pos = findFloor(game.map);
-  game.player.x = pos.x;
-  game.player.y = pos.y;
-  game.entities = spawnEntities(game.map, game.level);
-  game.player.faith = Math.min(game.player.faith + 2, 10 + game.level);
-  showMsg("New territory! Level " + game.level);
+function nextLevel(){
+  game.level++;game.biome=getBiome(game.level);game.map=generateMap(game.level);
+  const p=findFloor(game.map,[]);game.player.x=p.x;game.player.y=p.y;
+  game.entities=spawnEntities(game.map,game.level);
+  game.player.faith=Math.min(game.player.faith+2,getMaxFaith());
+  game.explored=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  game.visible=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  computeFOV();
+  showMsg("Entered "+game.biome+" — Floor "+game.level);
 }
 
-function showMsg(text) {
-  msgEl.textContent = text;
-  msgEl.style.color = '#f0c040';
-  setTimeout(() => { msgEl.style.color = '#aaa'; }, 2000);
+function showMsg(t){msgEl.textContent=t;msgEl.style.color='#f0c040';setTimeout(()=>{msgEl.style.color='#aaa';},2500);}
+
+function spawnFloat(x,y,text,color){
+  const el=document.createElement('div');el.className='float-txt';el.textContent=text;el.style.color=color||'#e74c3c';
+  el.style.left=(x*TILE+TILE/2-10)+'px';el.style.top=(y*TILE)+'px';
+  floatsEl.appendChild(el);setTimeout(()=>el.remove(),700);
 }
 
-function canMove(x, y) {
-  if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return false;
-  const tile = game.map[y][x];
-  return tile === 'floor' || tile === 'water';
-}
+function getAtk(){let a=game.player.atk;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].atkBonus)a+=ITEMS[id].atkBonus;});return a;}
+function getDef(){let d=game.player.def;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].defBonus)d+=ITEMS[id].defBonus;});return d;}
+function getPreachRange(){let r=2;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].preachBonus)r+=ITEMS[id].preachBonus;});return r;}
+function getPrayRadius(){let r=4;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].prayBonus)r+=ITEMS[id].prayBonus;});return r;}
+function getMaxFaith(){let f=game.player.maxFaith;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].maxFaith)f+=ITEMS[id].maxFaith;});return f;}
+function hasSpeed(){return game.player.inventory.some(id=>ITEMS[id]&&ITEMS[id].speed);}
+function getFaithRegen(){let r=8;game.player.inventory.forEach(id=>{if(ITEMS[id]&&ITEMS[id].name==='Wooden Cross')r-=2;});return Math.max(3,r);}
 
-function getEntityAt(x, y) {
-  return game.entities.find(e => e.x === x && e.y === y);
-}
-
-function movePlayer(dx, dy) {
-  if (!game || game.gameOver) return;
-  const nx = game.player.x + dx;
-  const ny = game.player.y + dy;
-  if (!canMove(nx, ny)) return;
-
-  const entity = getEntityAt(nx, ny);
-  if (entity) {
-    if (entity.type === 'wolf' || entity.type === 'bandit') {
-      entity.hp--;
-      if (entity.hp <= 0) {
-        game.entities = game.entities.filter(e => e !== entity);
-        showMsg("The " + entity.type + " is defeated!");
-        game.player.faith = Math.min(game.player.faith + 1, 10 + game.level);
-      } else {
-        showMsg("You strike the " + entity.type + "! (HP:" + entity.hp + ")");
-      }
-      return;
-    }
-    if (entity.type === 'scroll') {
-      game.player.scrolls++;
-      game.player.faith += 2;
-      game.entities = game.entities.filter(e => e !== entity);
-      showMsg("Scripture scroll found! Faith +2");
-    }
-    if (entity.type === 'well' && !entity.used) {
-      game.player.hp = Math.min(game.player.hp + 4, game.player.maxHp);
-      entity.used = true;
-      showMsg("Healed at the well! HP +4");
-    }
-    if (entity.type === 'church') {
-      game.player.hp = game.player.maxHp;
-      game.player.faith += 3;
-      showMsg("Prayed at church. Fully restored!");
-    }
-    if (entity.type === 'exit') {
-      nextLevel();
-      return;
-    }
+function gainXP(amt){
+  game.player.xp+=amt;
+  if(game.player.xp>=xpNeeded(game.player.plevel)){
+    game.player.xp-=xpNeeded(game.player.plevel);
+    game.player.plevel++;
+    showLevelUp();
   }
-  game.player.x = nx;
-  game.player.y = ny;
 }
 
-function pray() {
-  if (!game || game.gameOver) return;
-  if (game.player.faith < 2) { showMsg("Not enough faith to pray!"); return; }
-  game.player.faith -= 2;
-  game.prayAnim = 15;
-  let hit = 0;
-  game.entities.forEach(e => {
-    if ((e.type === 'wolf' || e.type === 'bandit')) {
-      const dist = Math.abs(e.x - game.player.x) + Math.abs(e.y - game.player.y);
-      if (dist <= 3) { e.hp -= 2; hit++; }
-    }
-  });
-  game.entities = game.entities.filter(e => !((e.type === 'wolf' || e.type === 'bandit') && e.hp <= 0));
-  if (hit === 0) showMsg("You pray... peace fills the air.");
-  else showMsg("Holy light repels " + hit + " enemy(ies)!");
-}
-
-function preach() {
-  if (!game || game.gameOver) return;
-  let converted = false;
-  game.entities.forEach(e => {
-    if (e.type === 'villager' && !e.converted) {
-      const dist = Math.abs(e.x - game.player.x) + Math.abs(e.y - game.player.y);
-      if (dist <= 2) {
-        if (game.player.scrolls > 0 || game.player.faith >= 1) {
-          e.converted = true;
-          game.player.souls++;
-          if (game.player.scrolls > 0) game.player.scrolls--;
-          else game.player.faith--;
-          converted = true;
-          showMsg("A soul is saved! (" + game.player.souls + " total)");
-        } else {
-          showMsg("Need scrolls or faith to preach!");
-        }
-      }
-    }
-  });
-  if (!converted) showMsg("No unconverted villagers nearby.");
-}
-
-function moveEnemies() {
-  game.entities.forEach(e => {
-    if (e.type === 'wolf' || e.type === 'bandit') {
-      const dist = Math.abs(e.x - game.player.x) + Math.abs(e.y - game.player.y);
-      if (dist < 8) {
-        let dx = Math.sign(game.player.x - e.x);
-        let dy = Math.sign(game.player.y - e.y);
-        if (Math.random() > 0.5) {
-          if (canMove(e.x + dx, e.y) && !getEntityAt(e.x + dx, e.y)) e.x += dx;
-          else if (canMove(e.x, e.y + dy) && !getEntityAt(e.x, e.y + dy)) e.y += dy;
-        } else {
-          if (canMove(e.x, e.y + dy) && !getEntityAt(e.x, e.y + dy)) e.y += dy;
-          else if (canMove(e.x + dx, e.y) && !getEntityAt(e.x + dx, e.y)) e.x += dx;
-        }
-        if (e.x === game.player.x && e.y === game.player.y) {
-          const dmg = e.type === 'bandit' ? 2 : 1;
-          game.player.hp -= dmg;
-          showMsg("The " + e.type + " attacks! -" + dmg + " HP");
-          e.x -= Math.sign(game.player.x - e.x) || 1;
-          e.y -= Math.sign(game.player.y - e.y) || 0;
-          if (!canMove(e.x, e.y)) { e.x += 1; }
-        }
-      } else if (Math.random() > 0.7) {
-        const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
-        const d = dirs[rng(0,3)];
-        if (canMove(e.x+d.x, e.y+d.y)) { e.x += d.x; e.y += d.y; }
-      }
-    }
-    if (e.type === 'villager' && Math.random() > 0.92) {
-      const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
-      const d = dirs[rng(0,3)];
-      if (canMove(e.x+d.x, e.y+d.y) && !getEntityAt(e.x+d.x, e.y+d.y)) {
-        e.x += d.x; e.y += d.y;
-      }
-    }
+function showLevelUp(){
+  luOverlay.style.display='flex';luOptions.innerHTML='';
+  const choices=[
+    {text:'❤️ +4 Max HP',apply:()=>{game.player.maxHp+=4;game.player.hp=game.player.maxHp;}},
+    {text:'⚔️ +1 Attack',apply:()=>{game.player.atk++;}},
+    {text:'🛡 +1 Defense',apply:()=>{game.player.def++;}},
+    {text:'🙏 +3 Max Faith',apply:()=>{game.player.maxFaith+=3;game.player.faith=getMaxFaith();}},
+    {text:'💚 Full Heal',apply:()=>{game.player.hp=game.player.maxHp;game.player.faith=getMaxFaith();}},
+  ];
+  const picked=[];while(picked.length<3){const i=rng(0,choices.length-1);if(!picked.includes(i))picked.push(i);}
+  picked.forEach(i=>{
+    const div=document.createElement('div');div.className='lu-option';div.textContent=choices[i].text;
+    const apply=choices[i].apply;
+    function pick(e){e.preventDefault();apply();luOverlay.style.display='none';showMsg("Level "+game.player.plevel+"! "+choices[i].text);for(let j=0;j<6;j++)particles.push({x:game.player.x*TILE+TILE/2,y:game.player.y*TILE+TILE/2,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:25,maxLife:25,color:'#f0c040'});}
+    div.addEventListener('click',pick);div.addEventListener('touchend',pick,{passive:false});
+    luOptions.appendChild(div);
   });
 }
 
-function checkGameOver() {
-  if (game.player.hp <= 0) {
-    game.gameOver = true;
-    restartBtn.style.display = 'flex';
-    showMsg("Martyred. " + game.player.souls + " souls saved. Tap RESTART.");
+function computeFOV(){
+  game.visible=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  const px=game.player.x,py=game.player.y,rad=7;
+  for(let a=0;a<360;a+=2){
+    const dx=Math.cos(a*Math.PI/180),dy=Math.sin(a*Math.PI/180);
+    let cx=px+0.5,cy=py+0.5;
+    for(let d=0;d<rad;d++){
+      const tx=Math.floor(cx),ty=Math.floor(cy);
+      if(tx<0||tx>=COLS||ty<0||ty>=ROWS)break;
+      game.visible[ty][tx]=true;game.explored[ty][tx]=true;
+      if(game.map[ty][tx]==='wall'||game.map[ty][tx]==='tree')break;
+      cx+=dx;cy+=dy;
+    }
   }
 }
 
-function draw() {
-  ctx.fillStyle = '#0f0f23';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+function canMove(x,y){if(x<0||x>=COLS||y<0||y>=ROWS)return false;const t=game.map[y][x];return t==='floor'||t==='water';}
+function getEntAt(x,y){return game.entities.find(e=>e.x===x&&e.y===y);}
 
-  const fontSize = Math.max(10, TILE - 4);
-  const smallFont = Math.max(8, TILE - 8);
-
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      const tile = game.map[y][x];
-      let color = '#1a1a2e';
-      if (tile === 'floor') color = '#2a2a3e';
-      else if (tile === 'wall') color = '#4a4a5e';
-      else if (tile === 'tree') color = '#1e4d2b';
-      else if (tile === 'water') color = '#1a3a5c';
-      ctx.fillStyle = color;
-      ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
-      if (tile === 'tree') {
-        ctx.fillStyle = '#2d7a45';
-        ctx.font = fontSize + 'px monospace';
-        ctx.fillText('♣', x*TILE+2, y*TILE+TILE-3);
+function movePlayer(dx,dy){
+  if(!game||game.gameOver)return;
+  const nx=game.player.x+dx,ny=game.player.y+dy;
+  if(!canMove(nx,ny))return;
+  const ent=getEntAt(nx,ny);
+  if(ent){
+    if(ent.type==='wolf'||ent.type==='bandit'||ent.type==='demon'||ent.type==='boss'){
+      const dmg=getAtk();ent.hp-=dmg;ent.stunned=2;
+      spawnFloat(ent.x,ent.y,'-'+dmg,'#fff');screenShake=4;
+      for(let i=0;i<3;i++)particles.push({x:ent.x*TILE+TILE/2,y:ent.y*TILE+TILE/2,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3,life:15,maxLife:15,color:'#e74c3c'});
+      if(ent.hp<=0){
+        game.entities=game.entities.filter(e=>e!==ent);gainXP(ent.xpR);game.player.gold+=ent.gd;
+        spawnFloat(ent.x,ent.y,'+'+ent.gd+'g','#f1c40f');
+        if(ent.type==='boss'){game.entities.forEach(e=>{if(e.type==='exit')e.locked=false;});showMsg("Boss defeated! Exit unlocked!");}
       }
-      if (tile === 'water') {
-        ctx.fillStyle = '#4a9eff';
-        ctx.font = smallFont + 'px monospace';
-        ctx.fillText('~', x*TILE+TILE/4, y*TILE+TILE-4);
-      }
+      game.turn++;computeFOV();return;
     }
+    if(ent.type==='scroll'){game.player.scrolls++;game.player.faith=Math.min(game.player.faith+2,getMaxFaith());game.entities=game.entities.filter(e=>e!==ent);spawnFloat(ent.x,ent.y,'+2 faith','#9b59b6');}
+    if(ent.type==='well'&&!ent.used){const h=5;game.player.hp=Math.min(game.player.hp+h,game.player.maxHp);ent.used=true;spawnFloat(ent.x,ent.y,'+'+h+' HP','#2ecc71');}
+    if(ent.type==='church'){game.player.hp=game.player.maxHp;game.player.faith=getMaxFaith();spawnFloat(ent.x,ent.y,'RESTORED','#2ecc71');}
+    if(ent.type==='merchant'){openShop();return;}
+    if(ent.type==='chest'&&!ent.opened){ent.opened=true;if(game.player.inventory.length<6){game.player.inventory.push(ent.loot);showMsg("Found: "+ITEMS[ent.loot].name+"!");}else{game.player.gold+=3;showMsg("Inv full! +3 gold");}updateInv();}
+    if(ent.type==='exit'){if(ent.locked){showMsg("Locked! Defeat the boss!");return;}nextLevel();return;}
+  }
+  game.player.x=nx;game.player.y=ny;game.turn++;
+  // faith regen
+  game.player.regenT++;
+  if(game.player.regenT>=getFaithRegen()){game.player.faith=Math.min(game.player.faith+1,getMaxFaith());game.player.regenT=0;}
+  computeFOV();
+}
+
+function pray(){
+  if(!game||game.gameOver)return;
+  if(game.player.faith<3){showMsg("Need 3 faith to pray!");return;}
+  game.player.faith-=3;game.prayAnim=20;screenShake=5;
+  let hit=0;const rad=getPrayRadius(),dmg=3+game.player.plevel;
+  game.entities.forEach(e=>{
+    if(e.type==='wolf'||e.type==='bandit'||e.type==='demon'||e.type==='boss'){
+      if(Math.abs(e.x-game.player.x)+Math.abs(e.y-game.player.y)<=rad){e.hp-=dmg;e.stunned=3;hit++;spawnFloat(e.x,e.y,'-'+dmg,'#f0c040');for(let i=0;i<4;i++)particles.push({x:e.x*TILE+TILE/2,y:e.y*TILE+TILE/2,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3,life:20,maxLife:20,color:'#f0c040'});}
+    }
+  });
+  game.entities=game.entities.filter(e=>!((e.type==='wolf'||e.type==='bandit'||e.type==='demon'||e.type==='boss')&&e.hp<=0));
+  // check boss kill
+  if(hit>0){const bossKilled=!game.entities.some(e=>e.type==='boss');if(bossKilled)game.entities.forEach(e=>{if(e.type==='exit')e.locked=false;});}
+  showMsg(hit?("Holy light smites "+hit+" foe(s)!"):"You pray... peace fills the air.");
+}
+
+function preach(){
+  if(!game||game.gameOver)return;
+  const range=getPreachRange();let done=false;
+  game.entities.forEach(e=>{
+    if(e.type==='villager'&&!e.converted&&Math.abs(e.x-game.player.x)+Math.abs(e.y-game.player.y)<=range){
+      if(game.player.scrolls>0||game.player.faith>=2){
+        e.converted=true;game.player.souls++;
+        if(game.player.scrolls>0)game.player.scrolls--;else game.player.faith-=2;
+        gainXP(12);done=true;
+        spawnFloat(e.x,e.y,'✝ SAVED','#2ecc71');
+        for(let i=0;i<5;i++)particles.push({x:e.x*TILE+TILE/2,y:e.y*TILE+TILE/2,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3,life:20,maxLife:20,color:'#2ecc71'});
+        showMsg(e.name+" is saved! ("+game.player.souls+" souls)");
+      } else showMsg("Need scrolls or 2 faith!");
+    }
+  });
+  if(!done)showMsg("No unconverted villagers in range.");
+}
+
+function useHeal(){
+  if(!game||game.gameOver)return;
+  const idx=game.player.inventory.findIndex(id=>ITEMS[id]&&ITEMS[id].heal);
+  if(idx===-1){showMsg("No healing items!");return;}
+  const item=ITEMS[game.player.inventory[idx]];
+  game.player.hp=Math.min(game.player.hp+item.heal,game.player.maxHp);
+  spawnFloat(game.player.x,game.player.y,'+'+item.heal+' HP','#2ecc71');
+  game.player.inventory.splice(idx,1);updateInv();
+  showMsg("Used "+item.name+"!");
+}
+
+function openShop(){
+  shopOverlay.style.display='flex';shopItemsEl.innerHTML='';
+  const avail=[];for(let i=0;i<3;i++){const id=SHOP_POOL[rng(0,SHOP_POOL.length-1)];avail.push({id,price:ITEMS[id].heal?rng(3,5):rng(5,9)});}
+  avail.forEach(({id,price})=>{
+    const div=document.createElement('div');div.className='shop-item';
+    div.textContent=ITEMS[id].sym+' '+ITEMS[id].name+' — '+price+'g ('+ITEMS[id].desc+')';
+    function buy(e){e.preventDefault();if(game.player.gold>=price&&game.player.inventory.length<6){game.player.gold-=price;game.player.inventory.push(id);updateInv();div.textContent='✓ Bought!';div.style.color='#2ecc71';}else showMsg(game.player.inventory.length>=6?"Inv full!":"Not enough gold!");}
+    div.addEventListener('click',buy);div.addEventListener('touchend',buy,{passive:false});
+    shopItemsEl.appendChild(div);
+  });
+}
+shopClose.addEventListener('click',()=>{shopOverlay.style.display='none';});
+shopClose.addEventListener('touchend',(e)=>{e.preventDefault();shopOverlay.style.display='none';});
+
+function updateInv(){
+  const inv=document.getElementById('inventory');inv.innerHTML='';
+  for(let i=0;i<6;i++){const s=document.createElement('div');s.className='inv-slot';if(game&&game.player.inventory[i])s.textContent=ITEMS[game.player.inventory[i]].sym;inv.appendChild(s);}
+}
+
+function moveEnemies(){
+  game.entities.forEach(e=>{
+    if(e.type==='wolf'||e.type==='bandit'||e.type==='demon'||e.type==='boss'){
+      if(e.stunned>0){e.stunned--;return;}
+      const dist=Math.abs(e.x-game.player.x)+Math.abs(e.y-game.player.y);
+      const aggro=e.type==='boss'?14:e.type==='demon'?10:7;
+      if(dist<aggro&&dist>1){
+        let dx=Math.sign(game.player.x-e.x),dy=Math.sign(game.player.y-e.y);
+        if(Math.random()>0.5){if(canMove(e.x+dx,e.y)&&!getEntAt(e.x+dx,e.y))e.x+=dx;else if(canMove(e.x,e.y+dy)&&!getEntAt(e.x,e.y+dy))e.y+=dy;}
+        else{if(canMove(e.x,e.y+dy)&&!getEntAt(e.x,e.y+dy))e.y+=dy;else if(canMove(e.x+dx,e.y)&&!getEntAt(e.x+dx,e.y))e.x+=dx;}
+      }
+      if(Math.abs(e.x-game.player.x)+Math.abs(e.y-game.player.y)<=1){
+        const dmg=Math.max(1,e.atk-getDef());game.player.hp-=dmg;
+        spawnFloat(game.player.x,game.player.y,'-'+dmg,'#e74c3c');screenShake=3;
+      }
+      if(dist>=aggro&&Math.random()>0.7){const dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];const d=dirs[rng(0,3)];if(canMove(e.x+d.x,e.y+d.y)&&!getEntAt(e.x+d.x,e.y+d.y)){e.x+=d.x;e.y+=d.y;}}
+    }
+    if(e.type==='villager'&&Math.random()>0.93){const dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];const d=dirs[rng(0,3)];if(canMove(e.x+d.x,e.y+d.y)&&!getEntAt(e.x+d.x,e.y+d.y)){e.x+=d.x;e.y+=d.y;}}
+  });
+}
+
+function checkGameOver(){if(game.player.hp<=0){game.gameOver=true;restartBtn.style.display='flex';showMsg("Martyred. "+game.player.souls+" souls saved on Floor "+game.level);}}
+
+function drawMinimap(){
+  mmCtx.fillStyle='#111';mmCtx.fillRect(0,0,56,42);
+  const sx=56/COLS,sy=42/ROWS;
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    if(!game.explored[y][x])continue;
+    const t=game.map[y][x];mmCtx.fillStyle=(t==='wall'||t==='tree')?'#444':t==='water'?'#234':'#222';
+    mmCtx.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));
+  }
+  game.entities.forEach(e=>{if(!game.visible[e.y][e.x])return;if(e.type==='exit')mmCtx.fillStyle='#ecf0f1';else if(e.type==='villager')mmCtx.fillStyle='#2ecc71';else if(e.type==='wolf'||e.type==='bandit'||e.type==='demon'||e.type==='boss')mmCtx.fillStyle='#e74c3c';else return;mmCtx.fillRect(e.x*sx,e.y*sy,Math.ceil(sx*1.5),Math.ceil(sy*1.5));});
+  mmCtx.fillStyle='#f0c040';mmCtx.fillRect(game.player.x*sx,game.player.y*sy,Math.ceil(sx*2),Math.ceil(sy*2));
+}
+
+function draw(){
+  const shX=screenShake>0?(Math.random()-0.5)*screenShake:0;
+  const shY=screenShake>0?(Math.random()-0.5)*screenShake:0;
+  if(screenShake>0)screenShake-=0.5;
+  ctx.save();ctx.translate(shX,shY);
+  ctx.fillStyle='#0a0a18';ctx.fillRect(-5,-5,canvas.width+10,canvas.height+10);
+  const bc=BIOME_COLORS[game.biome]||BIOME_COLORS.plains;
+  const fs=Math.max(10,TILE-4);
+
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    if(!game.explored[y][x])continue;
+    const t=game.map[y][x],vis=game.visible[y][x];
+    let c=t==='floor'?bc.floor:t==='wall'?bc.wall:t==='tree'?bc.tree:t==='water'?bc.water:'#111';
+    ctx.globalAlpha=vis?1:0.3;ctx.fillStyle=c;ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
+    if(vis){
+      if(t==='tree'){ctx.fillStyle='#2d7a45';ctx.font=fs+'px monospace';ctx.fillText('♣',x*TILE+2,y*TILE+TILE-3);}
+      if(t==='water'){ctx.fillStyle='#4a9eff';ctx.font=(fs-2)+'px monospace';ctx.fillText('≈',x*TILE+3,y*TILE+TILE-4);}
+    }
+    ctx.globalAlpha=1;
   }
 
-  game.entities.forEach(e => {
-    let symbol = '?';
-    let color = '#fff';
-    if (e.type === 'villager') { symbol = e.converted ? '☺' : '☻'; color = e.converted ? '#27ae60' : '#2ecc71'; }
-    else if (e.type === 'wolf') { symbol = 'W'; color = '#e74c3c'; }
-    else if (e.type === 'bandit') { symbol = 'B'; color = '#c0392b'; }
-    else if (e.type === 'scroll') { symbol = '✦'; color = '#9b59b6'; }
-    else if (e.type === 'well') { symbol = e.used ? '○' : '◎'; color = e.used ? '#555' : '#3498db'; }
-    else if (e.type === 'church') { symbol = '†'; color = '#e67e22'; }
-    else if (e.type === 'exit') { symbol = '▣'; color = '#ecf0f1'; }
-    ctx.fillStyle = color;
-    ctx.font = 'bold ' + fontSize + 'px monospace';
-    ctx.fillText(symbol, e.x * TILE + 2, e.y * TILE + TILE - 3);
+  // entities
+  game.entities.forEach(e=>{
+    if(!game.visible[e.y][e.x])return;
+    let sym='?',col='#fff';
+    if(e.type==='villager'){sym=e.converted?'☺':'☻';col=e.converted?'#27ae60':'#2ecc71';}
+    else if(e.type==='wolf'){sym='🐺';col='#e74c3c';}
+    else if(e.type==='bandit'){sym='🗡';col='#c0392b';}
+    else if(e.type==='demon'){sym='👹';col='#8e44ad';}
+    else if(e.type==='boss'){sym='☠';col='#ff0040';}
+    else if(e.type==='scroll'){sym='📜';col='#9b59b6';}
+    else if(e.type==='well'){sym=e.used?'○':'◎';col=e.used?'#555':'#3498db';}
+    else if(e.type==='church'){sym='⛪';col='#e67e22';}
+    else if(e.type==='merchant'){sym='🏪';col='#f1c40f';}
+    else if(e.type==='chest'){sym=e.opened?'□':'📦';col=e.opened?'#555':'#f39c12';}
+    else if(e.type==='exit'){sym=e.locked?'🔒':'🚪';col=e.locked?'#e74c3c':'#ecf0f1';}
+    ctx.fillStyle=col;ctx.font=fs+'px monospace';ctx.fillText(sym,e.x*TILE+1,e.y*TILE+TILE-3);
+    // hp bars
+    if((e.type==='wolf'||e.type==='bandit'||e.type==='demon'||e.type==='boss')&&e.hp<e.maxHp){
+      const bw=TILE-4;ctx.fillStyle='#333';ctx.fillRect(e.x*TILE+2,e.y*TILE-2,bw,3);
+      ctx.fillStyle=e.type==='boss'?'#ff0040':'#e74c3c';ctx.fillRect(e.x*TILE+2,e.y*TILE-2,bw*(e.hp/e.maxHp),3);
+    }
   });
 
-  if (game.prayAnim > 0) {
-    ctx.fillStyle = 'rgba(240, 192, 64, ' + (game.prayAnim / 15 * 0.3) + ')';
-    ctx.beginPath();
-    ctx.arc(game.player.x * TILE + TILE/2, game.player.y * TILE + TILE/2, TILE*2.5, 0, Math.PI*2);
-    ctx.fill();
-    game.prayAnim--;
-  }
-  ctx.fillStyle = '#f0c040';
-  ctx.font = 'bold ' + fontSize + 'px monospace';
-  ctx.fillText('☨', game.player.x * TILE + 2, game.player.y * TILE + TILE - 3);
-
-  if (game.gameOver) {
-    ctx.fillStyle = 'rgba(0,0,0,0.75)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#e74c3c';
-    ctx.font = 'bold 22px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('MARTYRED', canvas.width/2, canvas.height/2 - 16);
-    ctx.fillStyle = '#f0c040';
-    ctx.font = '14px monospace';
-    ctx.fillText('Souls Saved: ' + game.player.souls + ' | Level: ' + game.level, canvas.width/2, canvas.height/2 + 12);
-    ctx.textAlign = 'left';
+  // pray anim
+  if(game.prayAnim>0){
+    const a=game.prayAnim/20*0.4,r=(20-game.prayAnim)*TILE*0.25;
+    ctx.strokeStyle='rgba(240,192,64,'+a+')';ctx.lineWidth=3;ctx.beginPath();ctx.arc(game.player.x*TILE+TILE/2,game.player.y*TILE+TILE/2,r,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(240,192,64,'+(a*0.2)+')';ctx.fill();game.prayAnim--;
   }
 
-  document.getElementById('hp').textContent = game.player.hp;
-  document.getElementById('faith').textContent = game.player.faith;
-  document.getElementById('souls').textContent = game.player.souls;
-  document.getElementById('level').textContent = game.level;
-  document.getElementById('scrolls').textContent = game.player.scrolls;
+  // player
+  ctx.fillStyle='#f0c040';ctx.font='bold '+fs+'px monospace';ctx.fillText('☨',game.player.x*TILE+2,game.player.y*TILE+TILE-3);
+
+  // particles
+  particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.life--;ctx.globalAlpha=p.life/p.maxLife;ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);ctx.globalAlpha=1;return p.life>0;});
+  ctx.restore();
+
+  // game over
+  if(game.gameOver){
+    ctx.fillStyle='rgba(0,0,0,0.8)';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.textAlign='center';ctx.fillStyle='#e74c3c';ctx.font='bold 20px monospace';ctx.fillText('MARTYRED',canvas.width/2,canvas.height/2-24);
+    ctx.fillStyle='#f0c040';ctx.font='12px monospace';
+    ctx.fillText('Souls: '+game.player.souls+' | Floor: '+game.level+' | Level: '+game.player.plevel,canvas.width/2,canvas.height/2+4);
+    ctx.fillStyle='#aaa';ctx.fillText('Tap RETRY',canvas.width/2,canvas.height/2+24);ctx.textAlign='left';
+  }
+
+  // HUD update
+  document.getElementById('hp').textContent=game.player.hp+'/'+game.player.maxHp;
+  document.getElementById('hp-bar').style.width=(game.player.hp/game.player.maxHp*100)+'%';
+  document.getElementById('faith').textContent=game.player.faith+'/'+getMaxFaith();
+  document.getElementById('faith-bar').style.width=(game.player.faith/getMaxFaith()*100)+'%';
+  document.getElementById('souls').textContent=game.player.souls;
+  document.getElementById('gold').textContent=game.player.gold;
+  document.getElementById('plevel').textContent=game.player.plevel;
+  document.getElementById('xp-bar').style.width=(game.player.xp/xpNeeded(game.player.plevel)*100)+'%';
+  document.getElementById('level').textContent=game.level;
+  drawMinimap();
 }
 
-let lastTime = 0;
-let enemyTimer = 0;
-
-function gameLoop(timestamp) {
-  if (!game) { animFrame = requestAnimationFrame(gameLoop); return; }
-  const delta = timestamp - lastTime;
-  lastTime = timestamp;
-
-  const now = performance.now();
-  if (now - lastMove > MOVE_DELAY && !game.gameOver) {
-    if (keys['ArrowUp'] || keys['KeyW']) { movePlayer(0, -1); lastMove = now; }
-    else if (keys['ArrowDown'] || keys['KeyS']) { movePlayer(0, 1); lastMove = now; }
-    else if (keys['ArrowLeft'] || keys['KeyA']) { movePlayer(-1, 0); lastMove = now; }
-    else if (keys['ArrowRight'] || keys['KeyD']) { movePlayer(1, 0); lastMove = now; }
-    else if (touchDir) {
-      if (touchDir === 'up') movePlayer(0, -1);
-      else if (touchDir === 'down') movePlayer(0, 1);
-      else if (touchDir === 'left') movePlayer(-1, 0);
-      else if (touchDir === 'right') movePlayer(1, 0);
-      lastMove = now;
+let lastTime=0,enemyTimer=0;
+function gameLoop(ts){
+  if(!game){animFrame=requestAnimationFrame(gameLoop);return;}
+  const dt=ts-lastTime;lastTime=ts;
+  const now=performance.now(),md=hasSpeed()?100:MOVE_DELAY;
+  if(now-lastMove>md&&!game.gameOver){
+    let moved=false;
+    if(keys['ArrowUp']||keys['KeyW']){movePlayer(0,-1);moved=true;}
+    else if(keys['ArrowDown']||keys['KeyS']){movePlayer(0,1);moved=true;}
+    else if(keys['ArrowLeft']||keys['KeyA']){movePlayer(-1,0);moved=true;}
+    else if(keys['ArrowRight']||keys['KeyD']){movePlayer(1,0);moved=true;}
+    else if(touchDir){
+      if(touchDir==='up')movePlayer(0,-1);else if(touchDir==='down')movePlayer(0,1);
+      else if(touchDir==='left')movePlayer(-1,0);else if(touchDir==='right')movePlayer(1,0);
+      moved=true;
     }
+    if(moved)lastMove=now;
   }
-
-  enemyTimer += delta;
-  if (enemyTimer > Math.max(300, 500 - game.level * 20)) {
-    moveEnemies();
-    checkGameOver();
-    enemyTimer = 0;
-  }
-
-  draw();
-  animFrame = requestAnimationFrame(gameLoop);
+  enemyTimer+=dt;const espd=Math.max(280,500-game.level*15);
+  if(enemyTimer>espd){moveEnemies();checkGameOver();enemyTimer=0;}
+  draw();animFrame=requestAnimationFrame(gameLoop);
 }
 
-// Keyboard controls
-document.addEventListener('keydown', (e) => {
-  keys[e.code] = true;
-  if (e.code === 'Space') { e.preventDefault(); pray(); }
-  if (e.code === 'KeyE') { preach(); }
-  if (e.code === 'KeyR' && game && game.gameOver) { initGame(); }
-});
-document.addEventListener('keyup', (e) => { keys[e.code] = false; });
+// Input
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'){e.preventDefault();pray();}if(e.code==='KeyE')preach();if(e.code==='KeyH')useHeal();if(e.code==='KeyR'&&game&&game.gameOver)initGame();});
+document.addEventListener('keyup',e=>{keys[e.code]=false;});
 
-// Touch controls - with repeat on hold
-function setupTouchBtn(id, dir) {
-  const btn = document.getElementById(id);
-  let holdTimer = null;
-
-  function startMove(e) {
-    e.preventDefault();
-    touchDir = dir;
-    btn.classList.add('active');
-  }
-  function stopMove(e) {
-    e.preventDefault();
-    touchDir = null;
-    btn.classList.remove('active');
-  }
-
-  btn.addEventListener('touchstart', startMove, {passive: false});
-  btn.addEventListener('touchend', stopMove, {passive: false});
-  btn.addEventListener('touchcancel', stopMove, {passive: false});
-  btn.addEventListener('mousedown', startMove);
-  btn.addEventListener('mouseup', stopMove);
-  btn.addEventListener('mouseleave', stopMove);
+function setupDir(id,dir){
+  const btn=document.getElementById(id);
+  function start(e){e.preventDefault();touchDir=dir;btn.classList.add('active');}
+  function stop(e){e.preventDefault();touchDir=null;btn.classList.remove('active');}
+  btn.addEventListener('touchstart',start,{passive:false});btn.addEventListener('touchend',stop,{passive:false});
+  btn.addEventListener('touchcancel',stop,{passive:false});btn.addEventListener('mousedown',start);btn.addEventListener('mouseup',stop);btn.addEventListener('mouseleave',stop);
 }
+setupDir('btn-up','up');setupDir('btn-down','down');setupDir('btn-left','left');setupDir('btn-right','right');
 
-setupTouchBtn('btn-up', 'up');
-setupTouchBtn('btn-down', 'down');
-setupTouchBtn('btn-left', 'left');
-setupTouchBtn('btn-right', 'right');
+function setupAct(id,fn){const b=document.getElementById(id);b.addEventListener('touchstart',e=>{e.preventDefault();fn();},{passive:false});b.addEventListener('mousedown',e=>{e.preventDefault();fn();});}
+setupAct('btn-pray',pray);setupAct('btn-preach',preach);setupAct('btn-heal',useHeal);
+setupAct('btn-restart',()=>{if(game&&game.gameOver)initGame();});
 
-// Action buttons
-function setupActionBtn(id, action) {
-  const btn = document.getElementById(id);
-  function doAction(e) {
-    e.preventDefault();
-    action();
-  }
-  btn.addEventListener('touchstart', doAction, {passive: false});
-  btn.addEventListener('mousedown', doAction);
-}
+// Swipe on canvas
+let swS=null;
+canvas.addEventListener('touchstart',e=>{e.preventDefault();swS={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:false});
+canvas.addEventListener('touchend',e=>{e.preventDefault();if(!swS)return;const dx=e.changedTouches[0].clientX-swS.x,dy=e.changedTouches[0].clientY-swS.y;const th=20;if(Math.abs(dx)>th||Math.abs(dy)>th){if(Math.abs(dx)>Math.abs(dy))movePlayer(dx>0?1:-1,0);else movePlayer(0,dy>0?1:-1);}swS=null;},{passive:false});
 
-setupActionBtn('btn-pray', pray);
-setupActionBtn('btn-preach', preach);
-setupActionBtn('btn-restart', () => { if (game && game.gameOver) initGame(); });
-
-// Prevent iOS scroll/zoom on game area
-document.addEventListener('touchmove', (e) => { e.preventDefault(); }, {passive: false});
-
-// Swipe on canvas for quick movement
-let swipeStart = null;
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  swipeStart = { x: touch.clientX, y: touch.clientY };
-}, {passive: false});
-
-canvas.addEventListener('touchend', (e) => {
-  e.preventDefault();
-  if (!swipeStart) return;
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - swipeStart.x;
-  const dy = touch.clientY - swipeStart.y;
-  const threshold = 20;
-  if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-    if (Math.abs(dx) > Math.abs(dy)) {
-      movePlayer(dx > 0 ? 1 : -1, 0);
-    } else {
-      movePlayer(0, dy > 0 ? 1 : -1);
-    }
-  }
-  swipeStart = null;
-}, {passive: false});
+document.addEventListener('touchmove',e=>{e.preventDefault();},{passive:false});
 
 // Start
-startBtn.addEventListener('click', () => {
-  overlay.style.display = 'none';
-  initGame();
-  lastTime = performance.now();
-  animFrame = requestAnimationFrame(gameLoop);
-});
-startBtn.addEventListener('touchend', (e) => {
-  e.preventDefault();
-  overlay.style.display = 'none';
-  initGame();
-  lastTime = performance.now();
-  animFrame = requestAnimationFrame(gameLoop);
-}, {passive: false});
+function startGame(){overlay.style.display='none';initGame();lastTime=performance.now();animFrame=requestAnimationFrame(gameLoop);}
+startBtn.addEventListener('click',startGame);
+startBtn.addEventListener('touchend',e=>{e.preventDefault();startGame();},{passive:false});
 </script>
 </body>
 </html>
