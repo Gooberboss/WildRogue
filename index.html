@@ -216,7 +216,25 @@
   --input-hover-border-color: black;
   --link-outline: none;
 }
-body { background: var(--color-bg); }</style>
+body { background: var(--color-bg); }
+#sanctuary-banner{
+position:absolute;
+bottom:90px;
+left:50%;
+transform:translateX(-50%);
+padding:10px 20px;
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.2);
+border-radius:12px;
+color:#f5e6a8;
+font-weight:bold;
+font-size:14px;
+z-index:30;
+backdrop-filter:blur(4px);
+box-shadow:0 0 20px rgba(255,215,0,0.15);
+}
+
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -546,14 +564,14 @@ html, body {
 @keyframes levelPop { 0% { transform: translate(-50%,-50%) scale(0.5); opacity:0; } 100% { transform: translate(-50%,-50%) scale(1); opacity:1; } }
 
 /* Kill streak */
-#killstreak {
+#rescuestreak {
   position: absolute; bottom: 45%; left: 50%; transform: translateX(-50%);
   color: #ff4757; font-size: 14px; font-weight: 700;
   text-shadow: 0 0 8px rgba(255,71,87,0.5);
   opacity: 0; z-index: 15; pointer-events: none;
   transition: opacity 0.3s;
 }
-#killstreak.show { opacity: 1; animation: streakPop 0.3s ease-out; }
+#rescuestreak.show { opacity: 1; animation: streakPop 0.3s ease-out; }
 @keyframes streakPop { 0% { transform: translateX(-50%) scale(1.5); } 100% { transform: translateX(-50%) scale(1); } }
 </style>
 </head>
@@ -618,15 +636,15 @@ box-shadow:0 0 20px rgba(0,0,0,0.5);
     </div>
     <div class="hud-item"><span class="icon">⚔️</span><span id="hud-atk">5</span></div>
     <div class="hud-item"><span class="icon">🛡️</span><span id="hud-def">0</span></div>
-    <div class="hud-item"><span class="icon">🏔️</span>F<span id="hud-floor">1</span></div>
-    <div class="hud-item"><span class="icon">💀</span><span id="hud-kills">0</span></div>
-    <div class="hud-item"><span class="icon">🪙</span><span id="hud-gold">0</span></div><div class="hud-item"><span class="icon">✨</span><span id="hud-essence">0</span></div>
+    <div class="hud-item"><span class="icon">🗺️</span>F<span id="hud-floor">1</span></div>
+    <div class="hud-item"><span class="icon">💀</span><span id="hud-rescues">0</span></div>
+    <div class="hud-item"><span class="icon">🪙</span><span id="hud-hope">0</span></div><div class="hud-item"><span class="icon">✨</span><span id="hud-essence">0</span></div>
   </div>
 
   <div id="status-effects"></div>
   <canvas id="minimap" width="80" height="80"></canvas>
   <div id="combo"></div>
-  <div id="killstreak"></div>
+  <div id="rescuestreak"></div>
 
   
 <div id="inventory-bar" style="pointer-events:auto;
@@ -677,12 +695,17 @@ z-index:60;
     </div>
     <div id="right-controls">
       <div class="action-btn" id="skill-btn">🌀<div class="cd-overlay"></div></div>
-      <div class="action-btn" id="attack-btn">⚔️<div class="cd-overlay"></div></div>
+      <div class="action-btn" id="attack-btn">📖<div class="cd-overlay"></div></div>
       <div class="action-btn" id="dodge-btn">💨<div class="cd-overlay"></div></div>
     </div>
   </div></div>
 
   <div id="message"></div>
+
+<div id="sanctuary-banner">
+⛪ Mission Sanctuary • Protect Villagers • Spread Hope
+</div>
+
   <div id="level-msg"></div>
 
   <div id="death-screen">
@@ -702,7 +725,7 @@ z-index:60;
     <h1>🌲 Mission Quest</h1>
     <div class="subtitle">~ ~ Light Into the Nations ~ ~</div>
     <p>Travel through dangerous lands, share hope, rescue villagers, gather supplies, grow in faith, and bring light to every region.</p>
-    <p style="color:#555;font-size:11px;">🕹️ Joystick to move • ⚔️ Attack • 🌀 Skill • 💨 Dodge<br>Now includes permanent Essence progression!</p>
+    <p style="color:#555;font-size:11px;">🕹️ Joystick to move • 📖 Scripture Strike • 🌀 Skill • 💨 Dodge<br>Now includes permanent Essence progression!</p>
     <p style="color:#d8d8d8;font-size:12px;max-width:320px;text-align:center;">“Let your light shine before others.” – Matthew 5:16</p>
     <button onclick="startGame()">Begin the Mission</button>
   </div>
@@ -771,7 +794,7 @@ function addCombo() {
 function addKillStreak() {
   killStreak++;
   killStreakTimer = 120;
-  const el = document.getElementById('killstreak');
+  const el = document.getElementById('rescuestreak');
   const msgs = ['', '', 'Double Kill!', 'Triple Kill!', 'Rampage!', 'UNSTOPPABLE!', 'GODLIKE!'];
   if (killStreak >= 2) {
     el.textContent = `🔥 ${msgs[Math.min(killStreak, 6)]}`;
@@ -781,6 +804,18 @@ function addKillStreak() {
     triggerScreenShake(killStreak * 2, 10);
   }
 }
+
+
+function createPrayerParticle(x,y){
+  game.particles.push({
+    x,y,
+    vx:(Math.random()-0.5)*0.5,
+    vy:-1-Math.random(),
+    life:60,
+    text:'✨'
+  });
+}
+
 
 // ===== SOUND SYNTHESIS =====
 let audioCtx = null;
@@ -882,7 +917,7 @@ const ITEM_TEMPLATES = [
   { type: 'potion_speed', names: ['Joyful Drink'], emoji: '💨', stat: 'speed', base: 0.3 },
   { type: 'ring', names: ['Ring of Grace','Ring of Hope','Ring of Mercy'], emoji: '💍', stat: 'mixed', base: 1 },
   { type: 'food', names: ['Bread','Loaves','Fruit Basket','Loaves','Olives'], emoji: '🍖', stat: 'hp', base: 15 },
-  { type: 'gold', names: ['Donations'], emoji: '🪙', stat: 'gold', base: 10 },
+  { type: 'hope', names: ['Donations'], emoji: '🪙', stat: 'hope', base: 10 },
   { type: 'scroll', names: ['Scripture Scroll','Mercy Scroll','Praise Scroll'], emoji: '📜', stat: 'skill', base: 1 },
 ];
 
@@ -951,6 +986,45 @@ const TRAP_TYPES = [
   { type:'slow', emoji:'🕸️', dmg:0, effect:'slow', duration:120, color:'#aaa' },
 ];
 
+
+// ===== TURBAN ENEMY VISUALS =====
+function drawTurban(ctx, x, y, size){
+  ctx.fillStyle = '#f5f5f5';
+  ctx.beginPath();
+  ctx.ellipse(x, y - size * 0.9, size * 0.7, size * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#d9d9d9';
+  ctx.fillRect(x - size * 0.55, y - size, size * 1.1, size * 0.18);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(x, y - size * 0.95, size * 0.18, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+
+
+const SCRIPTURES = [
+"Be strong and courageous. — Joshua 1:9",
+"The light shines in the darkness. — John 1:5",
+"Blessed are the peacemakers. — Matthew 5:9",
+"Perfect love casts out fear. — 1 John 4:18",
+"Do not grow weary in doing good. — Galatians 6:9"
+];
+
+function showScripture(){
+  const verse = SCRIPTURES[Math.floor(Math.random()*SCRIPTURES.length)];
+  showMsg("📖 " + verse, 180);
+}
+
+setInterval(()=>{
+  if(game && !game.gameOver && !game.paused){
+    showScripture();
+  }
+}, 45000);
+
+
 // ===== GAME STATE =====
 let game = null;
 let frameCount = 0;
@@ -960,7 +1034,7 @@ function initGame() {
     player: {
       x:0, y:0, hp:100, maxHp:100, atk:5, def:0, speed:2.5,
       invuln:0, attackCooldown:0, attackAnim:0, dx:0, dy:0,
-      level:1, xp:0, xpToNext:30, gold:0, essence: parseInt(localStorage.getItem('wildrogue_essence')||'0'),
+      level:1, xp:0, xpToNext:30, hope:0, essence: parseInt(localStorage.getItem('wildrogue_essence')||'0'),
       critChance:0.05, lifesteal:0, thorns:0, dodgeChance:0,
       atkRange:40, xpMult:1,
       skill:SKILLS[0], skillCooldown:0,
@@ -972,7 +1046,7 @@ function initGame() {
     map:[], enemies:[], items:[], particles:[], projectiles:[], slashEffects:[], traps:[],
     ambientParticles: [],
     explored:[],
-    floor:1, kills:0, totalDmgDealt:0,
+    floor:1, rescues:0, totalDmgDealt:0,
     camera:{x:0,y:0},
     stairsX:0, stairsY:0,
     gameOver:false, paused:false, msgTimer:0, deathCause:'', biome:'forest',
@@ -1382,9 +1456,9 @@ function saveBestStats(){
     localStorage.setItem('wr_best_floor', game.floor);
   }
 
-  const bestKills = parseInt(localStorage.getItem('wr_best_kills')||'0');
-  if(game.kills > bestKills){
-    localStorage.setItem('wr_best_kills', game.kills);
+  const bestKills = parseInt(localStorage.getItem('wr_best_rescues')||'0');
+  if(game.rescues > bestKills){
+    localStorage.setItem('wr_best_rescues', game.rescues);
   }
 }
 
@@ -1447,7 +1521,7 @@ function useSkill(){
     spawnParticle(p.x,p.y,'#2ed573',15,{speed:1.5,life:40});triggerHealFlash();showMsg('🌿 Healing...',40);
   }else if(skill.id==='lightning'){
     for(const e of game.enemies){if(dist(p,e)<skill.range){const dmg=Math.ceil(p.atk*skill.dmgMult);e.hp-=dmg;e.hitAnim=15;spawnParticle(e.x,e.y,'#ff0',10,{speed:4});spawnDmgNumber(e.x,e.y-10,dmg,'#ff0');game.totalDmgDealt+=dmg;}}
-    game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.kills++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
+    game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.rescues++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
     triggerScreenShake(5,10);playSound('explosion');
   }else if(skill.id==='freeze'){
     for(const e of game.enemies){if(dist(p,e)<skill.range){e.frozen=skill.duration;spawnParticle(e.x,e.y,'#88f',8);}}showMsg('❄️ Peaceful!',40);
@@ -1480,7 +1554,7 @@ function update(){
 
   // Combo timer
   if(comboTimer>0){comboTimer--;if(comboTimer<=0){comboCount=0;document.getElementById('combo').classList.remove('show');}}
-  if(killStreakTimer>0){killStreakTimer--;if(killStreakTimer<=0){killStreak=0;document.getElementById('killstreak').classList.remove('show');}}
+  if(killStreakTimer>0){killStreakTimer--;if(killStreakTimer<=0){killStreak=0;document.getElementById('rescuestreak').classList.remove('show');}}
 
   // Ambient particles
   if(frameCount%8===0){
@@ -1569,7 +1643,7 @@ function update(){
         if(p.lifesteal>0){const heal=Math.ceil(dmg*p.lifesteal);p.hp=Math.min(p.maxHp,p.hp+heal);}
         
         if(enemy.hp<=0){
-          spawnExplosion(enemy.x,enemy.y,enemy.color,18);game.kills++;
+          spawnExplosion(enemy.x,enemy.y,enemy.color,18);game.rescues++;
           game.player.essence += enemy.isBoss ? 10 : 1;
           localStorage.setItem('wildrogue_essence', game.player.essence);
           grantXP(enemy.xp);addKillStreak();playSound('kill');
@@ -1692,7 +1766,7 @@ function update(){
     }
     if(pr.life<=0||isWall(pr.x,pr.y,3))game.projectiles.splice(i,1);
   }
-  game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.kills++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
+  game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.rescues++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
 
   // Allies
   for(let i=p.allies.length-1;i>=0;i--){
@@ -1701,7 +1775,7 @@ function update(){
     if(nearest){const ang=Math.atan2(nearest.y-ally.y,nearest.x-ally.x);ally.x+=Math.cos(ang)*ally.speed;ally.y+=Math.sin(ang)*ally.speed;ally.attackCd--;if(nearDist<25&&ally.attackCd<=0){ally.attackCd=20;nearest.hp-=ally.atk;nearest.hitAnim=8;spawnDmgNumber(nearest.x,nearest.y-10,ally.atk,'#aaa');game.totalDmgDealt+=ally.atk;playSound('hit');}}
     else{const ang=Math.atan2(p.y-ally.y,p.x-ally.x);if(dist(ally,p)>40){ally.x+=Math.cos(ang)*ally.speed;ally.y+=Math.sin(ang)*ally.speed;}}
   }
-  game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.kills++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
+  game.enemies=game.enemies.filter(e=>{if(e.hp<=0){game.rescues++;grantXP(e.xp);spawnExplosion(e.x,e.y,e.color,15);addKillStreak();return false;}return true;});
 
   // Traps
   for(const trap of game.traps){
@@ -1724,7 +1798,7 @@ function update(){
       else if(t.stat==='atk'){p.atk+=item.value;showMsg(`${item.emoji} +${item.value} ATK (${item.rarity})`,50);}
       else if(t.stat==='def'){p.def+=item.value;showMsg(`${item.emoji} +${item.value} DEF (${item.rarity})`,50);}
       else if(t.stat==='speed'){p.speed+=item.value;showMsg(`${item.emoji} Speed Up!`,40);}
-      else if(t.stat==='gold'){p.gold+=item.value;}
+      else if(t.stat==='hope'){p.hope+=item.value;}
       else if(t.stat==='mixed'){p.atk+=1;p.def+=1;p.maxHp+=10;p.hp+=10;showMsg(`${item.emoji} ${item.name} (${item.rarity})`,50);}
       else if(t.stat==='skill'){p.skillCooldown=Math.max(0,p.skillCooldown-60);showMsg('📜 Skill refreshed!',40);}
       spawnParticle(item.x,item.y,item.color,10,{speed:3,life:25});playSound('pickup');
@@ -1758,8 +1832,8 @@ function update(){
   document.getElementById('hud-atk').textContent=p.atk;
   document.getElementById('hud-def').textContent=p.def;
   document.getElementById('hud-floor').textContent=game.floor;
-  document.getElementById('hud-kills').textContent=game.kills;
-  document.getElementById('hud-gold').textContent=p.gold;
+  document.getElementById('hud-rescues').textContent=game.rescues;
+  document.getElementById('hud-hope').textContent=p.hope;
   skillBtn.classList.toggle('on-cd',p.skillCooldown>0);
   dodgeBtn.classList.toggle('on-cd',p.dodgeCooldown>0);
   const seDiv=document.getElementById('status-effects');
@@ -2010,10 +2084,10 @@ function gameOver(){
   setTimeout(()=>{
     document.getElementById('death-stats').innerHTML=`
       <div class="stat-box"><div class="val">${game.floor}</div><div class="lbl">Floor</div></div>
-      <div class="stat-box"><div class="val">${game.kills}</div><div class="lbl">Kills</div></div>
+      <div class="stat-box"><div class="val">${game.rescues}</div><div class="lbl">Kills</div></div>
       <div class="stat-box"><div class="val">${game.player.level}</div><div class="lbl">Level</div></div>
       <div class="stat-box"><div class="val">${game.totalDmgDealt}</div><div class="lbl">Damage</div></div>
-      <div class="stat-box"><div class="val">${game.player.gold}</div><div class="lbl">Gold</div></div>
+      <div class="stat-box"><div class="val">${game.player.hope}</div><div class="lbl">Gold</div></div>
       <div class="stat-box"><div class="val">${game.player.perks.length}</div><div class="lbl">Perks</div></div>`;
     document.getElementById('death-cause').textContent=game.deathCause||'You perished...';
     document.getElementById('death-screen').classList.add('show');
@@ -2060,3 +2134,4 @@ loop();
 
 
 </body></html>
+<!-- Turban visuals helper added but renderer hook may require manual adjustment -->
