@@ -30,8 +30,6 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
-
-/* Animated background */
 .bg-particles {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: radial-gradient(ellipse at 50% 0%, #16213e 0%, var(--darker) 70%);
@@ -48,8 +46,6 @@ body {
     radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
     radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%);
 }
-
-/* Screen management */
 .screen { 
   display: none; position: relative; z-index: 1;
   min-height: 100vh; min-height: -webkit-fill-available;
@@ -59,14 +55,11 @@ body {
 .screen.active { display: flex; flex-direction: column; }
 
 /* Title Screen */
-#title-screen {
-  align-items: center; justify-content: center; text-align: center; gap: 20px;
-}
+#title-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
 .title-icon { font-size: 80px; filter: drop-shadow(0 0 20px var(--glow)); }
 .title-text { font-size: 32px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 20px var(--glow); }
-.title-subtitle { font-size: 14px; color: #aaa; font-style: italic; max-width: 280px; line-height: 1.6; }
-.title-verse { font-size: 12px; color: #888; max-width: 300px; line-height: 1.5; margin: 10px 0; padding: 12px; border-left: 2px solid var(--gold); background: var(--card); border-radius: 0 8px 8px 0; }
-
+.title-subtitle { font-size: 14px; color: #aaa; font-style: italic; }
+.title-verse { font-size: 12px; color: #888; max-width: 300px; line-height: 1.5; margin: 8px 0; padding: 12px; border-left: 2px solid var(--gold); background: var(--card); border-radius: 0 8px 8px 0; text-align: left; }
 .btn-primary {
   background: linear-gradient(135deg, var(--gold), #e6a800);
   color: #1a1a2e; font-weight: 700; font-size: 16px;
@@ -76,229 +69,150 @@ body {
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .btn-primary:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(240,192,64,0.3); }
+.btn-secondary {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: #fff; font-weight: 700; font-size: 15px;
+  padding: 14px 36px; border: none; border-radius: 50px;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(52,152,219,0.3);
+  transition: transform 0.15s;
+}
+.btn-secondary:active { transform: scale(0.95); }
 
 /* HUD */
 #hud {
   position: fixed; top: 0; left: 0; right: 0;
-  padding: 12px 16px; padding-top: calc(env(safe-area-inset-top, 12px) + 8px);
+  padding: 10px 14px; padding-top: calc(env(safe-area-inset-top, 10px) + 6px);
   background: linear-gradient(180deg, rgba(15,15,26,0.95) 0%, transparent 100%);
   z-index: 100; display: none;
 }
 #hud.visible { display: block; }
-.hud-row { display: flex; justify-content: space-between; align-items: center; }
+.hud-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; flex-wrap: wrap; }
 .hud-stat {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 13px; font-weight: 600;
-  background: var(--card); padding: 4px 10px; border-radius: 20px;
+  display: flex; align-items: center; gap: 3px;
+  font-size: 12px; font-weight: 600;
+  background: var(--card); padding: 3px 8px; border-radius: 20px;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.08);
 }
-.hp-bar-container {
-  width: 100%; height: 6px; background: rgba(255,255,255,0.1);
-  border-radius: 3px; margin-top: 8px; overflow: hidden;
+.hp-bar-container { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.hp-bar { height: 100%; background: linear-gradient(90deg, var(--red), #ff6b6b); border-radius: 3px; transition: width 0.5s ease; }
+.xp-bar-container { width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 3px; overflow: hidden; }
+.xp-bar { height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple)); border-radius: 2px; transition: width 0.5s ease; }
+
+/* Dialogue / Story */
+#story-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 30px 20px; }
+.story-speaker { font-size: 48px; margin-bottom: 4px; }
+.story-name { font-size: 16px; font-weight: 700; color: var(--gold); }
+.story-text { font-size: 14px; color: #ddd; max-width: 320px; line-height: 1.7; min-height: 80px; }
+.story-choices { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+.story-choice {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px; padding: 14px 18px; cursor: pointer;
+  color: #fff; font-size: 13px; text-align: left; line-height: 1.4;
+  transition: transform 0.15s, border-color 0.2s;
 }
-.hp-bar {
-  height: 100%; background: linear-gradient(90deg, var(--red), #ff6b6b);
-  border-radius: 3px; transition: width 0.5s ease;
+.story-choice:active { transform: scale(0.97); border-color: var(--gold); }
+.story-continue {
+  background: rgba(240,192,64,0.15); border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 30px; padding: 12px 30px; cursor: pointer;
+  color: var(--gold); font-size: 14px; font-weight: 600;
+  transition: transform 0.15s;
 }
-.xp-bar-container {
-  width: 100%; height: 3px; background: rgba(255,255,255,0.05);
-  border-radius: 2px; margin-top: 4px; overflow: hidden;
-}
-.xp-bar {
-  height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple));
-  border-radius: 2px; transition: width 0.5s ease;
-}
+.story-continue:active { transform: scale(0.95); }
 
 /* Battle Screen */
-#battle-screen { justify-content: space-between; padding-top: 80px; }
-.enemy-section { text-align: center; padding: 20px 0; }
-.enemy-sprite {
-  font-size: 72px; display: inline-block;
-  filter: drop-shadow(0 0 15px rgba(255,0,0,0.3));
-  transition: transform 0.2s;
-}
+#battle-screen { justify-content: space-between; padding-top: 76px; }
+.enemy-section { text-align: center; padding: 16px 0; }
+.enemy-sprite { font-size: 68px; display: inline-block; filter: drop-shadow(0 0 15px rgba(255,0,0,0.3)); transition: transform 0.2s; }
 .enemy-sprite.hit { animation: enemyHit 0.4s ease; }
 .enemy-sprite.dead { animation: enemyDead 0.8s ease forwards; }
-.enemy-name { font-size: 18px; font-weight: 700; margin-top: 8px; color: #fff; }
-.enemy-title { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
-.enemy-hp-bar {
-  width: 200px; height: 8px; background: rgba(255,255,255,0.1);
-  border-radius: 4px; margin: 12px auto 0; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-.enemy-hp-fill {
-  height: 100%; background: linear-gradient(90deg, #ff4444, #ff6b6b);
-  border-radius: 4px; transition: width 0.4s ease;
-}
+.enemy-name { font-size: 17px; font-weight: 700; margin-top: 6px; }
+.enemy-title { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1.5px; }
+.enemy-hp-bar { width: 180px; height: 7px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 10px auto 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.enemy-hp-fill { height: 100%; background: linear-gradient(90deg, #ff4444, #ff6b6b); border-radius: 4px; transition: width 0.4s ease; }
 .enemy-level { font-size: 11px; color: #888; margin-top: 4px; }
-
-/* Battle log */
-.battle-log {
-  background: var(--card); border-radius: 12px; padding: 12px 16px;
-  min-height: 60px; max-height: 100px; overflow-y: auto;
-  border: 1px solid rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  margin: 12px 0;
-}
-.log-entry { font-size: 12px; color: #ccc; padding: 3px 0; line-height: 1.4; }
+.battle-log { background: var(--card); border-radius: 12px; padding: 10px 14px; min-height: 55px; max-height: 90px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin: 10px 0; }
+.log-entry { font-size: 12px; color: #ccc; padding: 2px 0; line-height: 1.4; }
 .log-entry.damage { color: #ff6b6b; }
 .log-entry.heal { color: #6bff6b; }
 .log-entry.info { color: var(--gold); }
 .log-entry.dodge { color: var(--blue); }
-
-/* Action buttons */
-.action-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px; padding: 10px 0;
-  padding-bottom: calc(env(safe-area-inset-bottom, 10px) + 10px);
-}
+.log-entry.story { color: #c9a0dc; font-style: italic; }
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 0; padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 8px); }
 .action-btn {
   background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 16px; padding: 16px 12px;
-  color: #fff; font-size: 14px; font-weight: 600;
-  cursor: pointer; text-align: center;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 14px 10px;
+  color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   transition: transform 0.1s, background 0.2s, border-color 0.2s;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .action-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.12); }
-.action-btn .icon { font-size: 24px; }
-.action-btn .label { font-size: 12px; color: #aaa; }
+.action-btn .icon { font-size: 22px; }
+.action-btn .label { font-size: 11px; color: #aaa; }
 .action-btn.strike { border-color: rgba(231,76,60,0.4); }
-.action-btn.strike:active { border-color: var(--red); box-shadow: 0 0 20px rgba(231,76,60,0.3); }
 .action-btn.heal { border-color: rgba(39,174,96,0.4); }
-.action-btn.heal:active { border-color: var(--green); box-shadow: 0 0 20px rgba(39,174,96,0.3); }
 .action-btn.dodge { border-color: rgba(52,152,219,0.4); }
-.action-btn.dodge:active { border-color: var(--blue); box-shadow: 0 0 20px rgba(52,152,219,0.3); }
 .action-btn.skill { border-color: rgba(155,89,182,0.4); }
-.action-btn.skill:active { border-color: var(--purple); box-shadow: 0 0 20px rgba(155,89,182,0.3); }
 .action-btn:disabled { opacity: 0.4; pointer-events: none; }
-
-/* Combo indicator */
-.combo-display {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  font-size: 48px; font-weight: 900; color: var(--gold);
-  text-shadow: 0 0 30px var(--glow); pointer-events: none;
-  opacity: 0; z-index: 50;
-}
+.combo-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 44px; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px var(--glow); pointer-events: none; opacity: 0; z-index: 50; }
 .combo-display.show { animation: comboFlash 1s ease forwards; }
+.float-dmg { position: absolute; font-weight: 900; font-size: 22px; pointer-events: none; z-index: 50; animation: floatUp 1.2s ease forwards; }
 
-/* Floating damage */
-.float-dmg {
-  position: absolute; font-weight: 900; font-size: 24px;
-  pointer-events: none; z-index: 50;
-  animation: floatUp 1.2s ease forwards;
-}
-
-/* Level up screen */
-#levelup-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
-.levelup-title { font-size: 28px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
-.blessing-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
-.blessing-card {
-  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px; padding: 16px 20px; cursor: pointer;
-  text-align: left; transition: transform 0.15s, border-color 0.2s;
-}
+/* Victory / Level / Death */
+#victory-screen, #levelup-screen, #death-screen { align-items: center; justify-content: center; text-align: center; gap: 14px; }
+.victory-title { font-size: 26px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
+.loot-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.loot-item { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; text-align: center; min-width: 75px; }
+.loot-icon { font-size: 26px; }
+.loot-name { font-size: 11px; color: #aaa; margin-top: 3px; }
+.levelup-title { font-size: 26px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
+.blessing-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+.blessing-card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 18px; cursor: pointer; text-align: left; transition: transform 0.15s, border-color 0.2s; }
 .blessing-card:active { transform: scale(0.97); border-color: var(--gold); }
-.blessing-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.blessing-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
 .blessing-desc { font-size: 12px; color: #aaa; line-height: 1.4; }
-
-/* Death screen */
-#death-screen { align-items: center; justify-content: center; text-align: center; gap: 20px; }
-.death-icon { font-size: 80px; opacity: 0.8; }
-.death-title { font-size: 28px; font-weight: 800; color: var(--red); }
+.death-icon { font-size: 72px; opacity: 0.8; }
+.death-title { font-size: 26px; font-weight: 800; color: var(--red); }
 .death-stats { font-size: 13px; color: #888; line-height: 2; }
 
-/* Victory screen */
-#victory-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
-.victory-title { font-size: 28px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
-.loot-grid { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.loot-item {
-  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px; padding: 12px 16px; text-align: center;
-  min-width: 80px;
-}
-.loot-icon { font-size: 28px; }
-.loot-name { font-size: 11px; color: #aaa; margin-top: 4px; }
-
-/* Map/Region screen */
-#map-screen { padding-top: 80px; }
-.region-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.region-desc { font-size: 12px; color: #888; margin-bottom: 20px; }
-.encounter-list { display: flex; flex-direction: column; gap: 10px; }
-.encounter-card {
-  background: var(--card); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px; padding: 16px; cursor: pointer;
-  display: flex; align-items: center; gap: 14px;
-  transition: transform 0.15s, border-color 0.2s;
-}
+/* Map */
+#map-screen { padding-top: 76px; }
+.region-title { font-size: 18px; font-weight: 700; margin-bottom: 3px; }
+.region-desc { font-size: 12px; color: #888; margin-bottom: 16px; line-height: 1.5; }
+.encounter-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
+.encounter-card { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, border-color 0.2s; }
 .encounter-card:active { transform: scale(0.97); border-color: var(--gold); }
-.encounter-icon { font-size: 36px; }
+.encounter-card.story-enc { border-color: rgba(155,89,182,0.3); }
+.encounter-card.boss-enc { border-color: rgba(231,76,60,0.3); }
+.encounter-icon { font-size: 32px; }
 .encounter-info { flex: 1; }
-.encounter-name { font-size: 14px; font-weight: 600; }
+.encounter-name { font-size: 13px; font-weight: 600; }
 .encounter-detail { font-size: 11px; color: #888; margin-top: 2px; }
 .encounter-reward { font-size: 11px; color: var(--gold); margin-top: 2px; }
 
-/* Rest screen */
-#rest-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
-.rest-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
-.rest-btn {
-  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px; padding: 14px 20px; cursor: pointer;
-  color: #fff; font-size: 14px; font-weight: 600;
-  transition: transform 0.15s;
-}
+/* Rest */
+#rest-screen { align-items: center; justify-content: center; text-align: center; gap: 14px; }
+.rest-options { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 300px; }
+.rest-btn { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 13px 18px; cursor: pointer; color: #fff; font-size: 13px; font-weight: 600; transition: transform 0.15s; text-align: left; }
 .rest-btn:active { transform: scale(0.95); }
 
-/* Inventory */
-#inventory-btn {
-  position: fixed; bottom: 20px; right: 20px;
-  width: 50px; height: 50px; border-radius: 50%;
-  background: var(--card); border: 1px solid rgba(255,255,255,0.15);
-  display: none; align-items: center; justify-content: center;
-  font-size: 22px; cursor: pointer; z-index: 90;
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-}
-#inventory-btn.visible { display: flex; }
-
-/* Screen shake */
-.shake { animation: shake 0.3s ease; }
+/* Journal */
+#journal-screen { padding-top: 76px; overflow-y: auto; }
+.journal-entry { background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+.journal-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+.journal-text { font-size: 12px; color: #bbb; line-height: 1.5; }
+.journal-back { color: var(--gold); font-size: 13px; cursor: pointer; margin-bottom: 12px; }
 
 /* Animations */
-@keyframes enemyHit { 
-  0%,100% { transform: translateX(0) scale(1); } 
-  25% { transform: translateX(-10px) scale(0.95); } 
-  75% { transform: translateX(10px) scale(0.95); } 
-}
-@keyframes enemyDead { 
-  0% { transform: scale(1) rotate(0); opacity: 1; } 
-  100% { transform: scale(0) rotate(180deg); opacity: 0; } 
-}
-@keyframes floatUp { 
-  0% { opacity: 1; transform: translateY(0) scale(1); } 
-  100% { opacity: 0; transform: translateY(-60px) scale(1.5); } 
-}
-@keyframes comboFlash { 
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
-  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } 
-}
-@keyframes shake { 
-  0%,100% { transform: translateX(0); } 
-  20% { transform: translateX(-5px); } 
-  40% { transform: translateX(5px); } 
-  60% { transform: translateX(-3px); } 
-  80% { transform: translateX(3px); } 
-}
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes enemyHit { 0%,100% { transform: translateX(0) scale(1); } 25% { transform: translateX(-10px) scale(0.95); } 75% { transform: translateX(10px) scale(0.95); } }
+@keyframes enemyDead { 0% { transform: scale(1) rotate(0); opacity: 1; } 100% { transform: scale(0) rotate(180deg); opacity: 0; } }
+@keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
+@keyframes comboFlash { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes glow { 0%,100% { filter: drop-shadow(0 0 10px var(--glow)); } 50% { filter: drop-shadow(0 0 25px var(--glow)); } }
-
-.animate-in { animation: fadeIn 0.4s ease forwards; }
-.pulse { animation: pulse 2s ease infinite; }
+.shake { animation: shake 0.3s ease; }
 .glow { animation: glow 2s ease infinite; }
 </style>
 </head>
@@ -324,9 +238,17 @@ body {
   <div class="title-text">MISSION QUEST</div>
   <div class="title-subtitle">~ Light Into the Nations ~</div>
   <div class="title-verse">"Let your light shine before others, that they may see your good deeds and glorify your Father in heaven." — Matthew 5:16</div>
-  <p style="font-size:13px;color:#aaa;max-width:280px;text-align:center;line-height:1.5;">Travel through dangerous lands. Defeat enemies, rescue villagers, and bring light to every region.</p>
+  <p style="font-size:13px;color:#aaa;max-width:300px;text-align:center;line-height:1.6;">The land of Canaan has fallen into darkness. Five regions cry out for deliverance. You are called to carry the Light through shadow, flame, and storm — until every nation has heard the Word.</p>
   <button class="btn-primary" id="btn-start">⚔️ Begin Mission</button>
-  <button class="btn-primary" id="btn-continue" style="display:none;background:linear-gradient(135deg,#3498db,#2980b9);box-shadow:0 4px 20px rgba(52,152,219,0.4);">📖 Continue Journey</button>
+  <button class="btn-secondary" id="btn-continue" style="display:none;">📖 Continue Journey</button>
+</div>
+
+<!-- Story/Dialogue Screen -->
+<div class="screen" id="story-screen">
+  <div class="story-speaker" id="story-speaker">👴</div>
+  <div class="story-name" id="story-name">Elder Samuel</div>
+  <div class="story-text" id="story-text"></div>
+  <div class="story-choices" id="story-choices"></div>
 </div>
 
 <!-- Map Screen -->
@@ -358,7 +280,7 @@ body {
 <!-- Victory Screen -->
 <div class="screen" id="victory-screen">
   <div class="victory-title">✨ Victory!</div>
-  <div id="victory-message" style="font-size:14px;color:#ccc;"></div>
+  <div id="victory-message" style="font-size:14px;color:#ccc;max-width:300px;line-height:1.5;"></div>
   <div class="loot-grid" id="loot-grid"></div>
   <button class="btn-primary" id="btn-continue-map">Continue Journey →</button>
 </div>
@@ -366,7 +288,7 @@ body {
 <!-- Level Up Screen -->
 <div class="screen" id="levelup-screen">
   <div class="levelup-title">✨ Ministry Growth!</div>
-  <p style="font-size:14px;color:#ccc;">Choose a blessing:</p>
+  <p style="font-size:14px;color:#ccc;">The Spirit strengthens you. Choose a blessing:</p>
   <div class="blessing-grid" id="blessing-grid"></div>
 </div>
 
@@ -375,23 +297,24 @@ body {
   <div class="death-icon">💀</div>
   <div class="death-title">Fallen in Battle</div>
   <div class="death-stats" id="death-stats"></div>
-  <button class="btn-primary" style="background:linear-gradient(135deg,var(--red),#c0392b);box-shadow:0 4px 20px rgba(231,76,60,0.4);" id="btn-revive">🕊️ Rise Again</button>
+  <div class="title-verse" style="max-width:280px;">"Though I walk through the valley of the shadow of death, I will fear no evil, for You are with me." — Psalm 23:4</div>
+  <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),#219a52);box-shadow:0 4px 20px rgba(39,174,96,0.4);" id="btn-revive">🕊️ Rise Again</button>
 </div>
 
 <!-- Rest Screen -->
 <div class="screen" id="rest-screen">
-  <div style="font-size:48px;">⛺</div>
-  <div style="font-size:20px;font-weight:700;">Safe Haven</div>
-  <p style="font-size:13px;color:#888;max-width:260px;">Rest and prepare for the journey ahead.</p>
-  <div class="rest-options">
-    <button class="rest-btn" id="btn-rest-heal">🙏 Pray & Rest — Full HP restore</button>
-    <button class="rest-btn" id="btn-rest-shop">🏪 Merchant — Spend gold</button>
-    <button class="rest-btn" id="btn-rest-continue">➡️ Continue Journey</button>
-  </div>
+  <div style="font-size:48px;" id="rest-icon">⛺</div>
+  <div style="font-size:18px;font-weight:700;" id="rest-title">Safe Haven</div>
+  <p style="font-size:12px;color:#888;max-width:260px;line-height:1.5;" id="rest-desc">A moment of peace in the wilderness. Rest and prepare.</p>
+  <div class="rest-options" id="rest-options"></div>
 </div>
 
-<!-- Inventory Button -->
-<div id="inventory-btn">🎒</div>
+<!-- Journal Screen -->
+<div class="screen" id="journal-screen">
+  <div class="journal-back" id="journal-back">← Back</div>
+  <div style="font-size:18px;font-weight:700;margin-bottom:12px;">📖 Mission Journal</div>
+  <div id="journal-entries"></div>
+</div>
 
 <script>
 // ===== GAME STATE =====
@@ -399,479 +322,445 @@ const defaultState = {
   hp: 100, maxHp: 100, atk: 10, def: 3, level: 1,
   xp: 0, xpNeeded: 30, gold: 0, region: 0, encounter: 0,
   combo: 0, dodging: false, skillCooldown: 0, healCharges: 3, maxHealCharges: 3,
-  items: [], kills: 0, blessings: [],
-  skillName: 'Holy Light', skillDmgMult: 2.5
+  kills: 0, blessings: [], villagersSaved: 0,
+  skillName: 'Holy Light', skillDmgMult: 2.5,
+  dodgeCounter: false,
+  journal: [], storyFlags: {}, chaptersCompleted: 0,
+  currentPath: [], pathIndex: 0
 };
 let state = {...defaultState};
 let currentEnemy = null;
 let battleActive = false;
 let pendingLevelUp = false;
+let returnScreen = 'map-screen';
 
-// ===== REGIONS & ENEMIES =====
-const regions = [
-  { name: '🌲 The Dark Forest', desc: 'Shadows lurk between ancient trees. Evil stirs.',
-    enemies: [
-      { name: 'Shadow Imp', sprite: '👹', title: 'Minion of Darkness', hp: 30, atk: 6, def: 1, xp: 12, gold: 5 },
-      { name: 'Cursed Wolf', sprite: '🐺', title: 'Corrupted Beast', hp: 45, atk: 8, def: 2, xp: 18, gold: 8 },
-      { name: 'Dark Archer', sprite: '🧝', title: 'Fallen Ranger', hp: 35, atk: 12, def: 1, xp: 20, gold: 10 },
-    ],
-    boss: { name: 'Forest Wraith', sprite: '👻', title: '⚠️ BOSS — Guardian of Shadows', hp: 100, atk: 14, def: 4, xp: 50, gold: 30 }
+// ===== STORY CONTENT =====
+const storyScenes = {
+  // === PROLOGUE ===
+  prologue: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'My child, darkness has consumed the land of Canaan. Five regions groan under the weight of evil. The people have forgotten the Light.',
+    next: 'prologue2'
   },
-  { name: '🏔️ The Cursed Mountains', desc: 'Frozen peaks hide ancient evils. The air itself resists you.',
-    enemies: [
-      { name: 'Ice Golem', sprite: '🧊', title: 'Frozen Sentinel', hp: 60, atk: 10, def: 5, xp: 25, gold: 12 },
-      { name: 'Harpy', sprite: '🦅', title: 'Screaming Terror', hp: 40, atk: 15, def: 2, xp: 22, gold: 10 },
-      { name: 'Stone Troll', sprite: '🗿', title: 'Mountain Dweller', hp: 80, atk: 12, def: 6, xp: 30, gold: 15 },
-    ],
-    boss: { name: 'Frost Dragon', sprite: '🐉', title: '⚠️ BOSS — Ancient Terror', hp: 160, atk: 18, def: 6, xp: 80, gold: 50 }
+  prologue2: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'Long ago, five Sacred Flames burned in temples across the land — each one a beacon of hope. The Shadow King extinguished them all. Without the Flames, the people fell into despair.',
+    next: 'prologue3'
   },
-  { name: '🌋 The Burning Wastes', desc: 'Fire and brimstone. Only the faithful survive here.',
-    enemies: [
-      { name: 'Fire Elemental', sprite: '🔥', title: 'Living Flame', hp: 55, atk: 16, def: 3, xp: 30, gold: 14 },
-      { name: 'Demon Knight', sprite: '👿', title: 'Infernal Warrior', hp: 90, atk: 14, def: 7, xp: 35, gold: 18 },
-      { name: 'Lava Serpent', sprite: '🐍', title: 'Molten Beast', hp: 70, atk: 18, def: 4, xp: 32, gold: 16 },
-    ],
-    boss: { name: 'Abaddon', sprite: '😈', title: '⚠️ FINAL BOSS — The Destroyer', hp: 250, atk: 22, def: 8, xp: 150, gold: 100 }
-  }
-];
+  prologue3: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'You have been chosen to rekindle them. Take this sword — forged in prayer. Take this shield — tempered by faith. Go now, and let your light shine before all nations.',
+    choices: [
+      { text: '"I accept this calling. I will not fail."', next: 'prologue_accept' },
+      { text: '"I am afraid... but I trust in the Lord."', next: 'prologue_humble' }
+    ]
+  },
+  prologue_accept: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'Bold words! Remember — it is not by your strength alone, but by the Spirit. "Be strong and courageous. Do not be afraid, for the Lord your God goes with you wherever you go." — Joshua 1:9',
+    next: 'prologue_end',
+    reward: { atk: 1 }
+  },
+  prologue_humble: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'Humility is the beginning of wisdom. "My grace is sufficient for you, for my power is made perfect in weakness." — 2 Corinthians 12:9. The Lord will be your strength.',
+    next: 'prologue_end',
+    reward: { def: 1, maxHp: 10 }
+  },
+  prologue_end: {
+    speaker: '👴', name: 'Elder Samuel',
+    text: 'Your first task: the Dark Forest to the east. The village of Bethel lies within, its people enslaved by shadow creatures. Free them, and rekindle the First Flame. Go with God.',
+    action: 'start_game',
+    journal: { title: 'The Calling', text: 'Elder Samuel has sent me to rekindle the Five Sacred Flames. My first destination: the Dark Forest, where the village of Bethel awaits deliverance.' }
+  },
 
-const blessings = [
-  { name: '❤️ Heart of Faith', desc: '+25 Max HP & full heal', apply: () => { state.maxHp += 25; state.hp = state.maxHp; }},
-  { name: '⚔️ Sword of Spirit', desc: '+4 Attack power', apply: () => { state.atk += 4; }},
-  { name: '🛡️ Shield of Grace', desc: '+3 Defense', apply: () => { state.def += 3; }},
-  { name: '🙏 Gift of Healing', desc: '+2 Heal charges per battle', apply: () => { state.maxHealCharges += 2; state.healCharges = state.maxHealCharges; }},
-  { name: '🌀 Power of Prayer', desc: 'Skill damage +50%', apply: () => { state.skillDmgMult += 0.5; }},
-  { name: '💨 Wings of Angels', desc: 'Dodge also counters for 50% ATK', apply: () => { state.dodgeCounter = true; }},
-];
+  // === REGION 1: DARK FOREST ===
+  forest_villager: {
+    speaker: '👩‍🌾', name: 'Miriam (Villager)',
+    text: 'Please, traveler! The shadow creatures took my children into the deep woods. They serve the Forest Wraith — a spirit of despair that feeds on hopelessness. Will you help us?',
+    choices: [
+      { text: '"I will find your children. Have faith."', next: 'forest_villager_yes' },
+      { text: '"Tell me more about this Wraith."', next: 'forest_villager_info' }
+    ]
+  },
+  forest_villager_yes: {
+    speaker: '👩‍🌾', name: 'Miriam',
+    text: 'Thank you! Take this — my late husband\'s amulet. He was a man of great faith. It may protect you in the darkness ahead. God bless you, traveler.',
+    reward: { def: 1, gold: 10 },
+    action: 'return_map',
+    journal: { title: 'Miriam\'s Children', text: 'A villager named Miriam begged me to rescue her children from the Forest Wraith. I carry her husband\'s amulet as a reminder of my promise.' },
+    flag: 'miriam_quest'
+  },
+  forest_villager_info: {
+    speaker: '👩‍🌾', name: 'Miriam',
+    text: 'The Wraith was once a priest who lost his faith after the Flames were extinguished. His despair consumed him, transforming him into a creature of shadow. He whispers lies to all who enter the forest — that hope is dead, that the Light will never return.',
+    next: 'forest_villager_info2'
+  },
+  forest_villager_info2: {
+    speaker: '👩‍🌾', name: 'Miriam',
+    text: 'But I still believe. Even in this darkness, I believe the Light will return. Please — save my children. Take this amulet for protection.',
+    reward: { def: 1, gold: 10 },
+    action: 'return_map',
+    journal: { title: 'The Wraith\'s Origin', text: 'The Forest Wraith was once a priest consumed by despair. Miriam still believes in the Light. I must not let her faith be in vain.' },
+    flag: 'miriam_quest'
+  },
+  forest_wanderer: {
+    speaker: '🧙', name: 'Elijah the Wanderer',
+    text: 'Ah, another soul brave enough to walk these cursed paths. I\'ve wandered these woods for years, searching for the old temple. The First Flame\'s altar still stands — hidden behind the Wraith\'s lair.',
+    choices: [
+      { text: '"Will you join me against the Wraith?"', next: 'forest_wanderer_join' },
+      { text: '"What can you tell me about the Sacred Flames?"', next: 'forest_wanderer_lore' }
+    ]
+  },
+  forest_wanderer_join: {
+    speaker: '🧙', name: 'Elijah',
+    text: 'Ha! I am old and weary, friend. My fighting days are past. But I can teach you a technique — the Psalm Shield. When you pray in battle, let the words become your armor. Your healing will be stronger now.',
+    reward: { maxHealCharges: 1 },
+    action: 'return_map',
+    journal: { title: 'Elijah\'s Teaching', text: 'The wanderer Elijah taught me the Psalm Shield technique. My prayers now carry greater healing power.' }
+  },
+  forest_wanderer_lore: {
+    speaker: '🧙', name: 'Elijah',
+    text: 'The Five Flames were lit by the first missionaries who came to Canaan. Each Flame represents a virtue: Faith, Hope, Love, Courage, and Wisdom. Together they held back the darkness. The Shadow King — an ancient evil — could not bear their light.',
+    next: 'forest_wanderer_lore2'
+  },
+  forest_wanderer_lore2: {
+    speaker: '🧙', name: 'Elijah',
+    text: 'He corrupted the guardians one by one. The priest became the Wraith. The warrior became the Frost Dragon. The scholar became the Lich. Each Flame went dark. But prophecy says a new light-bearer will come. Perhaps... that is you.',
+    reward: { xp: 15 },
+    action: 'return_map',
+    journal: { title: 'The Five Flames', text: 'Elijah told me of the Five Sacred Flames and their virtues: Faith, Hope, Love, Courage, and Wisdom. The Shadow King corrupted their guardians. I must restore what was lost.' }
+  },
+  forest_boss_pre: {
+    speaker: '👻', name: 'The Forest Wraith',
+    text: '"You carry a flickering candle into an ocean of darkness. Foolish child. I was once like you — full of hope, full of faith. But the Light abandoned us. It always does. Surrender to the shadow. It is... peaceful here."',
+    choices: [
+      { text: '"The Light never left — you turned away from it!"', next: 'forest_boss_defy' },
+      { text: '"I will pray for your soul, even as I fight you."', next: 'forest_boss_pray' }
+    ]
+  },
+  forest_boss_defy: {
+    speaker: '👻', name: 'The Forest Wraith',
+    text: '"LIES! Where was the Light when my people suffered? Where was it when the Shadow King came?! ...No matter. Words change nothing. Only darkness is eternal. COME — let me show you!"',
+    action: 'boss_fight_0',
+    reward: { atk: 2 }
+  },
+  forest_boss_pray: {
+    speaker: '👻', name: 'The Forest Wraith',
+    text: '"...Pray? For ME? ...I... no. NO! Your compassion is a weapon I will not fall to! The darkness is all I have left! FACE ME, LIGHT-BEARER!"',
+    action: 'boss_fight_0',
+    reward: { def: 1, maxHp: 10 }
+  },
+  forest_victory: {
+    speaker: '🕊️', name: '',
+    text: 'As the Wraith dissolves, a faint whisper echoes: "...thank you..." The shadows lift. Sunlight breaks through the canopy for the first time in years. Deep in the forest, the First Flame flickers back to life on its ancient altar.',
+    next: 'forest_victory2'
+  },
+  forest_victory2: {
+    speaker: '👩‍🌾', name: 'Miriam',
+    text: 'You did it! My children — they\'re free! The whole village is free! Look — the temple is glowing again! The First Flame of FAITH burns once more! Praise God!',
+    next: 'forest_victory3',
+    flag: 'flame_1'
+  },
+  forest_victory3: {
+    speaker: '👴', name: 'Elder Samuel (vision)',
+    text: 'Well done, faithful servant. One Flame rekindled — four remain. The Cursed Mountains to the north hold the Second Flame of HOPE. But beware — the cold there is not merely physical. It freezes the soul.',
+    action: 'next_region',
+    journal: { title: '🔥 First Flame Rekindled', text: 'The Flame of FAITH burns again in the Dark Forest. The Wraith is defeated, Bethel is free. Elder Samuel guides me north to the Cursed Mountains, where the Flame of HOPE awaits.' }
+  },
 
-// ===== DOM REFS =====
-const $ = id => document.getElementById(id);
-const screens = document.querySelectorAll('.screen');
+  // === REGION 2: CURSED MOUNTAINS ===
+  mountain_refugee: {
+    speaker: '👨‍👩‍👧', name: 'Refugee Family',
+    text: 'Please — we fled the mountain village of Moriah. The Frost Dragon has frozen everything. Our neighbors... they\'re trapped in ice, still alive but unable to move. It\'s been months. We couldn\'t save them.',
+    choices: [
+      { text: '"I will free them. No one is beyond saving."', next: 'mountain_refugee_help' },
+      { text: '"How do I reach the dragon\'s lair?"', next: 'mountain_refugee_path' }
+    ]
+  },
+  mountain_refugee_help: {
+    speaker: '👨‍👩‍👧', name: 'Refugee Father',
+    text: 'Bless you! The dragon roosts at the summit, near the old temple. But the path is treacherous — ice golems patrol the passes, and harpies circle above. Take these warm provisions. They\'re all we have, but you need them more.',
+    reward: { hp: 999, gold: 15 },
+    action: 'return_map',
+    journal: { title: 'Frozen Villagers', text: 'Refugees from Moriah told me their people are frozen alive by the Frost Dragon. I must reach the summit and defeat the beast to free them.' },
+    flag: 'moriah_quest'
+  },
+  mountain_refugee_path: {
+    speaker: '👨‍👩‍👧', name: 'Refugee Mother',
+    text: 'There are three passes. The eastern pass is guarded by ice golems — slow but powerful. The western pass has harpies — fast and vicious. The central path goes through an old mine... we heard strange sounds from within. None are safe.',
+    reward: { xp: 10 },
+    action: 'return_map',
+    journal: { title: 'Mountain Passes', text: 'Three paths lead to the summit: east (golems), west (harpies), or through the old mine. None are safe.' }
+  },
+  mountain_hermit: {
+    speaker: '🧎', name: 'Brother Thomas',
+    text: 'I have lived on this mountain in prayer and fasting for twenty years. Even when the dragon came, I did not leave. My faith keeps me warm. The cold cannot touch a heart that burns with the Spirit.',
+    choices: [
+      { text: '"Teach me to resist the dragon\'s frost."', next: 'mountain_hermit_teach' },
+      { text: '"Why does the dragon guard the Flame of Hope?"', next: 'mountain_hermit_lore' }
+    ]
+  },
+  mountain_hermit_teach: {
+    speaker: '🧎', name: 'Brother Thomas',
+    text: '"Hope does not put us to shame, because God\'s love has been poured out into our hearts." — Romans 5:5. Remember these words when the cold bites deepest. Let hope be your fire. Here — take my prayer beads. They will strengthen your spirit.',
+    reward: { def: 2, skillDmgMult: 0.3 },
+    action: 'return_map',
+    journal: { title: 'Brother Thomas\'s Gift', text: 'The mountain hermit taught me to resist despair through hope. His prayer beads strengthen my spirit against the dragon\'s frost.' }
+  },
+  mountain_hermit_lore: {
+    speaker: '🧎', name: 'Brother Thomas',
+    text: 'The dragon was once Sir Gideon, the bravest knight in Canaan. When the Shadow King came, Gideon fought alone — and lost. His hope shattered, the Shadow King transformed his despair into eternal winter. He guards the Flame unknowingly — frozen around it, unable to feel its warmth.',
+    next: 'mountain_hermit_lore2'
+  },
+  mountain_hermit_lore2: {
+    speaker: '🧎', name: 'Brother Thomas',
+    text: 'To defeat him, you must not merely overpower him — you must remind him of who he was. Strike with conviction, but also with compassion. The knight within may yet hear you.',
+    reward: { xp: 20 },
+    action: 'return_map',
+    journal: { title: 'Sir Gideon\'s Fall', text: 'The Frost Dragon was once Sir Gideon, a knight who lost hope fighting the Shadow King alone. His despair became eternal winter. Perhaps the knight within can still be reached.' }
+  },
+  mountain_boss_pre: {
+    speaker: '🐉', name: 'The Frost Dragon',
+    text: '"ANOTHER FOOL CLIMBS TO THEIR DEATH. I have frozen a thousand warriors. Your bones will join theirs on this peak. Hope is a lie told to children. There is only the cold. The endless, merciful cold."',
+    choices: [
+      { text: '"Sir Gideon! Remember who you were!"', next: 'mountain_boss_remember' },
+      { text: '"Your winter ends today, dragon!"', next: 'mountain_boss_fight' }
+    ]
+  },
+  mountain_boss_remember: {
+    speaker: '🐉', name: 'The Frost Dragon',
+    text: '"...Gideon? That name... I... NO! Gideon is DEAD! He died when hope died! You cannot— I will NOT—" *The dragon roars, but you notice cracks forming in the ice around its heart.* "ENOUGH! FREEZE!"',
+    action: 'boss_fight_1',
+    reward: { atk: 1, def: 1 }
+  },
+  mountain_boss_fight: {
+    speaker: '🐉', name: 'The Frost Dragon',
+    text: '"So be it. You will learn what every warrior learns on this mountain — that courage without hope is merely a slower death. FACE THE ETERNAL WINTER!"',
+    action: 'boss_fight_1'
+  },
+  mountain_victory: {
+    speaker: '🕊️', name: '',
+    text: 'The dragon collapses. Ice shatters across the mountain. As the frost melts, you see — just for a moment — the ghostly form of a knight kneeling in prayer. "Thank you," he whispers. "I remember now... there is always hope."',
+    next: 'mountain_victory2'
+  },
+  mountain_victory2: {
+    speaker: '🔥', name: '',
+    text: 'The Second Flame of HOPE erupts from the ancient altar, sending warmth cascading down the mountainside. Below, you hear cheering — the frozen villagers of Moriah are waking. Spring returns to the peaks.',
+    next: 'mountain_victory3',
+    flag: 'flame_2'
+  },
+  mountain_victory3: {
+    speaker: '👴', name: 'Elder Samuel (vision)',
+    text: 'Two Flames burn again! The darkness weakens. But your greatest trials lie ahead. The Burning Wastes to the south — where the Flame of LOVE was corrupted into hatred. And beyond... the Shadow King stirs.',
+    action: 'next_region',
+    journal: { title: '🔥 Second Flame Rekindled', text: 'The Flame of HOPE burns again. Sir Gideon\'s spirit is at peace. The frozen villagers are free. I journey south to the Burning Wastes for the Flame of LOVE.' }
+  },
 
-function showScreen(id) {
-  screens.forEach(s => s.classList.remove('active'));
-  $(id).classList.add('active');
-  const showHud = (id === 'battle-screen' || id === 'map-screen' || id === 'rest-screen');
-  $('hud').classList.toggle('visible', showHud);
-  $('inventory-btn').classList.toggle('visible', showHud);
-}
+  // === REGION 3: BURNING WASTES ===
+  wastes_survivor: {
+    speaker: '🧑‍🦱', name: 'Caleb (Survivor)',
+    text: 'Turn back, stranger. The Wastes are cursed — the very ground burns with hatred. The demon Abaddon rules here. He was once the temple\'s high priest of Love... now he preaches only destruction.',
+    choices: [
+      { text: '"Love is the strongest force. It cannot be destroyed."', next: 'wastes_survivor_love' },
+      { text: '"I\'ve faced worse. Tell me his weaknesses."', next: 'wastes_survivor_weak' }
+    ]
+  },
+  wastes_survivor_love: {
+    speaker: '🧑‍🦱', name: 'Caleb',
+    text: '"Love bears all things, believes all things, hopes all things, endures all things." — 1 Corinthians 13:7. ...You really believe that, don\'t you? Maybe... maybe you can succeed where we failed. Take my father\'s ring — it was blessed at the temple of Love, before the fall.',
+    reward: { atk: 2, gold: 20 },
+    action: 'return_map',
+    journal: { title: 'Caleb\'s Ring', text: 'Caleb gave me his father\'s blessed ring from the old temple of Love. Even in the Burning Wastes, love endures.' },
+    flag: 'caleb_ring'
+  },
+  wastes_survivor_weak: {
+    speaker: '🧑‍🦱', name: 'Caleb',
+    text: 'Abaddon feeds on hatred and anger. The more you hate him, the stronger he becomes. Many warriors came here burning with righteous fury — and he consumed them all. You must fight him without hatred in your heart. Fight with love, or not at all.',
+    reward: { xp: 25 },
+    action: 'return_map',
+    journal: { title: 'Abaddon\'s Power', text: 'Abaddon feeds on hatred. I must fight without anger — only love can defeat him. Righteous fury will only make him stronger.' }
+  },
+  wastes_prophet: {
+    speaker: '📿', name: 'Sister Ruth',
+    text: 'I minister to the lost souls wandering these wastes — people consumed by bitterness and rage. The fire here isn\'t natural — it\'s the manifestation of unforgiveness. Every grudge, every hatred, fuels these flames.',
+    choices: [
+      { text: '"How do you survive here?"', next: 'wastes_prophet_how' },
+      { text: '"Can Abaddon be redeemed?"', next: 'wastes_prophet_redeem' }
+    ]
+  },
+  wastes_prophet_how: {
+    speaker: '📿', name: 'Sister Ruth',
+    text: 'By forgiving. Every day, I forgive those who wronged me. I forgive the Shadow King for what he did to our land. Forgiveness is not weakness — it is the ultimate act of love. It starves the fire of fuel. Here, let me pray over you...',
+    reward: { maxHp: 15, hp: 999 },
+    action: 'return_map',
+    journal: { title: 'The Power of Forgiveness', text: 'Sister Ruth taught me that forgiveness starves the fires of hatred. Her prayer strengthened my body and spirit.' }
+  },
+  wastes_prophet_redeem: {
+    speaker: '📿', name: 'Sister Ruth',
+    text: 'The priest within Abaddon is long gone, I fear. Unlike the Wraith or the Dragon, he chose his corruption willingly. When the Shadow King offered him power in exchange for love, he accepted. But... "with God, all things are possible." Perhaps even this.',
+    reward: { xp: 20 },
+    action: 'return_map',
+    journal: { title: 'Abaddon\'s Choice', text: 'Unlike the other guardians, Abaddon chose corruption willingly — trading love for power. Sister Ruth says redemption may still be possible... with God.' }
+  },
+  wastes_boss_pre: {
+    speaker: '😈', name: 'Abaddon the Destroyer',
+    text: '"Ah, the little light-bearer. I\'ve been watching you — rekindling flames, saving villagers, spreading your naive hope. How... adorable. Love? LOVE? Love is weakness! Power is all that matters. The Shadow King showed me the truth!"',
+    choices: [
+      { text: '"I don\'t hate you. I pity you."', next: 'wastes_boss_pity' },
+      { text: '"You traded everything for nothing. Prepare yourself."', next: 'wastes_boss_direct' }
+    ]
+  },
+  wastes_boss_pity: {
+    speaker: '😈', name: 'Abaddon',
+    text: '"PITY?! You DARE— I am ABADDON! I have burned KINGDOMS! I— ...why doesn\'t your pity feed my flames? What ARE you?! No matter — I will destroy you the old-fashioned way! BURN!"',
+    action: 'boss_fight_2',
+    reward: { def: 2 }
+  },
+  wastes_boss_direct: {
+    speaker: '😈', name: 'Abaddon',
+    text: '"Nothing?! I have POWER! I have DOMINION! I— ...traded love for this? No. NO! I chose correctly! And I will PROVE it by reducing you to ASH! COME, LIGHT-BEARER! LET US SEE WHOSE FLAME BURNS BRIGHTER!"',
+    action: 'boss_fight_2'
+  },
+  wastes_victory: {
+    speaker: '🕊️', name: '',
+    text: 'Abaddon falls, and the fires across the Wastes begin to die. Unlike the others, no spirit rises from the demon — only silence. But from the ashes, something grows: a single flower, pushing through the scorched earth.',
+    next: 'wastes_victory2'
+  },
+  wastes_victory2: {
+    speaker: '🔥', name: '',
+    text: 'The Third Flame of LOVE ignites — not with fury, but with gentle warmth. Across the Wastes, the burning ground cools. Green shoots appear. The land begins to heal, slowly, as love always heals — patiently, persistently.',
+    next: 'wastes_victory3',
+    flag: 'flame_3'
+  },
+  wastes_victory3: {
+    speaker: '👴', name: 'Elder Samuel (vision)',
+    text: 'Three Flames burn! The Shadow King grows desperate. Two Flames remain — COURAGE in the Sunken Ruins, and WISDOM in the Shadow Citadel itself. You approach the final battle, my child. Steel your heart.',
+    action: 'next_region',
+    journal: { title: '🔥 Third Flame Rekindled', text: 'The Flame of LOVE burns again. The Burning Wastes begin to heal. Two Flames remain: Courage in the Sunken Ruins, and Wisdom in the Shadow Citadel.' }
+  },
 
-// ===== SAVE/LOAD =====
-function saveGame() {
-  try { localStorage.setItem('missionquest_save', JSON.stringify(state)); } catch(e) {}
-}
-function loadGame() {
-  try {
-    const s = localStorage.getItem('missionquest_save');
-    if (s) { state = {...defaultState, ...JSON.parse(s)}; return true; }
-  } catch(e) {}
-  return false;
-}
+  // === REGION 4: SUNKEN RUINS ===
+  ruins_diver: {
+    speaker: '🧜', name: 'Jonah (Deep Diver)',
+    text: 'The Sunken Ruins were once the greatest library in Canaan — until the Shadow King sank it beneath the waves. The Leviathan guards it now — a sea beast born from the collective cowardice of those who fled instead of fighting.',
+    choices: [
+      { text: '"Cowardice? That seems harsh."', next: 'ruins_diver_harsh' },
+      { text: '"How do I breathe underwater?"', next: 'ruins_diver_breathe' }
+    ]
+  },
+  ruins_diver_harsh: {
+    speaker: '🧜', name: 'Jonah',
+    text: 'Perhaps. But courage isn\'t the absence of fear — it\'s acting despite fear. When the Shadow King came, many ran. Their abandoned courage pooled here, twisted into the Leviathan. To defeat it, you must face what you fear most. The beast will show you.',
+    reward: { atk: 2 },
+    action: 'return_map',
+    journal: { title: 'The Leviathan\'s Nature', text: 'The Leviathan is formed from abandoned courage. It will show me my deepest fear. I must face it without flinching.' }
+  },
+  ruins_diver_breathe: {
+    speaker: '🧜', name: 'Jonah',
+    text: 'The ruins aren\'t fully submerged — air pockets remain in the upper chambers. But the deeper you go, the darker it gets. Take this enchanted pearl — it will let you breathe in the flooded sections. The Leviathan lurks in the deepest chamber.',
+    reward: { def: 2, gold: 20 },
+    action: 'return_map',
+    journal: { title: 'Jonah\'s Pearl', text: 'Jonah gave me an enchanted pearl for breathing underwater. The Leviathan waits in the deepest chamber of the Sunken Ruins.' }
+  },
+  ruins_ghost: {
+    speaker: '👤', name: 'Ghost of the Librarian',
+    text: 'Welcome to what remains of the Great Library. I am its keeper — or was, in life. The knowledge here could save your world... if you survive long enough to use it. The Leviathan devours all who seek wisdom without courage.',
+    choices: [
+      { text: '"What wisdom can you share with me?"', next: 'ruins_ghost_wisdom' },
+      { text: '"Tell me about the Flame of Courage."', next: 'ruins_ghost_flame' }
+    ]
+  },
+  ruins_ghost_wisdom: {
+    speaker: '👤', name: 'Ghost Librarian',
+    text: '"The fear of the Lord is the beginning of wisdom." — Proverbs 9:10. True courage is not fearlessness — it is faith that what you fight for is greater than what you fear. Remember this against the Leviathan. It feeds on doubt.',
+    reward: { skillDmgMult: 0.5 },
+    action: 'return_map',
+    journal: { title: 'Librarian\'s Wisdom', text: 'The ghost librarian taught me that courage is faith greater than fear. The Leviathan feeds on doubt — I must not waver.' }
+  },
+  ruins_ghost_flame: {
+    speaker: '👤', name: 'Ghost Librarian',
+    text: 'The Flame of Courage was the brightest of all five — it inspired ordinary people to do extraordinary things. When it went dark, fear spread like a plague. People stopped helping each other. Stopped standing up for what was right. The world grew cold — not from ice, but from indifference.',
+    reward: { xp: 30 },
+    action: 'return_map',
+    journal: { title: 'The Flame of Courage', text: 'The Flame of Courage once inspired ordinary people to extraordinary acts. Without it, indifference spread. I must restore it.' }
+  },
+  ruins_boss_pre: {
+    speaker: '🐙', name: 'The Leviathan',
+    text: '*The water churns as an enormous form rises from the depths. Eyes like searchlights fix upon you. A voice echoes not in your ears, but in your mind:* "I KNOW YOUR FEARS, LITTLE ONE. SHALL I SHOW THEM TO YOU?"',
+    choices: [
+      { text: '"Show me. I will face them all."', next: 'ruins_boss_face' },
+      { text: '"My faith is greater than any fear you can conjure."', next: 'ruins_boss_faith' }
+    ]
+  },
+  ruins_boss_face: {
+    speaker: '🐙', name: 'The Leviathan',
+    text: '"INTERESTING. MOST SCREAM AND RUN. YOU... STAND. VERY WELL — LET US SEE IF YOUR COURAGE IS REAL, OR MERELY IGNORANCE WEARING A BRAVE FACE." *The beast lunges forward, tentacles crashing through ancient pillars.*',
+    action: 'boss_fight_3',
+    reward: { atk: 3 }
+  },
+  ruins_boss_faith: {
+    speaker: '🐙', name: 'The Leviathan',
+    text: '"FAITH? I HAVE CONSUMED THE FAITH OF THOUSANDS. BUT... YOURS BURNS DIFFERENTLY. IT DOES NOT TASTE OF ARROGANCE. CURIOUS. COME THEN, FAITHFUL ONE. PROVE YOUR WORDS WITH DEEDS."',
+    action: 'boss_fight_3',
+    reward: { def: 2, maxHp: 15 }
+  },
+  ruins_victory: {
+    speaker: '🕊️', name: '',
+    text: 'The Leviathan dissolves into mist. As it fades, you feel lighter — as if a weight you didn\'t know you carried has been lifted. Your fears haven\'t vanished, but they no longer control you.',
+    next: 'ruins_victory2'
+  },
+  ruins_victory2: {
+    speaker: '🔥', name: '',
+    text: 'The Fourth Flame of COURAGE blazes to life in the deepest chamber. Its light pierces upward through the water, visible even from the surface — a pillar of golden fire rising from the sea. Ships will navigate by it for generations.',
+    next: 'ruins_victory3',
+    flag: 'flame_4'
+  },
+  ruins_victory3: {
+    speaker: '👴', name: 'Elder Samuel (vision)',
+    text: 'Four Flames burn! Only one remains — the Flame of WISDOM, held in the Shadow King\'s own citadel. This is your final trial. The Shadow King himself awaits. Everything has led to this moment. Go with God, my child.',
+    action: 'next_region',
+    journal: { title: '🔥 Fourth Flame Rekindled', text: 'The Flame of COURAGE burns as a pillar of light from the sea. One Flame remains — WISDOM — in the Shadow King\'s Citadel. The final battle approaches.' }
+  },
 
-// ===== HUD UPDATE =====
-function updateHUD() {
-  $('hp-text').textContent = state.hp;
-  $('level-text').textContent = state.level;
-  $('atk-text').textContent = state.atk;
-  $('def-text').textContent = state.def;
-  $('gold-text').textContent = state.gold;
-  $('hp-bar').style.width = (state.hp / state.maxHp * 100) + '%';
-  $('xp-bar').style.width = (state.xp / state.xpNeeded * 100) + '%';
-}
-
-// ===== BATTLE SYSTEM =====
-function startBattle(enemy) {
-  currentEnemy = {...enemy, currentHp: enemy.hp};
-  battleActive = true;
-  state.combo = 0;
-  state.dodging = false;
-  state.healCharges = state.maxHealCharges;
-  state.skillCooldown = 0;
-  
-  $('enemy-sprite').textContent = enemy.sprite;
-  $('enemy-sprite').className = 'enemy-sprite';
-  $('enemy-name').textContent = enemy.name;
-  $('enemy-title').textContent = enemy.title;
-  $('enemy-level').textContent = `Lv. ${Math.max(1, state.level + Math.floor(Math.random()*3) - 1)}`;
-  updateEnemyHP();
-  clearLog();
-  addLog(`${enemy.name} appears!`, 'info');
-  updateActionButtons();
-  showScreen('battle-screen');
-}
-
-function updateEnemyHP() {
-  const pct = Math.max(0, currentEnemy.currentHp / currentEnemy.hp * 100);
-  $('enemy-hp-bar').style.width = pct + '%';
-}
-
-function updateActionButtons() {
-  $('heal-label').textContent = `${state.healCharges} left`;
-  $('btn-heal').disabled = state.healCharges <= 0;
-  $('skill-label').textContent = state.skillCooldown > 0 ? `${state.skillCooldown} turns` : state.skillName;
-  $('btn-skill').disabled = state.skillCooldown > 0;
-}
-
-function clearLog() { $('battle-log').innerHTML = ''; }
-function addLog(msg, type = '') {
-  const el = document.createElement('div');
-  el.className = 'log-entry ' + type;
-  el.textContent = msg;
-  $('battle-log').appendChild(el);
-  $('battle-log').scrollTop = $('battle-log').scrollHeight;
-}
-
-function showFloatDmg(text, color, x, y) {
-  const el = document.createElement('div');
-  el.className = 'float-dmg';
-  el.textContent = text;
-  el.style.color = color;
-  el.style.left = (x || 50) + '%';
-  el.style.top = (y || 30) + '%';
-  $('battle-screen').appendChild(el);
-  setTimeout(() => el.remove(), 1200);
-}
-
-function showCombo(num) {
-  const el = $('combo-display');
-  el.textContent = `${num}x COMBO!`;
-  el.className = 'combo-display show';
-  setTimeout(() => el.className = 'combo-display', 1000);
-}
-
-function playerAttack() {
-  if (!battleActive) return;
-  state.combo++;
-  const crit = Math.random() < 0.15;
-  const comboBonus = 1 + (state.combo * 0.1);
-  let dmg = Math.max(1, Math.floor((state.atk * comboBonus - currentEnemy.def * 0.5) * (crit ? 2 : 1)));
-  dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
-  
-  currentEnemy.currentHp -= dmg;
-  $('enemy-sprite').classList.add('hit');
-  setTimeout(() => $('enemy-sprite').classList.remove('hit'), 400);
-  
-  const critText = crit ? ' 💥CRIT!' : '';
-  addLog(`You strike for ${dmg} damage!${critText}`, 'damage');
-  showFloatDmg(crit ? `${dmg}!` : dmg, crit ? '#ffff00' : '#ff6b6b');
-  
-  if (state.combo >= 3) showCombo(state.combo);
-  
-  vibrate(crit ? [50, 30, 50] : [30]);
-  updateEnemyHP();
-  
-  if (currentEnemy.currentHp <= 0) {
-    enemyDefeated();
-  } else {
-    state.skillCooldown = Math.max(0, state.skillCooldown - 1);
-    updateActionButtons();
-    setTimeout(enemyTurn, 600);
-  }
-}
-
-function playerHeal() {
-  if (!battleActive || state.healCharges <= 0) return;
-  state.healCharges--;
-  state.combo = 0;
-  const healAmt = Math.floor(state.maxHp * 0.35);
-  state.hp = Math.min(state.maxHp, state.hp + healAmt);
-  addLog(`🙏 You pray and heal ${healAmt} HP!`, 'heal');
-  showFloatDmg(`+${healAmt}`, '#6bff6b', 50, 70);
-  vibrate([20, 20, 20]);
-  updateHUD();
-  updateActionButtons();
-  setTimeout(enemyTurn, 600);
-}
-
-function playerDodge() {
-  if (!battleActive) return;
-  state.dodging = true;
-  state.combo = 0;
-  addLog('💨 You prepare to dodge...', 'dodge');
-  state.skillCooldown = Math.max(0, state.skillCooldown - 1);
-  updateActionButtons();
-  setTimeout(enemyTurn, 600);
-}
-
-function playerSkill() {
-  if (!battleActive || state.skillCooldown > 0) return;
-  state.combo++;
-  const dmg = Math.floor(state.atk * state.skillDmgMult);
-  currentEnemy.currentHp -= dmg;
-  state.skillCooldown = 3;
-  
-  $('enemy-sprite').classList.add('hit');
-  setTimeout(() => $('enemy-sprite').classList.remove('hit'), 400);
-  document.body.classList.add('shake');
-  setTimeout(() => document.body.classList.remove('shake'), 300);
-  
-  addLog(`🌀 ${state.skillName}! ${dmg} holy damage!`, 'info');
-  showFloatDmg(`✨${dmg}`, '#f0c040');
-  vibrate([50, 30, 80]);
-  updateEnemyHP();
-  
-  if (currentEnemy.currentHp <= 0) {
-    enemyDefeated();
-  } else {
-    updateActionButtons();
-    setTimeout(enemyTurn, 600);
-  }
-}
-
-function enemyTurn() {
-  if (!battleActive) return;
-  
-  if (state.dodging) {
-    state.dodging = false;
-    if (Math.random() < 0.75) {
-      addLog(`${currentEnemy.name} attacks but you dodge!`, 'dodge');
-      if (state.dodgeCounter) {
-        const counterDmg = Math.floor(state.atk * 0.5);
-        currentEnemy.currentHp -= counterDmg;
-        addLog(`↩️ Counter! ${counterDmg} damage!`, 'damage');
-        showFloatDmg(counterDmg, '#3498db');
-        updateEnemyHP();
-        if (currentEnemy.currentHp <= 0) { enemyDefeated(); return; }
-      }
-      vibrate([10]);
-      return;
-    } else {
-      addLog(`${currentEnemy.name} predicted your dodge!`, 'damage');
-    }
-  }
-  
-  const dmg = Math.max(1, Math.floor(currentEnemy.atk * (0.8 + Math.random() * 0.4) - state.def * 0.6));
-  state.hp -= dmg;
-  state.combo = 0;
-  addLog(`${currentEnemy.name} hits you for ${dmg}!`, 'damage');
-  showFloatDmg(dmg, '#ff4444', 50, 70);
-  vibrate([80]);
-  document.body.classList.add('shake');
-  setTimeout(() => document.body.classList.remove('shake'), 300);
-  
-  updateHUD();
-  
-  if (state.hp <= 0) {
-    state.hp = 0;
-    updateHUD();
-    battleActive = false;
-    setTimeout(showDeath, 500);
-  }
-}
-
-function enemyDefeated() {
-  battleActive = false;
-  $('enemy-sprite').classList.add('dead');
-  state.kills++;
-  state.xp += currentEnemy.xp;
-  state.gold += currentEnemy.gold;
-  
-  addLog(`${currentEnemy.name} defeated! +${currentEnemy.xp}XP +${currentEnemy.gold}🪙`, 'info');
-  vibrate([30, 50, 30, 50, 100]);
-  
-  if (state.xp >= state.xpNeeded) {
-    pendingLevelUp = true;
-  }
-  
-  setTimeout(() => {
-    showVictory();
-  }, 1000);
-}
-
-function showVictory() {
-  $('victory-message').textContent = `${currentEnemy.name} has been vanquished!`;
-  $('loot-grid').innerHTML = `
-    <div class="loot-item"><div class="loot-icon">⭐</div><div class="loot-name">+${currentEnemy.xp} XP</div></div>
-    <div class="loot-item"><div class="loot-icon">🪙</div><div class="loot-name">+${currentEnemy.gold} Gold</div></div>
-  `;
-  updateHUD();
-  showScreen('victory-screen');
-}
-
-function levelUp() {
-  state.level++;
-  state.xp -= state.xpNeeded;
-  state.xpNeeded = Math.floor(state.xpNeeded * 1.5);
-  state.hp = state.maxHp;
-  pendingLevelUp = false;
-  
-  // Show 3 random blessings
-  const available = [...blessings].sort(() => Math.random() - 0.5).slice(0, 3);
-  $('blessing-grid').innerHTML = '';
-  available.forEach(b => {
-    const card = document.createElement('div');
-    card.className = 'blessing-card';
-    card.innerHTML = `<div class="blessing-name">${b.name}</div><div class="blessing-desc">${b.desc}</div>`;
-    card.onclick = () => {
-      b.apply();
-      state.blessings.push(b.name);
-      updateHUD();
-      saveGame();
-      showMap();
-    };
-    $('blessing-grid').appendChild(card);
-  });
-  
-  showScreen('levelup-screen');
-}
-
-function showDeath() {
-  $('death-stats').innerHTML = `
-    Level reached: ${state.level}<br>
-    Enemies defeated: ${state.kills}<br>
-    Gold earned: ${state.gold}
-  `;
-  showScreen('death-screen');
-}
-
-// ===== MAP SYSTEM =====
-function showMap() {
-  const region = regions[state.region];
-  $('region-title').textContent = region.name;
-  $('region-desc').textContent = region.desc;
-  
-  const list = $('encounter-list');
-  list.innerHTML = '';
-  
-  // Generate encounters
-  const encounters = [];
-  const numEncounters = 3 + Math.floor(Math.random() * 2);
-  
-  for (let i = 0; i < numEncounters; i++) {
-    const enemy = region.enemies[Math.floor(Math.random() * region.enemies.length)];
-    encounters.push({ type: 'battle', enemy, icon: enemy.sprite, name: enemy.name, detail: enemy.title, reward: `+${enemy.xp}XP +${enemy.gold}🪙` });
-  }
-  
-  // Add rest stop
-  encounters.splice(Math.floor(encounters.length / 2), 0, { type: 'rest', icon: '⛺', name: 'Safe Haven', detail: 'Rest and recover', reward: 'Heal & Shop' });
-  
-  // Add boss at end
-  encounters.push({ type: 'boss', enemy: region.boss, icon: region.boss.sprite, name: region.boss.name, detail: region.boss.title, reward: `+${region.boss.xp}XP +${region.boss.gold}🪙` });
-  
-  encounters.forEach((enc, i) => {
-    const card = document.createElement('div');
-    card.className = 'encounter-card';
-    card.style.animationDelay = (i * 0.1) + 's';
-    card.style.animation = 'slideUp 0.4s ease forwards';
-    card.style.opacity = '0';
-    card.innerHTML = `
-      <div class="encounter-icon">${enc.icon}</div>
-      <div class="encounter-info">
-        <div class="encounter-name">${enc.name}</div>
-        <div class="encounter-detail">${enc.detail}</div>
-        <div class="encounter-reward">${enc.reward}</div>
-      </div>
-    `;
-    card.onclick = () => {
-      if (enc.type === 'rest') { showRest(); }
-      else { startBattle(enc.enemy); }
-    };
-    list.appendChild(card);
-  });
-  
-  updateHUD();
-  showScreen('map-screen');
-}
-
-function showRest() {
-  showScreen('rest-screen');
-}
-
-// ===== SHOP =====
-function showShop() {
-  const items = [
-    { name: '❤️ Health Potion', desc: 'Restore 50 HP', cost: 15, apply: () => { state.hp = Math.min(state.maxHp, state.hp + 50); }},
-    { name: '⚔️ Whetstone', desc: '+2 ATK permanently', cost: 30, apply: () => { state.atk += 2; }},
-    { name: '🛡️ Iron Plate', desc: '+2 DEF permanently', cost: 30, apply: () => { state.def += 2; }},
-    { name: '❤️ Life Crystal', desc: '+15 Max HP', cost: 40, apply: () => { state.maxHp += 15; state.hp += 15; }},
-  ];
-  
-  const list = $('encounter-list');
-  list.innerHTML = '<div style="font-size:20px;font-weight:700;margin-bottom:8px;">🏪 Merchant</div>';
-  
-  items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'encounter-card';
-    const canAfford = state.gold >= item.cost;
-    card.style.opacity = canAfford ? '1' : '0.5';
-    card.innerHTML = `
-      <div class="encounter-icon" style="font-size:28px;">${item.name.split(' ')[0]}</div>
-      <div class="encounter-info">
-        <div class="encounter-name">${item.name}</div>
-        <div class="encounter-detail">${item.desc}</div>
-        <div class="encounter-reward">🪙 ${item.cost} gold</div>
-      </div>
-    `;
-    if (canAfford) {
-      card.onclick = () => {
-        state.gold -= item.cost;
-        item.apply();
-        updateHUD();
-        saveGame();
-        showShop();
-      };
-    }
-    list.appendChild(card);
-  });
-  
-  const backBtn = document.createElement('div');
-  backBtn.className = 'encounter-card';
-  backBtn.innerHTML = '<div class="encounter-icon">↩️</div><div class="encounter-info"><div class="encounter-name">Back</div></div>';
-  backBtn.onclick = () => showRest();
-  list.appendChild(backBtn);
-  
-  showScreen('map-screen');
-}
-
-// ===== HAPTIC FEEDBACK =====
-function vibrate(pattern) {
-  if (navigator.vibrate) navigator.vibrate(pattern);
-}
-
-// ===== EVENT LISTENERS =====
-$('btn-start').onclick = () => {
-  state = {...defaultState};
-  saveGame();
-  showMap();
-};
-
-$('btn-continue').onclick = () => { showMap(); };
-
-$('btn-strike').onclick = playerAttack;
-$('btn-heal').onclick = playerHeal;
-$('btn-dodge').onclick = playerDodge;
-$('btn-skill').onclick = playerSkill;
-
-$('btn-continue-map').onclick = () => {
-  if (pendingLevelUp) { levelUp(); }
-  else { showMap(); }
-  saveGame();
-};
-
-$('btn-revive').onclick = () => {
-  state.hp = Math.floor(state.maxHp * 0.5);
-  state.gold = Math.floor(state.gold * 0.7);
-  updateHUD();
-  saveGame();
-  showMap();
-};
-
-$('btn-rest-heal').onclick = () => {
-  state.hp = state.maxHp;
-  updateHUD();
-  saveGame();
-  addLog && showMap();
-  showMap();
-};
-
-$('btn-rest-shop').onclick = showShop;
-$('btn-rest-continue').onclick = showMap;
-
-// ===== INIT =====
-if (loadGame()) {
-  $('btn-continue').style.display = 'block';
-}
-updateHUD();
-</script>
-</body>
-</html>
+  // === REGION 5: SHADOW CITADEL ===
+  citadel_angel: {
+    speaker: '👼', name: 'Messenger of Light',
+    text: 'Light-bearer. You stand at the threshold of the Shadow King\'s domain. Four Flames burn behind you. Their light reaches even here — see how the shadows recoil? You are not alone. You were never alone.',
+    choices: [
+      { text: '"I am ready for the final battle."', next: 'citadel_angel_ready' },
+      { text: '"I\'m afraid. What if I fail?"', next: 'citadel_angel_afraid' }
+    ]
+  },
+  citadel_angel_ready: {
+    speaker: '👼', name: 'Messenger of Light',
+    text: '"Be strong and courageous. Do not be terrified; do not be discouraged, for the Lord your God will be with you wherever you go." The four Flames lend you their power. Go now — and bring the dawn.',
+    reward: { atk: 3, def: 2, maxHp: 20, hp: 999 },
+    action: 'return_map',
+    journal: { title: 'The Angel\'s Blessing', text: 'A messenger of Light blessed me with the power of all four Flames. I am ready for the Shadow King.' }
+  },
+  citadel_angel_afraid: {
+    speaker: '👼', name: 'Messenger of Light',
+    text: '"Even the bravest feel fear at the gates of darkness. But remember — you carry four Flames within you now. Faith, Hope, Love, and Courage. The fifth — Wisdom — will come when you need it most. Trust." *Warmth floods through you.*',
+    reward: { atk: 2, def: 3, maxHp: 25, hp: 999 },
+    action: 'return_map',
+    journal: { title: 'Courage in Fear', text: 'Even afraid, I carry four Flames within me. The angel promised Wisdom will come when I need it most.' }
+  },
+  citadel_prisoner: {
+    speaker: '⛓️', name: 'Imprisoned Prophet',
+    text: 'You... you\'re real? Not another shadow trick? I\'ve been here so long... The Shadow King keeps me alive to mock me. He says no one will ever come. But I prayed. Every day, I prayed. And here you are.',
+    choices: [
+      { text: '"You\'re free now. What can you tell me about the King?"', next: 'citadel_prisoner_info' },
+      { text: '"Your faith saved you. Come, let me break your chains."', next: 'citadel_prisoner_free' }
+    ]
+  },
+  citadel_prisoner_info: {
+    speaker: '⛓️', name: 'Prophet',
+    text: 'The Shadow King was once the wisest ruler in Canaan. He sought knowledge above all else — even above God. He found forbidden wisdom, and it consumed him. Now he believes himself a god. His weakness? He cannot comprehend sacrifice. Selfless love confuses him.',
+    reward: { xp: 40 },
+    action: 'return_map',
+    journal: { title: 'The Shadow King\'s Weakness', text: 'The Shadow King was once a wise ruler who sought forbidden knowledge. He cannot comprehend selfless sacrifice — that is his weakness.' },
+    flag: 'prisoner_freed'
+  },
+  citadel_prisoner_free: {
+    speaker: '
