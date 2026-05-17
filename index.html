@@ -1,29 +1,31 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Kung Fu Side Scroller</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kung Fu Legends</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="title">Kung Fu Fighter v4</div>
-
 <div id="hud">
-  <span>HP: <span id="hp">100</span></span>
-  <span>Score: <span id="score">0</span></span>
+  <div>❤️ <span id="hp">100</span></div>
+  <div>🏆 <span id="score">0</span></div>
+  <div class="title">Kung Fu Legends v5</div>
 </div>
 
-<canvas id="gameCanvas"></canvas>
+<canvas id="game"></canvas>
 
-<div id="controls">
-  <button id="left">◀</button>
-  <button id="jump">⬆</button>
-  <button id="attack">拳</button>
+<div id="joystickArea">
+  <div id="joystickBase">
+    <div id="joystickStick"></div>
+  </div>
+</div>
+
+<div id="actionButtons">
+  <button id="punch">拳</button>
   <button id="kick">🦶</button>
-  <button id="right">▶</button>
+  <button id="jump">⬆</button>
 </div>
 
 <script src="game.js"></script>

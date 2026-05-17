@@ -1,62 +1,78 @@
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #222;
-  font-family: Arial, sans-serif;
-  touch-action: none;
+html,body{
+margin:0;
+overflow:hidden;
+touch-action:none;
+font-family:Arial,sans-serif;
+background:black;
 }
 
-#gameCanvas {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(#7fd3ff, #dff7ff);
+canvas{
+width:100vw;
+height:100vh;
+display:block;
+background:#87ceeb;
 }
 
-#title {
-  position: fixed;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  background: rgba(0,0,0,0.6);
-  padding: 8px 14px;
-  border-radius: 10px;
-  z-index: 10;
+#hud{
+position:fixed;
+top:10px;
+left:10px;
+z-index:20;
+color:white;
+background:rgba(0,0,0,0.45);
+padding:12px;
+border-radius:14px;
+font-size:18px;
+backdrop-filter:blur(6px);
 }
 
-#hud {
-  position: fixed;
-  top: 55px;
-  left: 10px;
-  z-index: 10;
-  color: white;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 10px;
+.title{
+font-size:12px;
+opacity:0.8;
+margin-top:4px;
 }
 
-#hud span {
-  margin-right: 14px;
+#joystickArea{
+position:fixed;
+bottom:20px;
+left:20px;
+width:140px;
+height:140px;
+z-index:30;
 }
 
-#controls {
-  position: fixed;
-  bottom: 12px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  z-index: 20;
+#joystickBase{
+position:absolute;
+width:140px;
+height:140px;
+border-radius:50%;
+background:rgba(255,255,255,0.18);
 }
 
-button {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: none;
-  font-size: 28px;
-  background: rgba(255,255,255,0.9);
+#joystickStick{
+position:absolute;
+left:40px;
+top:40px;
+width:60px;
+height:60px;
+border-radius:50%;
+background:rgba(255,255,255,0.8);
+}
+
+#actionButtons{
+position:fixed;
+right:20px;
+bottom:25px;
+display:flex;
+gap:12px;
+z-index:30;
+}
+
+#actionButtons button{
+width:82px;
+height:82px;
+border:none;
+border-radius:50%;
+font-size:30px;
+background:rgba(255,255,255,0.85);
 }

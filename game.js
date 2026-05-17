@@ -1,279 +1,291 @@
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 }
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+resize();
+addEventListener('resize',resize);
 
-const player = {
-  x: 100,
-  y: 0,
-  width: 40,
-  height: 70,
-  velY: 0,
-  jumping: false,
-  attacking: false,
-  kicking: false,
-  jumpKicking: false,
-  facing: 1,
-  hp: 100
+const player={
+x:200,
+y:0,
+vx:0,
+vy:0,
+w:55,
+h:85,
+dir:1,
+hp:100,
+jumping:false,
+attack:'',
+combo:0
 };
 
-const gravity = 0.8;
-const ground = () => canvas.height - 140;
+const gravity=0.8;
+const ground=()=>canvas.height-150;
 
-player.y = ground();
+player.y=ground();
 
-let score = 0;
+let cameraX=0;
+let score=0;
 
-const keys = {
-  left: false,
-  right: false
-};
+const enemies=[];
 
-const enemies = [];
-
-for (let i = 0; i < 12; i++) {
-  enemies.push({
-    x: 500 + i * 240,
-    y: ground(),
-    alive: true
-  });
+for(let i=0;i<18;i++){
+enemies.push({
+x:700+i*260,
+y:ground(),
+alive:true,
+flash:0
+});
 }
 
-function attack(range, points) {
-  enemies.forEach(enemy => {
-    if (!enemy.alive) return;
+function hitEnemies(range,points){
+enemies.forEach(e=>{
+if(!e.alive)return;
 
-    const dx = Math.abs(enemy.x - player.x);
-    const dy = Math.abs(enemy.y - player.y);
+const dx=Math.abs(e.x-player.x);
+const dy=Math.abs(e.y-player.y);
 
-    if (dx < range && dy < 80) {
-      enemy.alive = false;
-      score += points;
-    }
-  });
+if(dx<range && dy<100){
+e.flash=6;
+e.alive=false;
+score+=points;
+}
+});
 }
 
-function update() {
+function update(){
 
-  if (keys.left) {
-    player.x -= 5;
-    player.facing = -1;
-  }
+player.vy+=gravity;
+player.y+=player.vy;
 
-  if (keys.right) {
-    player.x += 5;
-    player.facing = 1;
-  }
-
-  if (player.jumpKicking) {
-    player.x += player.facing * 6;
-  }
-
-  player.velY += gravity;
-  player.y += player.velY;
-
-  if (player.y > ground()) {
-    player.y = ground();
-    player.velY = 0;
-    player.jumping = false;
-    player.jumpKicking = false;
-  }
-
-  enemies.forEach(enemy => {
-    if (!enemy.alive) return;
-
-    if (Math.abs(enemy.x - player.x) < 40) {
-      player.hp -= 0.03;
-    }
-  });
-
-  document.getElementById("hp").textContent =
-    Math.max(0, Math.floor(player.hp));
-
-  document.getElementById("score").textContent = score;
+if(player.y>ground()){
+player.y=ground();
+player.vy=0;
+player.jumping=false;
 }
 
-function drawBackground() {
+player.x+=player.vx;
 
-  ctx.fillStyle = "#4CAF50";
-  ctx.fillRect(0, ground()+50, canvas.width, 120);
+cameraX+=(player.x-cameraX-220)*0.08;
 
-  for (let i = 0; i < 20; i++) {
-    const x = (i * 180) - (player.x * 0.4 % 180);
+enemies.forEach(e=>{
+if(!e.alive)return;
 
-    ctx.fillStyle = "#777";
-    ctx.fillRect(x, ground()-100, 60, 100);
+if(Math.abs(e.x-player.x)<50){
+player.hp-=0.03;
+}
+if(e.flash>0)e.flash--;
+});
 
-    ctx.beginPath();
-    ctx.arc(x+30, ground()-120, 55, 0, Math.PI * 2);
-    ctx.fillStyle = "#2ecc71";
-    ctx.fill();
-  }
+document.getElementById('hp').textContent=Math.floor(player.hp);
+document.getElementById('score').textContent=score;
 }
 
-function drawPlayer() {
+function drawBackground(){
 
-  ctx.save();
-  ctx.translate(player.x, player.y);
-  ctx.scale(player.facing, 1);
+const sky=ctx.createLinearGradient(0,0,0,canvas.height);
+sky.addColorStop(0,"#7fc9ff");
+sky.addColorStop(1,"#dff6ff");
 
-  ctx.fillStyle = "#111";
-  ctx.fillRect(-15, 0, 30, 45);
+ctx.fillStyle=sky;
+ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.beginPath();
-  ctx.arc(0, -18, 16, 0, Math.PI * 2);
-  ctx.fillStyle = "#f2c28b";
-  ctx.fill();
+for(let i=0;i<12;i++){
 
-  ctx.strokeStyle = "red";
-  ctx.lineWidth = 6;
+const x=(i*400)-(cameraX*0.3%400);
 
-  if (player.attacking) {
-    ctx.beginPath();
-    ctx.moveTo(15, 10);
-    ctx.lineTo(45, 0);
-    ctx.stroke();
-  }
+ctx.fillStyle="#7a8ea5";
+ctx.fillRect(x,220,120,260);
 
-  if (player.kicking) {
-    ctx.beginPath();
-    ctx.moveTo(0, 35);
-    ctx.lineTo(50, 25);
-    ctx.stroke();
-  }
-
-  if (player.jumpKicking) {
-    ctx.strokeStyle = "gold";
-
-    ctx.beginPath();
-    ctx.moveTo(0, 20);
-    ctx.lineTo(65, -10);
-    ctx.stroke();
-  }
-
-  ctx.restore();
+ctx.fillStyle="#4caf50";
+ctx.beginPath();
+ctx.arc(x+60,190,95,0,Math.PI*2);
+ctx.fill();
 }
 
-function drawEnemies() {
-
-  enemies.forEach(enemy => {
-
-    if (!enemy.alive) return;
-
-    ctx.save();
-    ctx.translate(enemy.x, enemy.y);
-
-    ctx.fillStyle = "#7b1fa2";
-    ctx.fillRect(-15, 0, 30, 45);
-
-    ctx.beginPath();
-    ctx.arc(0, -18, 15, 0, Math.PI * 2);
-    ctx.fillStyle = "#f2c28b";
-    ctx.fill();
-
-    ctx.restore();
-  });
+ctx.fillStyle="#4CAF50";
+ctx.fillRect(0,ground()+55,canvas.width,120);
 }
 
-function draw() {
+function drawPlayer(){
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.save();
+ctx.translate(player.x-cameraX,player.y);
+ctx.scale(player.dir,1);
 
-  drawBackground();
-  drawEnemies();
-  drawPlayer();
+ctx.shadowBlur=18;
+ctx.shadowColor="rgba(0,0,0,0.35)";
 
-  if (player.hp <= 0) {
-    ctx.fillStyle = "rgba(0,0,0,0.7)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#1b1b1b";
+ctx.fillRect(-18,0,36,55);
 
-    ctx.fillStyle = "white";
-    ctx.font = "48px Arial";
-    ctx.fillText("Game Over", canvas.width/2 - 120, canvas.height/2);
-  }
+ctx.fillStyle="#d22";
+ctx.fillRect(-22,5,44,18);
+
+ctx.beginPath();
+ctx.arc(0,-22,20,0,Math.PI*2);
+ctx.fillStyle="#f2c28b";
+ctx.fill();
+
+ctx.strokeStyle="#ffcc00";
+ctx.lineWidth=8;
+
+if(player.attack==="punch"){
+ctx.beginPath();
+ctx.moveTo(18,12);
+ctx.lineTo(60,-4);
+ctx.stroke();
 }
 
-function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
+if(player.attack==="kick"){
+ctx.beginPath();
+ctx.moveTo(5,40);
+ctx.lineTo(65,22);
+ctx.stroke();
+}
+
+if(player.attack==="jumpkick"){
+ctx.beginPath();
+ctx.moveTo(-5,15);
+ctx.lineTo(75,-12);
+ctx.stroke();
+}
+
+ctx.restore();
+}
+
+function drawEnemies(){
+
+enemies.forEach(e=>{
+
+if(!e.alive)return;
+
+ctx.save();
+ctx.translate(e.x-cameraX,e.y);
+
+ctx.shadowBlur=12;
+
+ctx.fillStyle=e.flash>0?"white":"#7b1fa2";
+ctx.fillRect(-18,0,36,52);
+
+ctx.beginPath();
+ctx.arc(0,-20,18,0,Math.PI*2);
+ctx.fillStyle="#f2c28b";
+ctx.fill();
+
+ctx.restore();
+});
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+drawBackground();
+drawEnemies();
+drawPlayer();
+
+if(player.hp<=0){
+ctx.fillStyle="rgba(0,0,0,0.7)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+ctx.font="50px Arial";
+ctx.fillText("GAME OVER",canvas.width/2-170,canvas.height/2);
+}
+}
+
+function loop(){
+update();
+draw();
+requestAnimationFrame(loop);
 }
 
 loop();
 
-function holdButton(id, key) {
+// JOYSTICK
+const stick=document.getElementById('joystickStick');
+let dragging=false;
 
-  const btn = document.getElementById(id);
+function moveStick(x,y){
 
-  btn.addEventListener("touchstart", e => {
-    e.preventDefault();
-    keys[key] = true;
-  });
+const rect=document.getElementById('joystickBase').getBoundingClientRect();
 
-  btn.addEventListener("touchend", e => {
-    e.preventDefault();
-    keys[key] = false;
-  });
+const cx=rect.left+70;
+const cy=rect.top+70;
 
-  btn.addEventListener("mousedown", () => {
-    keys[key] = true;
-  });
+let dx=x-cx;
+let dy=y-cy;
 
-  btn.addEventListener("mouseup", () => {
-    keys[key] = false;
-  });
+const dist=Math.sqrt(dx*dx+dy*dy);
+const max=40;
+
+if(dist>max){
+dx=dx/dist*max;
+dy=dy/dist*max;
 }
 
-holdButton("left", "left");
-holdButton("right", "right");
+stick.style.transform=`translate(${dx}px,${dy}px)`;
 
-document.getElementById("jump").addEventListener("click", () => {
+player.vx=(dx/max)*7;
 
-  if (!player.jumping) {
-    player.velY = -16;
-    player.jumping = true;
-  }
+if(dx>5)player.dir=1;
+if(dx<-5)player.dir=-1;
+}
+
+document.getElementById('joystickArea').addEventListener('touchstart',e=>{
+dragging=true;
+moveStick(e.touches[0].clientX,e.touches[0].clientY);
 });
 
-document.getElementById("attack").addEventListener("click", () => {
-
-  if (player.attacking) return;
-
-  player.attacking = true;
-
-  attack(70, 100);
-
-  setTimeout(() => {
-    player.attacking = false;
-  }, 180);
+document.addEventListener('touchmove',e=>{
+if(!dragging)return;
+moveStick(e.touches[0].clientX,e.touches[0].clientY);
 });
 
-document.getElementById("kick").addEventListener("click", () => {
-
-  if (player.jumping) {
-
-    player.jumpKicking = true;
-
-    attack(110, 250);
-
-    setTimeout(() => {
-      player.jumpKicking = false;
-    }, 350);
-
-  } else {
-
-    player.kicking = true;
-
-    attack(90, 150);
-
-    setTimeout(() => {
-      player.kicking = false;
-    }, 220);
-  }
+document.addEventListener('touchend',()=>{
+dragging=false;
+stick.style.transform='translate(0px,0px)';
+player.vx=0;
 });
+
+function attack(type){
+
+player.attack=type;
+
+if(type==="punch")hitEnemies(80,100);
+if(type==="kick")hitEnemies(110,180);
+if(type==="jumpkick")hitEnemies(140,300);
+
+if(type==="jumpkick"){
+player.vx=player.dir*10;
+}
+
+setTimeout(()=>{
+player.attack='';
+},220);
+}
+
+document.getElementById('punch').onclick=()=>{
+attack("punch");
+};
+
+document.getElementById('kick').onclick=()=>{
+
+if(player.jumping){
+attack("jumpkick");
+}else{
+attack("kick");
+}
+};
+
+document.getElementById('jump').onclick=()=>{
+
+if(!player.jumping){
+player.vy=-17;
+player.jumping=true;
+}
+};
