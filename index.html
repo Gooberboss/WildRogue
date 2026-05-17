@@ -4,27 +4,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Mission Valley v2</title>
+<title>Mission Valley v3</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div id="titleScreen">
+  <h1>MISSION VALLEY</h1>
+  <div class="subtitle">Christian Missionary Farming RPG</div>
+  <button id="startBtn">START GAME</button>
+  <div class="version">v3</div>
+</div>
+
 <canvas id="game"></canvas>
 
 <div id="hud">
-  <div>Mission Valley <span class="version">v2</span></div>
-  <div id="day">Day 1</div>
-  <div id="coins">Supplies: 0</div>
-  <div id="faith">Faith: 0</div>
-  <div id="msg">Help the village grow.</div>
+  <div>🌾 Supplies: <span id="supplies">0</span></div>
+  <div>✝ Faith: <span id="faith">0</span></div>
+  <div id="message">Help the village grow.</div>
 </div>
 
 <div id="controls">
-  <button id="up">▲</button>
-  <div>
-    <button id="left">◀</button>
-    <button id="down">▼</button>
-    <button id="right">▶</button>
-  </div>
+  <button id="up">▲</button><br>
+  <button id="left">◀</button>
+  <button id="down">▼</button>
+  <button id="right">▶</button>
   <button id="action">✝</button>
 </div>
 
