@@ -534,8 +534,19 @@ const screens = document.querySelectorAll('.screen');
 
 function showScreen(id) {
   screens.forEach(s => s.classList.remove('active'));
-  $(id).classList.add('active');
-  const showHud = (id === 'battle-screen' || id === 'map-screen' || id === 'rest-screen');
+  const target = $(id);
+  if (!target) {
+    console.error('Missing screen:', id);
+    return;
+  }
+  target.classList.add('active');
+
+  const showHud = (
+    id === 'battle-screen' ||
+    id === 'map-screen' ||
+    id === 'rest-screen'
+  );
+
   $('hud').classList.toggle('visible', showHud);
   $('inventory-btn').classList.toggle('visible', showHud);
 }
@@ -913,7 +924,14 @@ function vibrate(pattern) {
 }
 
 // ===== EVENT LISTENERS =====
-$('btn-start').onclick = () => { showScreen('class-screen'); };
+$('btn-start').onclick = () => {
+  try{
+    showScreen('class-screen');
+  }catch(e){
+    console.error(e);
+    showMap();
+  }
+};
 
 $('btn-continue').onclick = () => { showMap(); };
 
