@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Kung Fu Legends v8</title>
+<title>Kung Fu Legends v9</title>
 <style>
 html,body{
 margin:0;
@@ -25,44 +25,65 @@ position:fixed;
 top:10px;
 left:10px;
 z-index:10;
-background:rgba(0,0,0,0.5);
-padding:10px;
-border-radius:12px;
+background:rgba(0,0,0,0.45);
+padding:10px 14px;
+border-radius:14px;
 color:white;
 font-size:20px;
-}
-
-#controlsLeft{
-position:fixed;
-bottom:8px;
-left:20px;
-display:flex;
-gap:10px;
-z-index:20;
-}
-
-#controlsRight{
-position:fixed;
-bottom:8px;
-right:20px;
-display:flex;
-gap:10px;
-z-index:20;
-}
-
-button{
-width:74px;
-height:74px;
-border:none;
-border-radius:50%;
-font-size:30px;
-background:rgba(255,255,255,0.82);
 backdrop-filter:blur(4px);
 }
 
 .small{
 font-size:12px;
 opacity:0.75;
+}
+
+#movePad{
+position:fixed;
+left:20px;
+bottom:20px;
+width:170px;
+height:170px;
+border-radius:50%;
+background:rgba(255,255,255,0.12);
+z-index:20;
+}
+
+#stick{
+position:absolute;
+left:55px;
+top:55px;
+width:60px;
+height:60px;
+border-radius:50%;
+background:rgba(255,255,255,0.8);
+}
+
+#actions{
+position:fixed;
+right:18px;
+bottom:20px;
+display:flex;
+flex-direction:column;
+gap:12px;
+z-index:20;
+}
+
+.row{
+display:flex;
+gap:12px;
+justify-content:flex-end;
+}
+
+button{
+width:82px;
+height:82px;
+border:none;
+border-radius:50%;
+font-size:30px;
+background:rgba(255,255,255,0.82);
+backdrop-filter:blur(4px);
+box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 </style>
 </head>
@@ -73,18 +94,21 @@ opacity:0.75;
 <div id="hud">
 <div>❤️ <span id="hp">100</span></div>
 <div>🏆 <span id="score">0</span></div>
-<div class="small">Kung Fu Legends v8</div>
+<div class="small">Kung Fu Legends v9 Controls</div>
 </div>
 
-<div id="controlsLeft">
-<button id="left">◀</button>
-<button id="right">▶</button>
+<div id="movePad">
+<div id="stick"></div>
 </div>
 
-<div id="controlsRight">
+<div id="actions">
+<div class="row">
 <button id="jump">⬆</button>
+</div>
+<div class="row">
 <button id="punch">拳</button>
 <button id="kick">🦶</button>
+</div>
 </div>
 
 <script>
@@ -99,7 +123,7 @@ resize();
 window.addEventListener("resize",resize);
 
 function ground(){
-return canvas.height-250;
+return canvas.height-260;
 }
 
 const gravity=0.8;
@@ -117,23 +141,20 @@ hp:100
 
 let score=0;
 let cameraX=0;
+let moveInput=0;
 
 const enemies=[];
 
-for(let i=0;i<14;i++){
+for(let i=0;i<16;i++){
 enemies.push({
-x:700+i*260,
+x:700+i*240,
 y:ground(),
 alive:true
 });
 }
 
-const keys={left:false,right:false};
-
 function hit(range,points){
-
 for(const e of enemies){
-
 if(!e.alive) continue;
 
 const dx=Math.abs(e.x-player.x);
@@ -143,23 +164,15 @@ if(dx<range && dy<90){
 e.alive=false;
 score+=points;
 }
-
 }
 }
 
 function update(){
 
-player.vx=0;
+player.vx=moveInput*7;
 
-if(keys.left){
-player.vx=-6;
-player.dir=-1;
-}
-
-if(keys.right){
-player.vx=6;
-player.dir=1;
-}
+if(moveInput>0.1) player.dir=1;
+if(moveInput<-0.1) player.dir=-1;
 
 if(player.attack==="jumpkick"){
 player.vx+=player.dir*5;
@@ -176,10 +189,9 @@ player.vy=0;
 player.jumping=false;
 }
 
-cameraX+=(player.x-cameraX-120)*0.08;
+cameraX+=(player.x-cameraX-140)*0.09;
 
 for(const e of enemies){
-
 if(!e.alive) continue;
 
 if(Math.abs(e.x-player.x)<45){
@@ -194,7 +206,7 @@ document.getElementById("score").textContent=score;
 function drawBackground(){
 
 const sky=ctx.createLinearGradient(0,0,0,canvas.height);
-sky.addColorStop(0,"#67c6ff");
+sky.addColorStop(0,"#69c9ff");
 sky.addColorStop(1,"#dff6ff");
 
 ctx.fillStyle=sky;
@@ -209,7 +221,7 @@ ctx.fillRect(x,ground()-130,80,140);
 
 ctx.beginPath();
 ctx.arc(x+40,ground()-150,75,0,Math.PI*2);
-ctx.fillStyle="#67c96f";
+ctx.fillStyle="#66cc77";
 ctx.fill();
 }
 
@@ -272,10 +284,7 @@ for(const e of enemies){
 if(!e.alive) continue;
 
 ctx.save();
-
 ctx.translate(e.x-cameraX,e.y);
-
-ctx.shadowBlur=10;
 
 ctx.fillStyle="#7B1FA2";
 ctx.fillRect(-16,0,32,52);
@@ -298,7 +307,6 @@ drawEnemies();
 drawPlayer();
 
 if(player.hp<=0){
-
 ctx.fillStyle="rgba(0,0,0,0.7)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 
@@ -313,34 +321,50 @@ update();
 draw();
 requestAnimationFrame(loop);
 }
-
 loop();
 
-function bindHold(id,key){
+// JOYSTICK
+const pad=document.getElementById("movePad");
+const stick=document.getElementById("stick");
+let active=false;
 
-const btn=document.getElementById(id);
+function moveStick(x,y){
 
-btn.addEventListener("touchstart",e=>{
-e.preventDefault();
-keys[key]=true;
-});
+const rect=pad.getBoundingClientRect();
 
-btn.addEventListener("touchend",e=>{
-e.preventDefault();
-keys[key]=false;
-});
+const centerX=rect.left+85;
+const centerY=rect.top+85;
+
+let dx=x-centerX;
+let dy=y-centerY;
+
+const distance=Math.sqrt(dx*dx+dy*dy);
+const max=45;
+
+if(distance>max){
+dx=(dx/distance)*max;
+dy=(dy/distance)*max;
 }
 
-bindHold("left","left");
-bindHold("right","right");
+stick.style.transform=`translate(${dx}px,${dy}px)`;
 
-document.getElementById("jump").addEventListener("touchstart",e=>{
-e.preventDefault();
-
-if(!player.jumping){
-player.vy=-17;
-player.jumping=true;
+moveInput=dx/max;
 }
+
+pad.addEventListener("touchstart",e=>{
+active=true;
+moveStick(e.touches[0].clientX,e.touches[0].clientY);
+});
+
+document.addEventListener("touchmove",e=>{
+if(!active) return;
+moveStick(e.touches[0].clientX,e.touches[0].clientY);
+});
+
+document.addEventListener("touchend",()=>{
+active=false;
+moveInput=0;
+stick.style.transform="translate(0px,0px)";
 });
 
 function doAttack(type){
@@ -355,6 +379,15 @@ setTimeout(()=>{
 player.attack="";
 },240);
 }
+
+document.getElementById("jump").addEventListener("touchstart",e=>{
+e.preventDefault();
+
+if(!player.jumping){
+player.vy=-17;
+player.jumping=true;
+}
+});
 
 document.getElementById("punch").addEventListener("touchstart",e=>{
 e.preventDefault();
