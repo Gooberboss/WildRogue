@@ -1088,12 +1088,12 @@ enemyDefeated = function(){
   originalEnemyDefeated();
 }
 
-document.querySelectorAll('.class-card').forEach(card=>{
+document.querySelectorAll('.class-card').forEach(card => {
   card.onclick = () => {
     const c = card.dataset.class;
     state = {...defaultState};
 
-    if(c === 'missionary'){
+    if (c === 'missionary') {
       state.className = 'Missionary';
       state.maxHp = 115;
       state.hp = 115;
@@ -1101,13 +1101,13 @@ document.querySelectorAll('.class-card').forEach(card=>{
       state.healCharges = 5;
     }
 
-    if(c === 'crusader'){
+    if (c === 'crusader') {
       state.className = 'Crusader';
       state.atk = 15;
       state.def = 6;
     }
 
-    if(c === 'prophet'){
+    if (c === 'prophet') {
       state.className = 'Prophet';
       state.skillDmgMult = 4;
       state.skillName = 'Divine Judgment';
@@ -1116,7 +1116,7 @@ document.querySelectorAll('.class-card').forEach(card=>{
     saveGame();
     showMap();
   };
-};
+});
 
 // ===== INIT =====
 if (loadGame()) {
