@@ -9,7 +9,7 @@ touch-action:none;
 #title{
 position:fixed;
 inset:0;
-background:linear-gradient(#4c8a4c,#1e381e);
+background:linear-gradient(#4c8a4c,#1d381d);
 display:flex;
 flex-direction:column;
 justify-content:center;
@@ -18,28 +18,18 @@ color:white;
 z-index:100;
 }
 
-#title h1{
-font-size:56px;
-margin:0;
-}
-
-#title p{
-font-size:22px;
-margin:12px 0;
-}
-
 #playBtn{
 padding:18px 40px;
 font-size:28px;
 border:none;
 border-radius:16px;
 background:gold;
+margin-top:20px;
 }
 
 .ver{
-margin-top:18px;
+margin-top:16px;
 color:gold;
-font-size:22px;
 }
 
 #game{
@@ -48,7 +38,6 @@ inset:0;
 width:100vw;
 height:100vh;
 background:#6aac63;
-display:block;
 }
 
 #hud{
@@ -66,27 +55,7 @@ z-index:10;
 
 #msg{
 margin-top:10px;
-min-height:50px;
-}
-
-#inventory{
-position:fixed;
-top:10px;
-right:10px;
-display:none;
-z-index:10;
-}
-
-.slot{
-width:58px;
-height:58px;
-background:rgba(255,255,255,0.9);
-border-radius:12px;
-margin-bottom:8px;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:28px;
+min-height:60px;
 }
 
 #controls{
