@@ -1,19 +1,33 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Mission Valley</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mission Valley v2</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="game"></canvas>
+<canvas id="game"></canvas>
 
-  <div id="ui">
-    <div id="day">Day 1</div>
-    <div id="message">Help villagers and spread hope.</div>
+<div id="hud">
+  <div>Mission Valley <span class="version">v2</span></div>
+  <div id="day">Day 1</div>
+  <div id="coins">Supplies: 0</div>
+  <div id="faith">Faith: 0</div>
+  <div id="msg">Help the village grow.</div>
+</div>
+
+<div id="controls">
+  <button id="up">▲</button>
+  <div>
+    <button id="left">◀</button>
+    <button id="down">▼</button>
+    <button id="right">▶</button>
   </div>
+  <button id="action">✝</button>
+</div>
 
-  <script src="game.js"></script>
+<script src="game.js"></script>
 </body>
 </html>

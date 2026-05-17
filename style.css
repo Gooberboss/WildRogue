@@ -1,3 +1,4 @@
+
 html, body {
   margin: 0;
   overflow: hidden;
@@ -7,20 +8,46 @@ html, body {
 
 canvas {
   display: block;
-  background: #4c8a4c;
+  background: #5ea35e;
 }
 
-#ui {
+#hud {
   position: absolute;
   top: 10px;
   left: 10px;
+  background: rgba(0,0,0,0.6);
   color: white;
-  background: rgba(0,0,0,0.5);
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
+  width: 220px;
 }
 
-#message {
-  margin-top: 6px;
-  max-width: 250px;
+.version {
+  color: gold;
+}
+
+#msg {
+  margin-top: 8px;
+  min-height: 50px;
+}
+
+#controls {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+button {
+  width: 70px;
+  height: 70px;
+  margin: 5px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.8);
+  font-size: 28px;
+}
+
+button:active {
+  transform: scale(0.95);
 }

@@ -1,3 +1,4 @@
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
@@ -9,152 +10,223 @@ resize();
 window.addEventListener('resize', resize);
 
 const player = {
-  x: 100,
-  y: 100,
-  size: 24,
-  speed: 3
+  x: 200,
+  y: 200,
+  size: 28,
+  speed: 4
 };
 
-const npc = {
-  x: 400,
-  y: 250,
-  size: 26,
-  helped: false
-};
+let supplies = 0;
+let faith = 0;
 
-const farm = [];
-for (let i = 0; i < 6; i++) {
-  farm.push({
-    x: 150 + i * 40,
-    y: 400,
+const villagers = [
+  {x: 500, y: 260, helped: false},
+  {x: 700, y: 420, helped: false},
+  {x: 350, y: 520, helped: false}
+];
+
+const crops = [];
+for(let i=0;i<10;i++){
+  crops.push({
+    x: 150 + i * 45,
+    y: 650,
     grown: false
   });
 }
 
+const trees = [];
+for(let i=0;i<25;i++){
+  trees.push({
+    x: Math.random()*1800,
+    y: Math.random()*1200
+  });
+}
+
+const buildings = [
+  {x: 900, y: 180, w:120, h:140, type:'church'},
+  {x: 1200, y: 500, w:140, h:100, type:'school'}
+];
+
 let keys = {};
 
-window.addEventListener('keydown', e => {
+window.addEventListener('keydown', e=>{
   keys[e.key] = true;
-
-  if (e.key === 'e') {
-    interact();
-  }
+  if(e.key === 'e') interact();
 });
 
-window.addEventListener('keyup', e => {
+window.addEventListener('keyup', e=>{
   keys[e.key] = false;
 });
 
-canvas.addEventListener('touchstart', e => {
-  const touch = e.touches[0];
-  const tx = touch.clientX;
-  const ty = touch.clientY;
-
-  if (tx < canvas.width / 2) player.x -= 20;
-  else player.x += 20;
-
-  if (ty < canvas.height / 2) player.y -= 20;
-  else player.y += 20;
-
-  interact();
-});
-
-function distance(a, b) {
-  return Math.hypot(a.x - b.x, a.y - b.y);
+function move(dx,dy){
+  player.x += dx;
+  player.y += dy;
 }
 
-function interact() {
-  if (distance(player, npc) < 50 && !npc.helped) {
-    npc.helped = true;
-    document.getElementById('message').innerText =
-      "You encouraged a villager with scripture and kindness.";
-  }
+document.getElementById('up').ontouchstart = ()=>move(0,-25);
+document.getElementById('down').ontouchstart = ()=>move(0,25);
+document.getElementById('left').ontouchstart = ()=>move(-25,0);
+document.getElementById('right').ontouchstart = ()=>move(25,0);
+document.getElementById('action').ontouchstart = ()=>interact();
 
-  farm.forEach(crop => {
-    if (Math.abs(player.x - crop.x) < 30 &&
-        Math.abs(player.y - crop.y) < 30) {
+function setMessage(t){
+  document.getElementById('msg').innerText = t;
+}
 
-      crop.grown = true;
-      document.getElementById('message').innerText =
-        "You planted a crop to help feed the village.";
+function updateHUD(){
+  document.getElementById('coins').innerText = "Supplies: " + supplies;
+  document.getElementById('faith').innerText = "Faith: " + faith;
+}
+
+function distance(a,b){
+  return Math.hypot(a.x-b.x,a.y-b.y);
+}
+
+function interact(){
+
+  villagers.forEach(v=>{
+    if(distance(player,v)<70 && !v.helped){
+      v.helped = true;
+      supplies += 5;
+      faith += 2;
+      setMessage("You encouraged a villager with kindness and scripture.");
     }
   });
+
+  crops.forEach(c=>{
+    if(Math.abs(player.x-c.x)<40 &&
+       Math.abs(player.y-c.y)<40){
+
+      if(!c.grown){
+        c.grown = true;
+        supplies += 1;
+        setMessage("You planted food for the community.");
+      } else {
+        supplies += 2;
+        setMessage("You harvested crops for the village.");
+      }
+    }
+  });
+
+  buildings.forEach(b=>{
+    if(player.x > b.x-80 &&
+       player.x < b.x+b.w+80 &&
+       player.y > b.y-80 &&
+       player.y < b.y+b.h+80){
+
+      if(b.type === 'church'){
+        faith += 5;
+        setMessage("The church brought hope to the village.");
+      }
+
+      if(b.type === 'school'){
+        faith += 3;
+        supplies += 2;
+        setMessage("Children learned and grew in wisdom.");
+      }
+    }
+  });
+
+  updateHUD();
 }
 
-function update() {
-  if (keys['ArrowUp'] || keys['w']) player.y -= player.speed;
-  if (keys['ArrowDown'] || keys['s']) player.y += player.speed;
-  if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
-  if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+function update(){
+
+  if(keys['w'] || keys['ArrowUp']) player.y -= player.speed;
+  if(keys['s'] || keys['ArrowDown']) player.y += player.speed;
+  if(keys['a'] || keys['ArrowLeft']) player.x -= player.speed;
+  if(keys['d'] || keys['ArrowRight']) player.x += player.speed;
 }
 
-function drawGround() {
+function drawGround(){
   ctx.fillStyle = '#5ea35e';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  for (let i = 0; i < canvas.width; i += 64) {
-    for (let j = 0; j < canvas.height; j += 64) {
+  for(let i=0;i<canvas.width;i+=64){
+    for(let j=0;j<canvas.height;j+=64){
       ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-      ctx.strokeRect(i, j, 64, 64);
+      ctx.strokeRect(i,j,64,64);
     }
   }
 }
 
-function drawChurch() {
-  ctx.fillStyle = '#c8b28a';
-  ctx.fillRect(600, 120, 100, 120);
+function drawTrees(){
+  trees.forEach(t=>{
+    ctx.fillStyle = '#5b3a1e';
+    ctx.fillRect(t.x,t.y,12,25);
 
-  ctx.fillStyle = '#8b5a2b';
-  ctx.fillRect(640, 180, 20, 60);
-
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(645, 130, 10, 40);
-  ctx.fillRect(630, 145, 40, 10);
+    ctx.fillStyle = '#2c7a2c';
+    ctx.beginPath();
+    ctx.arc(t.x+6,t.y,24,0,Math.PI*2);
+    ctx.fill();
+  });
 }
 
-function drawFarm() {
-  farm.forEach(crop => {
-    ctx.fillStyle = '#6b4423';
-    ctx.fillRect(crop.x, crop.y, 28, 28);
+function drawBuildings(){
+  buildings.forEach(b=>{
 
-    if (crop.grown) {
-      ctx.fillStyle = '#ffd94d';
-      ctx.fillRect(crop.x + 8, crop.y - 10, 10, 12);
+    if(b.type==='church'){
+      ctx.fillStyle='#d8c39a';
+      ctx.fillRect(b.x,b.y,b.w,b.h);
+
+      ctx.fillStyle='#fff';
+      ctx.fillRect(b.x+50,b.y+10,20,50);
+      ctx.fillRect(b.x+40,b.y+25,40,12);
+    }
+
+    if(b.type==='school'){
+      ctx.fillStyle='#b06f3c';
+      ctx.fillRect(b.x,b.y,b.w,b.h);
+
+      ctx.fillStyle='#222';
+      ctx.fillRect(b.x+50,b.y+40,40,60);
     }
   });
 }
 
-function drawNPC() {
-  ctx.fillStyle = npc.helped ? '#66ccff' : '#ffcc66';
-  ctx.fillRect(npc.x, npc.y, npc.size, npc.size);
-
-  ctx.fillStyle = '#222';
-  ctx.fillRect(npc.x + 6, npc.y + 6, 4, 4);
-  ctx.fillRect(npc.x + 16, npc.y + 6, 4, 4);
+function drawVillagers(){
+  villagers.forEach(v=>{
+    ctx.fillStyle = v.helped ? '#66ccff' : '#ffcc66';
+    ctx.fillRect(v.x,v.y,26,26);
+  });
 }
 
-function drawPlayer() {
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(player.x, player.y, player.size, player.size);
+function drawFarm(){
+  crops.forEach(c=>{
+    ctx.fillStyle='#6b4423';
+    ctx.fillRect(c.x,c.y,32,32);
 
-  ctx.fillStyle = '#222';
-  ctx.fillRect(player.x + 5, player.y + 5, 4, 4);
-  ctx.fillRect(player.x + 15, player.y + 5, 4, 4);
-
-  ctx.fillStyle = '#8b4513';
-  ctx.fillRect(player.x + 9, player.y - 8, 6, 10);
+    if(c.grown){
+      ctx.fillStyle='#ffd94d';
+      ctx.fillRect(c.x+10,c.y-10,12,14);
+    }
+  });
 }
 
-function gameLoop() {
+function drawPlayer(){
+  ctx.fillStyle='white';
+  ctx.fillRect(player.x,player.y,player.size,player.size);
+
+  ctx.fillStyle='#8b4513';
+  ctx.fillRect(player.x+10,player.y-10,8,12);
+
+  ctx.fillStyle='#222';
+  ctx.fillRect(player.x+6,player.y+7,4,4);
+  ctx.fillRect(player.x+18,player.y+7,4,4);
+}
+
+function loop(){
   update();
 
   drawGround();
-  drawChurch();
+  drawTrees();
+  drawBuildings();
   drawFarm();
-  drawNPC();
+  drawVillagers();
   drawPlayer();
 
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(loop);
 }
 
-gameLoop();
+updateHUD();
+loop();
