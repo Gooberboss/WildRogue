@@ -1,885 +1,877 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Mission Quest</title>
+<title>⛪ Mission Quest</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { 
-  background: #0a0a0f; 
-  font-family: -apple-system, system-ui, sans-serif; 
-  overflow: hidden; 
-  touch-action: none;
-  -webkit-user-select: none;
+:root {
+  --gold: #f0c040;
+  --red: #e74c3c;
+  --green: #27ae60;
+  --blue: #3498db;
+  --purple: #9b59b6;
+  --dark: #1a1a2e;
+  --darker: #0f0f1a;
+  --card: rgba(255,255,255,0.05);
+  --glow: rgba(240,192,64,0.3);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  background: var(--darker);
+  color: #fff;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
   user-select: none;
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  top: 0; left: 0;
+  -webkit-user-select: none;
 }
-#game-container {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  top: 0; left: 0;
-  overflow: hidden;
-}
-canvas { display: block; position: absolute; top: 0; left: 0; }
 
+/* Animated background */
+.bg-particles {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, #16213e 0%, var(--darker) 70%);
+  z-index: 0;
+}
+.bg-particles::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%);
+}
+
+/* Screen management */
+.screen { 
+  display: none; position: relative; z-index: 1;
+  min-height: 100vh; min-height: -webkit-fill-available;
+  padding: 20px; padding-top: env(safe-area-inset-top, 20px);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+.screen.active { display: flex; flex-direction: column; }
+
+/* Title Screen */
+#title-screen {
+  align-items: center; justify-content: center; text-align: center; gap: 20px;
+}
+.title-icon { font-size: 80px; filter: drop-shadow(0 0 20px var(--glow)); }
+.title-text { font-size: 32px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 20px var(--glow); }
+.title-subtitle { font-size: 14px; color: #aaa; font-style: italic; max-width: 280px; line-height: 1.6; }
+.title-verse { font-size: 12px; color: #888; max-width: 300px; line-height: 1.5; margin: 10px 0; padding: 12px; border-left: 2px solid var(--gold); background: var(--card); border-radius: 0 8px 8px 0; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), #e6a800);
+  color: #1a1a2e; font-weight: 700; font-size: 16px;
+  padding: 16px 40px; border: none; border-radius: 50px;
+  cursor: pointer; letter-spacing: 1px;
+  box-shadow: 0 4px 20px rgba(240,192,64,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-primary:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(240,192,64,0.3); }
+
+/* HUD */
 #hud {
-  position: absolute;
-  top: env(safe-area-inset-top, 0px); left: 0; right: 0;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
-  z-index: 10;
-  pointer-events: none;
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 12px 16px; padding-top: calc(env(safe-area-inset-top, 12px) + 8px);
+  background: linear-gradient(180deg, rgba(15,15,26,0.95) 0%, transparent 100%);
+  z-index: 100; display: none;
 }
-.hud-left, .hud-right { display: flex; gap: 10px; align-items: center; }
+#hud.visible { display: block; }
+.hud-row { display: flex; justify-content: space-between; align-items: center; }
 .hud-stat {
-  display: flex; align-items: center; gap: 3px;
-  color: #fff; font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600;
+  background: var(--card); padding: 4px 10px; border-radius: 20px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
 }
-.hud-stat .icon { font-size: 14px; }
-#health-bar-container {
-  width: 90px; height: 8px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.2);
-  overflow: hidden;
+.hp-bar-container {
+  width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+  border-radius: 3px; margin-top: 8px; overflow: hidden;
 }
-#health-bar {
-  height: 100%; width: 100%;
-  background: linear-gradient(90deg, #ef4444, #f87171);
-  border-radius: 4px;
-  transition: width 0.2s;
+.hp-bar {
+  height: 100%; background: linear-gradient(90deg, var(--red), #ff6b6b);
+  border-radius: 3px; transition: width 0.5s ease;
 }
-#xp-bar-container {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 34px); left: 12px;
-  width: 80px; height: 4px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 2px;
-  overflow: hidden;
-  z-index: 10;
-  pointer-events: none;
+.xp-bar-container {
+  width: 100%; height: 3px; background: rgba(255,255,255,0.05);
+  border-radius: 2px; margin-top: 4px; overflow: hidden;
 }
-#xp-bar {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, #a855f7, #c084fc);
-  border-radius: 2px;
-  transition: width 0.2s;
+.xp-bar {
+  height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple));
+  border-radius: 2px; transition: width 0.5s ease;
 }
 
-#controls {
-  position: absolute;
-  bottom: env(safe-area-inset-bottom, 0px); left: 0; right: 0;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  z-index: 10;
-  pointer-events: none;
+/* Battle Screen */
+#battle-screen { justify-content: space-between; padding-top: 80px; }
+.enemy-section { text-align: center; padding: 20px 0; }
+.enemy-sprite {
+  font-size: 72px; display: inline-block;
+  filter: drop-shadow(0 0 15px rgba(255,0,0,0.3));
+  transition: transform 0.2s;
 }
-#joystick-zone {
-  width: 130px; height: 130px;
-  position: relative;
-  pointer-events: all;
-  touch-action: none;
+.enemy-sprite.hit { animation: enemyHit 0.4s ease; }
+.enemy-sprite.dead { animation: enemyDead 0.8s ease forwards; }
+.enemy-name { font-size: 18px; font-weight: 700; margin-top: 8px; color: #fff; }
+.enemy-title { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
+.enemy-hp-bar {
+  width: 200px; height: 8px; background: rgba(255,255,255,0.1);
+  border-radius: 4px; margin: 12px auto 0; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
 }
-#joystick-base {
-  width: 110px; height: 110px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(255,255,255,0.2);
-  position: absolute;
-  bottom: 0; left: 0;
+.enemy-hp-fill {
+  height: 100%; background: linear-gradient(90deg, #ff4444, #ff6b6b);
+  border-radius: 4px; transition: width 0.4s ease;
 }
-#joystick-thumb {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.5), rgba(255,255,255,0.15));
-  position: absolute;
-  bottom: 33px; left: 33px;
-  pointer-events: none;
+.enemy-level { font-size: 11px; color: #888; margin-top: 4px; }
+
+/* Battle log */
+.battle-log {
+  background: var(--card); border-radius: 12px; padding: 12px 16px;
+  min-height: 60px; max-height: 100px; overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  margin: 12px 0;
 }
-#action-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  pointer-events: all;
-  touch-action: none;
+.log-entry { font-size: 12px; color: #ccc; padding: 3px 0; line-height: 1.4; }
+.log-entry.damage { color: #ff6b6b; }
+.log-entry.heal { color: #6bff6b; }
+.log-entry.info { color: var(--gold); }
+.log-entry.dodge { color: var(--blue); }
+
+/* Action buttons */
+.action-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 10px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom, 10px) + 10px);
 }
 .action-btn {
-  width: 58px; height: 58px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.25);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  font-size: 22px;
-  position: relative;
-  touch-action: none;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; padding: 16px 12px;
+  color: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: center;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.1s, background 0.2s, border-color 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
 }
-.action-btn .label {
-  font-size: 8px; color: rgba(255,255,255,0.5);
-  position: absolute; bottom: -14px;
-  white-space: nowrap;
-}
-.action-btn .cd-ring {
-  position: absolute; inset: -2px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: rgba(255,255,255,0.6);
-  display: none;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-#btn-attack { background: rgba(251,191,36,0.2); grid-column: 2; grid-row: 2; }
-#btn-skill { background: rgba(168,85,247,0.2); grid-column: 1; grid-row: 2; }
-#btn-dodge { background: rgba(96,165,250,0.2); grid-column: 2; grid-row: 1; }
-#btn-heal { background: rgba(74,222,128,0.2); grid-column: 1; grid-row: 1; }
+.action-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.12); }
+.action-btn .icon { font-size: 24px; }
+.action-btn .label { font-size: 12px; color: #aaa; }
+.action-btn.strike { border-color: rgba(231,76,60,0.4); }
+.action-btn.strike:active { border-color: var(--red); box-shadow: 0 0 20px rgba(231,76,60,0.3); }
+.action-btn.heal { border-color: rgba(39,174,96,0.4); }
+.action-btn.heal:active { border-color: var(--green); box-shadow: 0 0 20px rgba(39,174,96,0.3); }
+.action-btn.dodge { border-color: rgba(52,152,219,0.4); }
+.action-btn.dodge:active { border-color: var(--blue); box-shadow: 0 0 20px rgba(52,152,219,0.3); }
+.action-btn.skill { border-color: rgba(155,89,182,0.4); }
+.action-btn.skill:active { border-color: var(--purple); box-shadow: 0 0 20px rgba(155,89,182,0.3); }
+.action-btn:disabled { opacity: 0.4; pointer-events: none; }
 
-#notification {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 50px); left: 50%;
-  transform: translateX(-50%);
-  color: #fbbf24;
-  font-size: 13px; font-weight: 600;
-  text-shadow: 0 0 8px rgba(251,191,36,0.5);
-  z-index: 15;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  text-align: center;
-  white-space: nowrap;
+/* Combo indicator */
+.combo-display {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 48px; font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 30px var(--glow); pointer-events: none;
+  opacity: 0; z-index: 50;
+}
+.combo-display.show { animation: comboFlash 1s ease forwards; }
+
+/* Floating damage */
+.float-dmg {
+  position: absolute; font-weight: 900; font-size: 24px;
+  pointer-events: none; z-index: 50;
+  animation: floatUp 1.2s ease forwards;
 }
 
-#minimap {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 42px); right: 10px;
-  width: 70px; height: 70px;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 4px;
-  z-index: 10;
-  pointer-events: none;
+/* Level up screen */
+#levelup-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
+.levelup-title { font-size: 28px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
+.blessing-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
+.blessing-card {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 16px 20px; cursor: pointer;
+  text-align: left; transition: transform 0.15s, border-color 0.2s;
 }
+.blessing-card:active { transform: scale(0.97); border-color: var(--gold); }
+.blessing-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.blessing-desc { font-size: 12px; color: #aaa; line-height: 1.4; }
 
-.overlay {
-  position: absolute; inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 24px;
-  text-align: center;
+/* Death screen */
+#death-screen { align-items: center; justify-content: center; text-align: center; gap: 20px; }
+.death-icon { font-size: 80px; opacity: 0.8; }
+.death-title { font-size: 28px; font-weight: 800; color: var(--red); }
+.death-stats { font-size: 13px; color: #888; line-height: 2; }
+
+/* Victory screen */
+#victory-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
+.victory-title { font-size: 28px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px var(--glow); }
+.loot-grid { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.loot-item {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 12px 16px; text-align: center;
+  min-width: 80px;
 }
-#start-screen {
-  display: flex;
-  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+.loot-icon { font-size: 28px; }
+.loot-name { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* Map/Region screen */
+#map-screen { padding-top: 80px; }
+.region-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.region-desc { font-size: 12px; color: #888; margin-bottom: 20px; }
+.encounter-list { display: flex; flex-direction: column; gap: 10px; }
+.encounter-card {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px; cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  transition: transform 0.15s, border-color 0.2s;
 }
-#start-screen h1 { color: #fbbf24; font-size: 26px; margin-bottom: 6px; text-shadow: 0 0 15px rgba(251,191,36,0.3); }
-#start-screen .sub { color: #94a3b8; font-size: 13px; margin-bottom: 16px; font-style: italic; }
-#start-screen .verse { color: #a78bfa; font-size: 11px; margin-bottom: 24px; max-width: 280px; line-height: 1.5; }
-#start-screen .info { color: #64748b; font-size: 11px; margin-bottom: 20px; max-width: 260px; line-height: 1.4; }
-.btn {
-  padding: 14px 40px;
-  border: none; border-radius: 10px;
-  font-size: 16px; font-weight: 700;
-  cursor: pointer;
-  -webkit-appearance: none;
+.encounter-card:active { transform: scale(0.97); border-color: var(--gold); }
+.encounter-icon { font-size: 36px; }
+.encounter-info { flex: 1; }
+.encounter-name { font-size: 14px; font-weight: 600; }
+.encounter-detail { font-size: 11px; color: #888; margin-top: 2px; }
+.encounter-reward { font-size: 11px; color: var(--gold); margin-top: 2px; }
+
+/* Rest screen */
+#rest-screen { align-items: center; justify-content: center; text-align: center; gap: 16px; }
+.rest-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
+.rest-btn {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 14px 20px; cursor: pointer;
+  color: #fff; font-size: 14px; font-weight: 600;
+  transition: transform 0.15s;
 }
-#start-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1a2e; }
-#death-screen { background: rgba(5,5,10,0.95); }
-#death-screen h2 { color: #ef4444; font-size: 22px; margin-bottom: 10px; }
-#death-screen .stats { color: #94a3b8; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
-#revive-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
-#levelup-screen { background: rgba(5,5,10,0.93); }
-#levelup-screen h2 { color: #c084fc; font-size: 20px; margin-bottom: 14px; }
-.bless-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
-.bless-item {
-  padding: 14px 16px;
-  border: 1px solid rgba(168,85,247,0.3);
-  border-radius: 10px;
-  background: rgba(168,85,247,0.08);
-  text-align: left;
-  cursor: pointer;
-  -webkit-appearance: none;
-  color: #e2e8f0;
-  font-size: 14px;
+.rest-btn:active { transform: scale(0.95); }
+
+/* Inventory */
+#inventory-btn {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--card); border: 1px solid rgba(255,255,255,0.15);
+  display: none; align-items: center; justify-content: center;
+  font-size: 22px; cursor: pointer; z-index: 90;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.bless-item:active { background: rgba(168,85,247,0.25); }
-.bless-item strong { color: #c084fc; display: block; margin-bottom: 3px; }
-.bless-item span { color: #94a3b8; font-size: 12px; }
+#inventory-btn.visible { display: flex; }
+
+/* Screen shake */
+.shake { animation: shake 0.3s ease; }
+
+/* Animations */
+@keyframes enemyHit { 
+  0%,100% { transform: translateX(0) scale(1); } 
+  25% { transform: translateX(-10px) scale(0.95); } 
+  75% { transform: translateX(10px) scale(0.95); } 
+}
+@keyframes enemyDead { 
+  0% { transform: scale(1) rotate(0); opacity: 1; } 
+  100% { transform: scale(0) rotate(180deg); opacity: 0; } 
+}
+@keyframes floatUp { 
+  0% { opacity: 1; transform: translateY(0) scale(1); } 
+  100% { opacity: 0; transform: translateY(-60px) scale(1.5); } 
+}
+@keyframes comboFlash { 
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } 
+}
+@keyframes shake { 
+  0%,100% { transform: translateX(0); } 
+  20% { transform: translateX(-5px); } 
+  40% { transform: translateX(5px); } 
+  60% { transform: translateX(-3px); } 
+  80% { transform: translateX(3px); } 
+}
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes glow { 0%,100% { filter: drop-shadow(0 0 10px var(--glow)); } 50% { filter: drop-shadow(0 0 25px var(--glow)); } }
+
+.animate-in { animation: fadeIn 0.4s ease forwards; }
+.pulse { animation: pulse 2s ease infinite; }
+.glow { animation: glow 2s ease infinite; }
 </style>
 </head>
 <body>
-<div id="game-container">
-  <canvas id="gameCanvas"></canvas>
-  <canvas id="minimap"></canvas>
-  
-  <div id="hud">
-    <div class="hud-left">
-      <div class="hud-stat"><span class="icon">❤️</span><div id="health-bar-container"><div id="health-bar"></div></div><span id="hp-text">100</span></div>
-      <div class="hud-stat"><span class="icon">⭐</span><span id="level-text">1</span></div>
-    </div>
-    <div class="hud-right">
-      <div class="hud-stat"><span class="icon">⚔️</span><span id="atk-text">8</span></div>
-      <div class="hud-stat"><span class="icon">🛡️</span><span id="def-text">2</span></div>
-      <div class="hud-stat"><span class="icon">🪙</span><span id="coin-text">0</span></div>
-    </div>
-  </div>
-  <div id="xp-bar-container"><div id="xp-bar"></div></div>
-  <div id="notification"></div>
+<div class="bg-particles"></div>
 
-  <div id="controls">
-    <div id="joystick-zone">
-      <div id="joystick-base"></div>
-      <div id="joystick-thumb"></div>
-    </div>
-    <div id="action-buttons">
-      <div class="action-btn" id="btn-heal">🙏<span class="label">Heal</span><div class="cd-ring"></div></div>
-      <div class="action-btn" id="btn-dodge">💨<span class="label">Dodge</span><div class="cd-ring"></div></div>
-      <div class="action-btn" id="btn-skill">🌀<span class="label">Skill</span><div class="cd-ring"></div></div>
-      <div class="action-btn" id="btn-attack">📖<span class="label">Strike</span><div class="cd-ring"></div></div>
-    </div>
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-row">
+    <div class="hud-stat">❤️ <span id="hp-text">100</span></div>
+    <div class="hud-stat">⭐ <span id="level-text">1</span></div>
+    <div class="hud-stat">⚔️ <span id="atk-text">10</span></div>
+    <div class="hud-stat">🛡️ <span id="def-text">3</span></div>
+    <div class="hud-stat">🪙 <span id="gold-text">0</span></div>
   </div>
+  <div class="hp-bar-container"><div class="hp-bar" id="hp-bar"></div></div>
+  <div class="xp-bar-container"><div class="xp-bar" id="xp-bar"></div></div>
+</div>
 
-  <div class="overlay" id="start-screen">
-    <h1>⛪ Mission Quest</h1>
-    <div class="sub">~ Light Into the Nations ~</div>
-    <div class="verse">"Let your light shine before others, that they may see your good deeds and glorify your Father in heaven." — Matthew 5:16</div>
-    <div class="info">Travel through dangerous lands. Defeat enemies, rescue villagers, and bring light to every region.</div>
-    <button class="btn" id="start-btn">⚔️ Begin Mission</button>
+<!-- Title Screen -->
+<div class="screen active" id="title-screen">
+  <div class="title-icon glow">⛪</div>
+  <div class="title-text">MISSION QUEST</div>
+  <div class="title-subtitle">~ Light Into the Nations ~</div>
+  <div class="title-verse">"Let your light shine before others, that they may see your good deeds and glorify your Father in heaven." — Matthew 5:16</div>
+  <p style="font-size:13px;color:#aaa;max-width:280px;text-align:center;line-height:1.5;">Travel through dangerous lands. Defeat enemies, rescue villagers, and bring light to every region.</p>
+  <button class="btn-primary" id="btn-start">⚔️ Begin Mission</button>
+  <button class="btn-primary" id="btn-continue" style="display:none;background:linear-gradient(135deg,#3498db,#2980b9);box-shadow:0 4px 20px rgba(52,152,219,0.4);">📖 Continue Journey</button>
+</div>
+
+<!-- Map Screen -->
+<div class="screen" id="map-screen">
+  <div class="region-title" id="region-title"></div>
+  <div class="region-desc" id="region-desc"></div>
+  <div class="encounter-list" id="encounter-list"></div>
+</div>
+
+<!-- Battle Screen -->
+<div class="screen" id="battle-screen">
+  <div class="enemy-section">
+    <div class="enemy-sprite" id="enemy-sprite">👹</div>
+    <div class="enemy-name" id="enemy-name">Dark Imp</div>
+    <div class="enemy-title" id="enemy-title">Minion of Shadows</div>
+    <div class="enemy-hp-bar"><div class="enemy-hp-fill" id="enemy-hp-bar"></div></div>
+    <div class="enemy-level" id="enemy-level">Lv. 1</div>
+    <div class="combo-display" id="combo-display"></div>
   </div>
-
-  <div class="overlay" id="death-screen">
-    <h2>💀 Fallen in Battle</h2>
-    <div class="stats" id="death-stats"></div>
-    <button class="btn" id="revive-btn">🕊️ Rise Again</button>
-  </div>
-
-  <div class="overlay" id="levelup-screen">
-    <h2>✨ Ministry Growth!</h2>
-    <p style="color:#94a3b8;font-size:12px;margin-bottom:14px;">Choose a blessing:</p>
-    <div class="bless-list" id="bless-list"></div>
+  <div class="battle-log" id="battle-log"></div>
+  <div class="action-grid">
+    <button class="action-btn strike" id="btn-strike"><span class="icon">⚔️</span>Strike<span class="label">Deal damage</span></button>
+    <button class="action-btn heal" id="btn-heal"><span class="icon">🙏</span>Heal<span class="label" id="heal-label">Restore HP</span></button>
+    <button class="action-btn dodge" id="btn-dodge"><span class="icon">💨</span>Dodge<span class="label">Evade next</span></button>
+    <button class="action-btn skill" id="btn-skill"><span class="icon">🌀</span>Skill<span class="label" id="skill-label">Holy Light</span></button>
   </div>
 </div>
 
+<!-- Victory Screen -->
+<div class="screen" id="victory-screen">
+  <div class="victory-title">✨ Victory!</div>
+  <div id="victory-message" style="font-size:14px;color:#ccc;"></div>
+  <div class="loot-grid" id="loot-grid"></div>
+  <button class="btn-primary" id="btn-continue-map">Continue Journey →</button>
+</div>
+
+<!-- Level Up Screen -->
+<div class="screen" id="levelup-screen">
+  <div class="levelup-title">✨ Ministry Growth!</div>
+  <p style="font-size:14px;color:#ccc;">Choose a blessing:</p>
+  <div class="blessing-grid" id="blessing-grid"></div>
+</div>
+
+<!-- Death Screen -->
+<div class="screen" id="death-screen">
+  <div class="death-icon">💀</div>
+  <div class="death-title">Fallen in Battle</div>
+  <div class="death-stats" id="death-stats"></div>
+  <button class="btn-primary" style="background:linear-gradient(135deg,var(--red),#c0392b);box-shadow:0 4px 20px rgba(231,76,60,0.4);" id="btn-revive">🕊️ Rise Again</button>
+</div>
+
+<!-- Rest Screen -->
+<div class="screen" id="rest-screen">
+  <div style="font-size:48px;">⛺</div>
+  <div style="font-size:20px;font-weight:700;">Safe Haven</div>
+  <p style="font-size:13px;color:#888;max-width:260px;">Rest and prepare for the journey ahead.</p>
+  <div class="rest-options">
+    <button class="rest-btn" id="btn-rest-heal">🙏 Pray & Rest — Full HP restore</button>
+    <button class="rest-btn" id="btn-rest-shop">🏪 Merchant — Spend gold</button>
+    <button class="rest-btn" id="btn-rest-continue">➡️ Continue Journey</button>
+  </div>
+</div>
+
+<!-- Inventory Button -->
+<div id="inventory-btn">🎒</div>
+
 <script>
-(function(){
-  "use strict";
-  var canvas = document.getElementById('gameCanvas');
-  var ctx = canvas.getContext('2d');
-  var mmCanvas = document.getElementById('minimap');
-  var mmCtx = mmCanvas.getContext('2d');
-  var W, H;
+// ===== GAME STATE =====
+const defaultState = {
+  hp: 100, maxHp: 100, atk: 10, def: 3, level: 1,
+  xp: 0, xpNeeded: 30, gold: 0, region: 0, encounter: 0,
+  combo: 0, dodging: false, skillCooldown: 0, healCharges: 3, maxHealCharges: 3,
+  items: [], kills: 0, blessings: [],
+  skillName: 'Holy Light', skillDmgMult: 2.5
+};
+let state = {...defaultState};
+let currentEnemy = null;
+let battleActive = false;
+let pendingLevelUp = false;
 
-  function resize(){
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = W; canvas.height = H;
-    mmCanvas.width = 70; mmCanvas.height = 70;
+// ===== REGIONS & ENEMIES =====
+const regions = [
+  { name: '🌲 The Dark Forest', desc: 'Shadows lurk between ancient trees. Evil stirs.',
+    enemies: [
+      { name: 'Shadow Imp', sprite: '👹', title: 'Minion of Darkness', hp: 30, atk: 6, def: 1, xp: 12, gold: 5 },
+      { name: 'Cursed Wolf', sprite: '🐺', title: 'Corrupted Beast', hp: 45, atk: 8, def: 2, xp: 18, gold: 8 },
+      { name: 'Dark Archer', sprite: '🧝', title: 'Fallen Ranger', hp: 35, atk: 12, def: 1, xp: 20, gold: 10 },
+    ],
+    boss: { name: 'Forest Wraith', sprite: '👻', title: '⚠️ BOSS — Guardian of Shadows', hp: 100, atk: 14, def: 4, xp: 50, gold: 30 }
+  },
+  { name: '🏔️ The Cursed Mountains', desc: 'Frozen peaks hide ancient evils. The air itself resists you.',
+    enemies: [
+      { name: 'Ice Golem', sprite: '🧊', title: 'Frozen Sentinel', hp: 60, atk: 10, def: 5, xp: 25, gold: 12 },
+      { name: 'Harpy', sprite: '🦅', title: 'Screaming Terror', hp: 40, atk: 15, def: 2, xp: 22, gold: 10 },
+      { name: 'Stone Troll', sprite: '🗿', title: 'Mountain Dweller', hp: 80, atk: 12, def: 6, xp: 30, gold: 15 },
+    ],
+    boss: { name: 'Frost Dragon', sprite: '🐉', title: '⚠️ BOSS — Ancient Terror', hp: 160, atk: 18, def: 6, xp: 80, gold: 50 }
+  },
+  { name: '🌋 The Burning Wastes', desc: 'Fire and brimstone. Only the faithful survive here.',
+    enemies: [
+      { name: 'Fire Elemental', sprite: '🔥', title: 'Living Flame', hp: 55, atk: 16, def: 3, xp: 30, gold: 14 },
+      { name: 'Demon Knight', sprite: '👿', title: 'Infernal Warrior', hp: 90, atk: 14, def: 7, xp: 35, gold: 18 },
+      { name: 'Lava Serpent', sprite: '🐍', title: 'Molten Beast', hp: 70, atk: 18, def: 4, xp: 32, gold: 16 },
+    ],
+    boss: { name: 'Abaddon', sprite: '😈', title: '⚠️ FINAL BOSS — The Destroyer', hp: 250, atk: 22, def: 8, xp: 150, gold: 100 }
   }
-  resize();
-  window.addEventListener('resize', resize);
-  window.addEventListener('orientationchange', function(){ setTimeout(resize, 100); });
+];
 
-  // Prevent iOS bounce/zoom
-  document.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive: false});
-  document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+const blessings = [
+  { name: '❤️ Heart of Faith', desc: '+25 Max HP & full heal', apply: () => { state.maxHp += 25; state.hp = state.maxHp; }},
+  { name: '⚔️ Sword of Spirit', desc: '+4 Attack power', apply: () => { state.atk += 4; }},
+  { name: '🛡️ Shield of Grace', desc: '+3 Defense', apply: () => { state.def += 3; }},
+  { name: '🙏 Gift of Healing', desc: '+2 Heal charges per battle', apply: () => { state.maxHealCharges += 2; state.healCharges = state.maxHealCharges; }},
+  { name: '🌀 Power of Prayer', desc: 'Skill damage +50%', apply: () => { state.skillDmgMult += 0.5; }},
+  { name: '💨 Wings of Angels', desc: 'Dodge also counters for 50% ATK', apply: () => { state.dodgeCounter = true; }},
+];
 
-  var TILE = 36;
-  var MW = 45, MH = 45;
-  var state = 'start';
-  var map = [];
-  var cam = {x:0, y:0};
-  var particles = [];
-  var dmgNums = [];
-  var enemies = [];
-  var items = [];
-  var npcs = [];
-  var portals = [];
-  var floor = 1;
-  var totalKills = 0;
-  var rescues = 0;
-  var shake = 0;
-  var notifTimer = 0;
-  var frame = 0;
+// ===== DOM REFS =====
+const $ = id => document.getElementById(id);
+const screens = document.querySelectorAll('.screen');
 
-  var P = {
-    x:0, y:0, w:24, h:24,
-    hp:100, maxHp:100, atk:8, def:2, spd:2.8,
-    lv:1, xp:0, xpNeed:18,
-    coins:0, facing:0,
-    vx:0, vy:0,
-    inv:0, atkCd:0, skillCd:0, dodgeCd:0, healCd:0,
-    dodging:false, dodgeT:0,
-    combo:0, comboT:0,
-    heals:3, maxHeals:3
-  };
+function showScreen(id) {
+  screens.forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  const showHud = (id === 'battle-screen' || id === 'map-screen' || id === 'rest-screen');
+  $('hud').classList.toggle('visible', showHud);
+  $('inventory-btn').classList.toggle('visible', showHud);
+}
 
-  // Joystick state
-  var joyId = null, joyDx = 0, joyDy = 0;
-  var joyZone = document.getElementById('joystick-zone');
-  var joyThumb = document.getElementById('joystick-thumb');
-  var joyBase = document.getElementById('joystick-base');
+// ===== SAVE/LOAD =====
+function saveGame() {
+  try { localStorage.setItem('missionquest_save', JSON.stringify(state)); } catch(e) {}
+}
+function loadGame() {
+  try {
+    const s = localStorage.getItem('missionquest_save');
+    if (s) { state = {...defaultState, ...JSON.parse(s)}; return true; }
+  } catch(e) {}
+  return false;
+}
 
-  joyZone.addEventListener('touchstart', function(e){
-    e.preventDefault();
-    var t = e.changedTouches[0];
-    joyId = t.identifier;
-    updateJoy(t.clientX, t.clientY);
-  }, {passive:false});
-  joyZone.addEventListener('touchmove', function(e){
-    e.preventDefault();
-    for(var i=0;i<e.changedTouches.length;i++){
-      if(e.changedTouches[i].identifier === joyId){
-        updateJoy(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+// ===== HUD UPDATE =====
+function updateHUD() {
+  $('hp-text').textContent = state.hp;
+  $('level-text').textContent = state.level;
+  $('atk-text').textContent = state.atk;
+  $('def-text').textContent = state.def;
+  $('gold-text').textContent = state.gold;
+  $('hp-bar').style.width = (state.hp / state.maxHp * 100) + '%';
+  $('xp-bar').style.width = (state.xp / state.xpNeeded * 100) + '%';
+}
+
+// ===== BATTLE SYSTEM =====
+function startBattle(enemy) {
+  currentEnemy = {...enemy, currentHp: enemy.hp};
+  battleActive = true;
+  state.combo = 0;
+  state.dodging = false;
+  state.healCharges = state.maxHealCharges;
+  state.skillCooldown = 0;
+  
+  $('enemy-sprite').textContent = enemy.sprite;
+  $('enemy-sprite').className = 'enemy-sprite';
+  $('enemy-name').textContent = enemy.name;
+  $('enemy-title').textContent = enemy.title;
+  $('enemy-level').textContent = `Lv. ${Math.max(1, state.level + Math.floor(Math.random()*3) - 1)}`;
+  updateEnemyHP();
+  clearLog();
+  addLog(`${enemy.name} appears!`, 'info');
+  updateActionButtons();
+  showScreen('battle-screen');
+}
+
+function updateEnemyHP() {
+  const pct = Math.max(0, currentEnemy.currentHp / currentEnemy.hp * 100);
+  $('enemy-hp-bar').style.width = pct + '%';
+}
+
+function updateActionButtons() {
+  $('heal-label').textContent = `${state.healCharges} left`;
+  $('btn-heal').disabled = state.healCharges <= 0;
+  $('skill-label').textContent = state.skillCooldown > 0 ? `${state.skillCooldown} turns` : state.skillName;
+  $('btn-skill').disabled = state.skillCooldown > 0;
+}
+
+function clearLog() { $('battle-log').innerHTML = ''; }
+function addLog(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'log-entry ' + type;
+  el.textContent = msg;
+  $('battle-log').appendChild(el);
+  $('battle-log').scrollTop = $('battle-log').scrollHeight;
+}
+
+function showFloatDmg(text, color, x, y) {
+  const el = document.createElement('div');
+  el.className = 'float-dmg';
+  el.textContent = text;
+  el.style.color = color;
+  el.style.left = (x || 50) + '%';
+  el.style.top = (y || 30) + '%';
+  $('battle-screen').appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function showCombo(num) {
+  const el = $('combo-display');
+  el.textContent = `${num}x COMBO!`;
+  el.className = 'combo-display show';
+  setTimeout(() => el.className = 'combo-display', 1000);
+}
+
+function playerAttack() {
+  if (!battleActive) return;
+  state.combo++;
+  const crit = Math.random() < 0.15;
+  const comboBonus = 1 + (state.combo * 0.1);
+  let dmg = Math.max(1, Math.floor((state.atk * comboBonus - currentEnemy.def * 0.5) * (crit ? 2 : 1)));
+  dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
+  
+  currentEnemy.currentHp -= dmg;
+  $('enemy-sprite').classList.add('hit');
+  setTimeout(() => $('enemy-sprite').classList.remove('hit'), 400);
+  
+  const critText = crit ? ' 💥CRIT!' : '';
+  addLog(`You strike for ${dmg} damage!${critText}`, 'damage');
+  showFloatDmg(crit ? `${dmg}!` : dmg, crit ? '#ffff00' : '#ff6b6b');
+  
+  if (state.combo >= 3) showCombo(state.combo);
+  
+  vibrate(crit ? [50, 30, 50] : [30]);
+  updateEnemyHP();
+  
+  if (currentEnemy.currentHp <= 0) {
+    enemyDefeated();
+  } else {
+    state.skillCooldown = Math.max(0, state.skillCooldown - 1);
+    updateActionButtons();
+    setTimeout(enemyTurn, 600);
+  }
+}
+
+function playerHeal() {
+  if (!battleActive || state.healCharges <= 0) return;
+  state.healCharges--;
+  state.combo = 0;
+  const healAmt = Math.floor(state.maxHp * 0.35);
+  state.hp = Math.min(state.maxHp, state.hp + healAmt);
+  addLog(`🙏 You pray and heal ${healAmt} HP!`, 'heal');
+  showFloatDmg(`+${healAmt}`, '#6bff6b', 50, 70);
+  vibrate([20, 20, 20]);
+  updateHUD();
+  updateActionButtons();
+  setTimeout(enemyTurn, 600);
+}
+
+function playerDodge() {
+  if (!battleActive) return;
+  state.dodging = true;
+  state.combo = 0;
+  addLog('💨 You prepare to dodge...', 'dodge');
+  state.skillCooldown = Math.max(0, state.skillCooldown - 1);
+  updateActionButtons();
+  setTimeout(enemyTurn, 600);
+}
+
+function playerSkill() {
+  if (!battleActive || state.skillCooldown > 0) return;
+  state.combo++;
+  const dmg = Math.floor(state.atk * state.skillDmgMult);
+  currentEnemy.currentHp -= dmg;
+  state.skillCooldown = 3;
+  
+  $('enemy-sprite').classList.add('hit');
+  setTimeout(() => $('enemy-sprite').classList.remove('hit'), 400);
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 300);
+  
+  addLog(`🌀 ${state.skillName}! ${dmg} holy damage!`, 'info');
+  showFloatDmg(`✨${dmg}`, '#f0c040');
+  vibrate([50, 30, 80]);
+  updateEnemyHP();
+  
+  if (currentEnemy.currentHp <= 0) {
+    enemyDefeated();
+  } else {
+    updateActionButtons();
+    setTimeout(enemyTurn, 600);
+  }
+}
+
+function enemyTurn() {
+  if (!battleActive) return;
+  
+  if (state.dodging) {
+    state.dodging = false;
+    if (Math.random() < 0.75) {
+      addLog(`${currentEnemy.name} attacks but you dodge!`, 'dodge');
+      if (state.dodgeCounter) {
+        const counterDmg = Math.floor(state.atk * 0.5);
+        currentEnemy.currentHp -= counterDmg;
+        addLog(`↩️ Counter! ${counterDmg} damage!`, 'damage');
+        showFloatDmg(counterDmg, '#3498db');
+        updateEnemyHP();
+        if (currentEnemy.currentHp <= 0) { enemyDefeated(); return; }
       }
+      vibrate([10]);
+      return;
+    } else {
+      addLog(`${currentEnemy.name} predicted your dodge!`, 'damage');
     }
-  }, {passive:false});
-  joyZone.addEventListener('touchend', function(e){
-    for(var i=0;i<e.changedTouches.length;i++){
-      if(e.changedTouches[i].identifier === joyId){
-        joyId = null; joyDx = 0; joyDy = 0;
-        joyThumb.style.transform = 'translate(0px,0px)';
-      }
-    }
+  }
+  
+  const dmg = Math.max(1, Math.floor(currentEnemy.atk * (0.8 + Math.random() * 0.4) - state.def * 0.6));
+  state.hp -= dmg;
+  state.combo = 0;
+  addLog(`${currentEnemy.name} hits you for ${dmg}!`, 'damage');
+  showFloatDmg(dmg, '#ff4444', 50, 70);
+  vibrate([80]);
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 300);
+  
+  updateHUD();
+  
+  if (state.hp <= 0) {
+    state.hp = 0;
+    updateHUD();
+    battleActive = false;
+    setTimeout(showDeath, 500);
+  }
+}
+
+function enemyDefeated() {
+  battleActive = false;
+  $('enemy-sprite').classList.add('dead');
+  state.kills++;
+  state.xp += currentEnemy.xp;
+  state.gold += currentEnemy.gold;
+  
+  addLog(`${currentEnemy.name} defeated! +${currentEnemy.xp}XP +${currentEnemy.gold}🪙`, 'info');
+  vibrate([30, 50, 30, 50, 100]);
+  
+  if (state.xp >= state.xpNeeded) {
+    pendingLevelUp = true;
+  }
+  
+  setTimeout(() => {
+    showVictory();
+  }, 1000);
+}
+
+function showVictory() {
+  $('victory-message').textContent = `${currentEnemy.name} has been vanquished!`;
+  $('loot-grid').innerHTML = `
+    <div class="loot-item"><div class="loot-icon">⭐</div><div class="loot-name">+${currentEnemy.xp} XP</div></div>
+    <div class="loot-item"><div class="loot-icon">🪙</div><div class="loot-name">+${currentEnemy.gold} Gold</div></div>
+  `;
+  updateHUD();
+  showScreen('victory-screen');
+}
+
+function levelUp() {
+  state.level++;
+  state.xp -= state.xpNeeded;
+  state.xpNeeded = Math.floor(state.xpNeeded * 1.5);
+  state.hp = state.maxHp;
+  pendingLevelUp = false;
+  
+  // Show 3 random blessings
+  const available = [...blessings].sort(() => Math.random() - 0.5).slice(0, 3);
+  $('blessing-grid').innerHTML = '';
+  available.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'blessing-card';
+    card.innerHTML = `<div class="blessing-name">${b.name}</div><div class="blessing-desc">${b.desc}</div>`;
+    card.onclick = () => {
+      b.apply();
+      state.blessings.push(b.name);
+      updateHUD();
+      saveGame();
+      showMap();
+    };
+    $('blessing-grid').appendChild(card);
   });
-  joyZone.addEventListener('touchcancel', function(){
-    joyId = null; joyDx = 0; joyDy = 0;
-    joyThumb.style.transform = 'translate(0px,0px)';
+  
+  showScreen('levelup-screen');
+}
+
+function showDeath() {
+  $('death-stats').innerHTML = `
+    Level reached: ${state.level}<br>
+    Enemies defeated: ${state.kills}<br>
+    Gold earned: ${state.gold}
+  `;
+  showScreen('death-screen');
+}
+
+// ===== MAP SYSTEM =====
+function showMap() {
+  const region = regions[state.region];
+  $('region-title').textContent = region.name;
+  $('region-desc').textContent = region.desc;
+  
+  const list = $('encounter-list');
+  list.innerHTML = '';
+  
+  // Generate encounters
+  const encounters = [];
+  const numEncounters = 3 + Math.floor(Math.random() * 2);
+  
+  for (let i = 0; i < numEncounters; i++) {
+    const enemy = region.enemies[Math.floor(Math.random() * region.enemies.length)];
+    encounters.push({ type: 'battle', enemy, icon: enemy.sprite, name: enemy.name, detail: enemy.title, reward: `+${enemy.xp}XP +${enemy.gold}🪙` });
+  }
+  
+  // Add rest stop
+  encounters.splice(Math.floor(encounters.length / 2), 0, { type: 'rest', icon: '⛺', name: 'Safe Haven', detail: 'Rest and recover', reward: 'Heal & Shop' });
+  
+  // Add boss at end
+  encounters.push({ type: 'boss', enemy: region.boss, icon: region.boss.sprite, name: region.boss.name, detail: region.boss.title, reward: `+${region.boss.xp}XP +${region.boss.gold}🪙` });
+  
+  encounters.forEach((enc, i) => {
+    const card = document.createElement('div');
+    card.className = 'encounter-card';
+    card.style.animationDelay = (i * 0.1) + 's';
+    card.style.animation = 'slideUp 0.4s ease forwards';
+    card.style.opacity = '0';
+    card.innerHTML = `
+      <div class="encounter-icon">${enc.icon}</div>
+      <div class="encounter-info">
+        <div class="encounter-name">${enc.name}</div>
+        <div class="encounter-detail">${enc.detail}</div>
+        <div class="encounter-reward">${enc.reward}</div>
+      </div>
+    `;
+    card.onclick = () => {
+      if (enc.type === 'rest') { showRest(); }
+      else { startBattle(enc.enemy); }
+    };
+    list.appendChild(card);
   });
+  
+  updateHUD();
+  showScreen('map-screen');
+}
 
-  function updateJoy(cx, cy){
-    var rect = joyBase.getBoundingClientRect();
-    var bx = rect.left + rect.width/2;
-    var by = rect.top + rect.height/2;
-    var dx = cx - bx, dy = cy - by;
-    var dist = Math.sqrt(dx*dx+dy*dy);
-    var max = 40;
-    if(dist > max){ dx = dx/dist*max; dy = dy/dist*max; }
-    joyThumb.style.transform = 'translate('+dx+'px,'+dy+'px)';
-    joyDx = dx/max; joyDy = dy/max;
-    if(dist > 5) P.facing = Math.atan2(dy, dx);
-  }
+function showRest() {
+  showScreen('rest-screen');
+}
 
-  // Action buttons - use touchstart for responsiveness on iOS
-  function bindBtn(id, fn){
-    var el = document.getElementById(id);
-    el.addEventListener('touchstart', function(e){ e.preventDefault(); fn(); }, {passive:false});
-    el.addEventListener('mousedown', function(e){ e.preventDefault(); fn(); });
-  }
-  bindBtn('btn-attack', doAttack);
-  bindBtn('btn-skill', doSkill);
-  bindBtn('btn-dodge', doDodge);
-  bindBtn('btn-heal', doHeal);
-
-  // Keyboard fallback
-  var keys = {};
-  document.addEventListener('keydown', function(e){ keys[e.key.toLowerCase()]=true; });
-  document.addEventListener('keyup', function(e){ keys[e.key.toLowerCase()]=false; });
-  document.addEventListener('keydown', function(e){
-    if(e.key===' '||e.key==='j') doAttack();
-    if(e.key==='k') doSkill();
-    if(e.key==='l'||e.key==='Shift') doDodge();
-    if(e.key==='h') doHeal();
+// ===== SHOP =====
+function showShop() {
+  const items = [
+    { name: '❤️ Health Potion', desc: 'Restore 50 HP', cost: 15, apply: () => { state.hp = Math.min(state.maxHp, state.hp + 50); }},
+    { name: '⚔️ Whetstone', desc: '+2 ATK permanently', cost: 30, apply: () => { state.atk += 2; }},
+    { name: '🛡️ Iron Plate', desc: '+2 DEF permanently', cost: 30, apply: () => { state.def += 2; }},
+    { name: '❤️ Life Crystal', desc: '+15 Max HP', cost: 40, apply: () => { state.maxHp += 15; state.hp += 15; }},
+  ];
+  
+  const list = $('encounter-list');
+  list.innerHTML = '<div style="font-size:20px;font-weight:700;margin-bottom:8px;">🏪 Merchant</div>';
+  
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'encounter-card';
+    const canAfford = state.gold >= item.cost;
+    card.style.opacity = canAfford ? '1' : '0.5';
+    card.innerHTML = `
+      <div class="encounter-icon" style="font-size:28px;">${item.name.split(' ')[0]}</div>
+      <div class="encounter-info">
+        <div class="encounter-name">${item.name}</div>
+        <div class="encounter-detail">${item.desc}</div>
+        <div class="encounter-reward">🪙 ${item.cost} gold</div>
+      </div>
+    `;
+    if (canAfford) {
+      card.onclick = () => {
+        state.gold -= item.cost;
+        item.apply();
+        updateHUD();
+        saveGame();
+        showShop();
+      };
+    }
+    list.appendChild(card);
   });
+  
+  const backBtn = document.createElement('div');
+  backBtn.className = 'encounter-card';
+  backBtn.innerHTML = '<div class="encounter-icon">↩️</div><div class="encounter-info"><div class="encounter-name">Back</div></div>';
+  backBtn.onclick = () => showRest();
+  list.appendChild(backBtn);
+  
+  showScreen('map-screen');
+}
 
-  // Map generation
-  function genMap(){
-    map = [];
-    for(var y=0;y<MH;y++){ map[y]=[]; for(var x=0;x<MW;x++) map[y][x]=1; }
-    var rooms = [];
-    var numR = 7 + floor*2;
-    for(var i=0;i<numR;i++){
-      var rw=4+Math.floor(Math.random()*4);
-      var rh=4+Math.floor(Math.random()*4);
-      var rx=1+Math.floor(Math.random()*(MW-rw-2));
-      var ry=1+Math.floor(Math.random()*(MH-rh-2));
-      var ok=true;
-      for(var j=0;j<rooms.length;j++){
-        var r=rooms[j];
-        if(rx<r.x+r.w+1&&rx+rw+1>r.x&&ry<r.y+r.h+1&&ry+rh+1>r.y){ok=false;break;}
-      }
-      if(ok){
-        rooms.push({x:rx,y:ry,w:rw,h:rh});
-        for(var dy=0;dy<rh;dy++) for(var dx=0;dx<rw;dx++) map[ry+dy][rx+dx]=0;
-      }
-    }
-    if(rooms.length<2){
-      rooms=[{x:3,y:3,w:10,h:10},{x:20,y:20,w:8,h:8}];
-      for(var r=0;r<rooms.length;r++)
-        for(var dy=0;dy<rooms[r].h;dy++) for(var dx=0;dx<rooms[r].w;dx++) map[rooms[r].y+dy][rooms[r].x+dx]=0;
-    }
-    for(var i=1;i<rooms.length;i++){
-      var a=rooms[i-1],b=rooms[i];
-      var cx=Math.floor(a.x+a.w/2),cy=Math.floor(a.y+a.h/2);
-      var bx2=Math.floor(b.x+b.w/2),by2=Math.floor(b.y+b.h/2);
-      while(cx!==bx2){if(cy>=0&&cy<MH&&cx>=0&&cx<MW)map[cy][cx]=0;cx+=cx<bx2?1:-1;}
-      while(cy!==by2){if(cy>=0&&cy<MH&&cx>=0&&cx<MW)map[cy][cx]=0;cy+=cy<by2?1:-1;}
-    }
-    P.x=(rooms[0].x+2)*TILE; P.y=(rooms[0].y+2)*TILE;
-    var last=rooms[rooms.length-1];
-    portals=[{x:(last.x+Math.floor(last.w/2))*TILE, y:(last.y+Math.floor(last.h/2))*TILE}];
+// ===== HAPTIC FEEDBACK =====
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
 
-    enemies=[];
-    var ec=5+floor*3;
-    var types=['slime','skeleton','shadow','demon'];
-    var bHp={slime:18,skeleton:30,shadow:45,demon:70};
-    var bAtk={slime:3,skeleton:6,shadow:9,demon:14};
-    var bSpd={slime:0.8,skeleton:1.2,shadow:1.8,demon:1.5};
-    for(var i=0;i<ec;i++){
-      var ri=1+Math.floor(Math.random()*(rooms.length-2));
-      var room=rooms[ri]||rooms[rooms.length-1];
-      var ti=Math.min(Math.floor(Math.random()*(1+floor*0.4)),3);
-      var t=types[ti];
-      var m=1+(floor-1)*0.25;
-      enemies.push({
-        x:(room.x+1+Math.random()*(room.w-2))*TILE,
-        y:(room.y+1+Math.random()*(room.h-2))*TILE,
-        w:22,h:22,type:t,
-        hp:Math.floor(bHp[t]*m),maxHp:Math.floor(bHp[t]*m),
-        atk:Math.floor(bAtk[t]*m),spd:bSpd[t],
-        atkT:0,aggro:140+floor*8,hit:0,
-        dir:Math.random()*6.28,moveT:0,dead:false
-      });
-    }
+// ===== EVENT LISTENERS =====
+$('btn-start').onclick = () => {
+  state = {...defaultState};
+  saveGame();
+  showMap();
+};
 
-    items=[];
-    for(var i=0;i<4+floor;i++){
-      var room=rooms[Math.floor(Math.random()*rooms.length)];
-      var ts=['coin','coin','coin','essence','heart'];
-      items.push({x:(room.x+1+Math.random()*(room.w-2))*TILE,y:(room.y+1+Math.random()*(room.h-2))*TILE,type:ts[Math.floor(Math.random()*ts.length)],got:false});
-    }
+$('btn-continue').onclick = () => { showMap(); };
 
-    npcs=[];
-    if(rooms.length>3){
-      var nc=Math.min(1+Math.floor(floor/2),3);
-      for(var i=0;i<nc;i++){
-        var ri=2+Math.floor(Math.random()*(rooms.length-3));
-        var room=rooms[ri]||rooms[1];
-        npcs.push({x:(room.x+Math.floor(room.w/2))*TILE,y:(room.y+Math.floor(room.h/2))*TILE,saved:false,icon:['👴','👧','👨','👩'][Math.floor(Math.random()*4)]});
-      }
-    }
-  }
+$('btn-strike').onclick = playerAttack;
+$('btn-heal').onclick = playerHeal;
+$('btn-dodge').onclick = playerDodge;
+$('btn-skill').onclick = playerSkill;
 
-  function blocked(px,py,pw,ph){
-    var x1=Math.floor(px/TILE),y1=Math.floor(py/TILE);
-    var x2=Math.floor((px+pw-1)/TILE),y2=Math.floor((py+ph-1)/TILE);
-    for(var ty=y1;ty<=y2;ty++) for(var tx=x1;tx<=x2;tx++)
-      if(ty<0||ty>=MH||tx<0||tx>=MW||map[ty][tx]===1) return true;
-    return false;
-  }
+$('btn-continue-map').onclick = () => {
+  if (pendingLevelUp) { levelUp(); }
+  else { showMap(); }
+  saveGame();
+};
 
-  function dist(ax,ay,bx,by){ return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by)); }
+$('btn-revive').onclick = () => {
+  state.hp = Math.floor(state.maxHp * 0.5);
+  state.gold = Math.floor(state.gold * 0.7);
+  updateHUD();
+  saveGame();
+  showMap();
+};
 
-  function addDmg(x,y,txt,col){ dmgNums.push({x:x,y:y,t:txt,c:col,life:35}); }
+$('btn-rest-heal').onclick = () => {
+  state.hp = state.maxHp;
+  updateHUD();
+  saveGame();
+  addLog && showMap();
+  showMap();
+};
 
-  function notify(txt){
-    notifTimer=100;
-    var el=document.getElementById('notification');
-    el.textContent=txt; el.style.opacity='1';
-  }
+$('btn-rest-shop').onclick = showShop;
+$('btn-rest-continue').onclick = showMap;
 
-  // Combat
-  function doAttack(){
-    if(P.atkCd>0||state!=='playing') return;
-    P.atkCd=12; P.combo++; P.comboT=25;
-    var dmg=P.atk+Math.floor(P.combo*1.2);
-    var ax=P.x+P.w/2+Math.cos(P.facing)*18;
-    var ay=P.y+P.h/2+Math.sin(P.facing)*18;
-    for(var i=0;i<5;i++){
-      var a=P.facing+(Math.random()-0.5)*1.2;
-      particles.push({x:ax+Math.cos(a)*(15+Math.random()*15),y:ay+Math.sin(a)*(15+Math.random()*15),vx:Math.cos(P.facing)*1.5,vy:Math.sin(P.facing)*1.5,life:10,ml:10,col:'#fbbf24',sz:2+Math.random()*2});
-    }
-    for(var i=0;i<enemies.length;i++){
-      var e=enemies[i]; if(e.dead) continue;
-      if(dist(e.x+e.w/2,e.y+e.h/2,ax,ay)<50){
-        var d=Math.max(1,dmg+Math.floor(Math.random()*3));
-        e.hp-=d; e.hit=6; shake=3;
-        addDmg(e.x+e.w/2,e.y-5,String(d),'#fbbf24');
-        if(e.hp<=0) killE(e);
-      }
-    }
-  }
-
-  function doSkill(){
-    if(P.skillCd>0||state!=='playing') return;
-    P.skillCd=80;
-    var cx=P.x+P.w/2, cy=P.y+P.h/2;
-    for(var i=0;i<14;i++){
-      var a=(i/14)*6.28;
-      particles.push({x:cx,y:cy,vx:Math.cos(a)*3.5,vy:Math.sin(a)*3.5,life:18,ml:18,col:'#a855f7',sz:4});
-    }
-    for(var i=0;i<enemies.length;i++){
-      var e=enemies[i]; if(e.dead) continue;
-      if(dist(e.x+e.w/2,e.y+e.h/2,cx,cy)<100){
-        var d=Math.floor(P.atk*1.8);
-        e.hp-=d; e.hit=6;
-        addDmg(e.x+e.w/2,e.y-5,String(d),'#a855f7');
-        if(e.hp<=0) killE(e);
-      }
-    }
-    shake=5;
-  }
-
-  function doDodge(){
-    if(P.dodgeCd>0||P.dodging||state!=='playing') return;
-    P.dodging=true; P.dodgeT=10; P.dodgeCd=35; P.inv=12;
-    P.vx=Math.cos(P.facing)*7; P.vy=Math.sin(P.facing)*7;
-  }
-
-  function doHeal(){
-    if(P.healCd>0||P.heals<=0||state!=='playing') return;
-    P.healCd=100; P.heals--;
-    var amt=Math.floor(P.maxHp*0.35);
-    P.hp=Math.min(P.maxHp,P.hp+amt);
-    addDmg(P.x+P.w/2,P.y-5,'+'+amt,'#4ade80');
-    for(var i=0;i<6;i++) particles.push({x:P.x+P.w/2+(Math.random()-0.5)*20,y:P.y+P.h/2+(Math.random()-0.5)*20,vx:(Math.random()-0.5)*1.5,vy:-1.5-Math.random(),life:16,ml:16,col:'#4ade80',sz:3});
-  }
-
-  function killE(e){
-    e.dead=true; totalKills++;
-    var xpG={slime:4,skeleton:7,shadow:11,demon:18}[e.type]||4;
-    P.xp+=xpG;
-    if(Math.random()<0.4) items.push({x:e.x,y:e.y,type:'coin',got:false});
-    if(Math.random()<0.12) items.push({x:e.x,y:e.y,type:'essence',got:false});
-    var col={slime:'#4ade80',skeleton:'#e2e8f0',shadow:'#7c3aed',demon:'#ef4444'}[e.type];
-    for(var i=0;i<8;i++) particles.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:16,ml:16,col:col,sz:2+Math.random()*3});
-    checkLvl();
-  }
-
-  function checkLvl(){
-    if(P.xp>=P.xpNeed){
-      P.xp-=P.xpNeed; P.lv++; P.xpNeed=Math.floor(P.xpNeed*1.4);
-      showLvlUp();
-    }
-  }
-
-  function showLvlUp(){
-    state='levelup';
-    document.getElementById('levelup-screen').style.display='flex';
-    var list=document.getElementById('bless-list');
-    list.innerHTML='';
-    var all=[
-      {n:'⚔️ Sword of the Spirit',d:'+4 Attack',fn:function(){P.atk+=4;}},
-      {n:'🛡️ Shield of Faith',d:'+3 Defense',fn:function(){P.def+=3;}},
-      {n:'❤️ Living Water',d:'+25 Max HP & Full Heal',fn:function(){P.maxHp+=25;P.hp=P.maxHp;}},
-      {n:'💨 Swift as Eagles',d:'+0.4 Speed',fn:function(){P.spd+=0.4;}},
-      {n:'🙏 Gift of Healing',d:'+1 Heal Charge',fn:function(){P.maxHeals++;P.heals=P.maxHeals;}},
-      {n:'✨ Holy Fire',d:'+3 ATK & Skill Power',fn:function(){P.atk+=3;}}
-    ];
-    var pick=[];
-    while(pick.length<3){var b=all[Math.floor(Math.random()*all.length)];if(pick.indexOf(b)===-1)pick.push(b);}
-    for(var i=0;i<pick.length;i++){
-      (function(b){
-        var btn=document.createElement('button');
-        btn.className='bless-item';
-        btn.innerHTML='<strong>'+b.n+'</strong><span>'+b.d+'</span>';
-        btn.addEventListener('touchstart',function(e){e.preventDefault();b.fn();closeLvl(b.n);},{passive:false});
-        btn.addEventListener('click',function(){b.fn();closeLvl(b.n);});
-        list.appendChild(btn);
-      })(pick[i]);
-    }
-  }
-
-  function closeLvl(name){
-    document.getElementById('levelup-screen').style.display='none';
-    state='playing';
-    notify(name+' acquired!');
-  }
-
-  function nextFloor(){
-    floor++; P.heals=P.maxHeals;
-    genMap();
-    notify('🗺️ Floor '+floor+' — Deeper into darkness...');
-    shake=6;
-  }
-
-  // Screens
-  document.getElementById('start-btn').addEventListener('click', startGame);
-  document.getElementById('start-btn').addEventListener('touchstart', function(e){e.preventDefault();startGame();},{passive:false});
-  document.getElementById('revive-btn').addEventListener('click', revive);
-  document.getElementById('revive-btn').addEventListener('touchstart', function(e){e.preventDefault();revive();},{passive:false});
-
-  function startGame(){
-    document.getElementById('start-screen').style.display='none';
-    state='playing'; floor=1;
-    P.hp=100;P.maxHp=100;P.atk=8;P.def=2;P.spd=2.8;
-    P.lv=1;P.xp=0;P.xpNeed=18;P.coins=0;
-    P.heals=3;P.maxHeals=3;
-    totalKills=0;rescues=0;
-    genMap();
-    notify('🗺️ Floor 1 — Find the portal!');
-  }
-
-  function revive(){
-    document.getElementById('death-screen').style.display='none';
-    state='playing'; floor=Math.max(1,floor-1);
-    P.hp=P.maxHp; P.heals=P.maxHeals;
-    genMap();
-    notify('🕊️ Risen again — Floor '+floor);
-  }
-
-  // Update
-  function update(){
-    if(state!=='playing') return;
-    frame++;
-
-    // Keyboard
-    var kx=0,ky=0;
-    if(keys['a']||keys['arrowleft'])kx=-1;
-    if(keys['d']||keys['arrowright'])kx=1;
-    if(keys['w']||keys['arrowup'])ky=-1;
-    if(keys['s']||keys['arrowdown'])ky=1;
-    if(kx||ky){var m=Math.sqrt(kx*kx+ky*ky);joyDx=kx/m;joyDy=ky/m;P.facing=Math.atan2(ky,kx);}
-
-    if(P.dodging){P.dodgeT--;if(P.dodgeT<=0){P.dodging=false;P.vx=0;P.vy=0;}}
-    else{P.vx=joyDx*P.spd;P.vy=joyDy*P.spd;}
-
-    var nx=P.x+P.vx, ny=P.y+P.vy;
-    if(!blocked(nx,P.y,P.w,P.h))P.x=nx;
-    if(!blocked(P.x,ny,P.w,P.h))P.y=ny;
-
-    if(P.atkCd>0)P.atkCd--;
-    if(P.skillCd>0)P.skillCd--;
-    if(P.dodgeCd>0)P.dodgeCd--;
-    if(P.healCd>0)P.healCd--;
-    if(P.inv>0)P.inv--;
-    if(P.comboT>0)P.comboT--;else P.combo=0;
-    if(shake>0)shake-=0.4;
-    if(notifTimer>0){notifTimer--;if(notifTimer<=0)document.getElementById('notification').style.opacity='0';}
-
-    // Enemies
-    for(var i=enemies.length-1;i>=0;i--){
-      var e=enemies[i];
-      if(e.dead){enemies.splice(i,1);continue;}
-      if(e.hit>0)e.hit--;
-      var dx=P.x-e.x,dy=P.y-e.y;
-      var d=Math.sqrt(dx*dx+dy*dy);
-      if(d<e.aggro){
-        var a=Math.atan2(dy,dx);
-        var enx=e.x+Math.cos(a)*e.spd;
-        var eny=e.y+Math.sin(a)*e.spd;
-        if(!blocked(enx,e.y,e.w,e.h))e.x=enx;
-        if(!blocked(e.x,eny,e.w,e.h))e.y=eny;
-        if(d<30&&e.atkT<=0){
-          if(P.inv<=0){
-            var dmg=Math.max(1,e.atk-P.def);
-            P.hp-=dmg;
-            addDmg(P.x+P.w/2,P.y-5,String(dmg),'#ef4444');
-            shake=2; P.inv=18;
-          }
-          e.atkT=40;
-        }
-      }else{
-        e.moveT--;
-        if(e.moveT<=0){e.dir=Math.random()*6.28;e.moveT=50+Math.random()*50;}
-        var enx=e.x+Math.cos(e.dir)*e.spd*0.3;
-        var eny=e.y+Math.sin(e.dir)*e.spd*0.3;
-        if(!blocked(enx,eny,e.w,e.h)){e.x=enx;e.y=eny;}
-      }
-      if(e.atkT>0)e.atkT--;
-    }
-
-    // Items
-    for(var i=items.length-1;i>=0;i--){
-      var it=items[i];
-      if(it.got){items.splice(i,1);continue;}
-      if(dist(P.x+P.w/2,P.y+P.h/2,it.x+8,it.y+8)<28){
-        it.got=true;
-        if(it.type==='coin')P.coins+=1+Math.floor(floor*0.5);
-        else if(it.type==='essence')P.coins+=3;
-        else if(it.type==='heart'){P.hp=Math.min(P.maxHp,P.hp+12);addDmg(P.x+P.w/2,P.y-5,'+12','#4ade80');}
-      }
-    }
-
-    // NPCs
-    for(var i=0;i<npcs.length;i++){
-      var n=npcs[i]; if(n.saved) continue;
-      if(dist(P.x+P.w/2,P.y+P.h/2,n.x+8,n.y+8)<35){
-        n.saved=true; rescues++; P.xp+=8;
-        notify('🕊️ Villager rescued!');
-        for(var j=0;j<5;j++) particles.push({x:n.x+8,y:n.y+8,vx:(Math.random()-0.5)*2.5,vy:-1.5-Math.random(),life:18,ml:18,col:'#fbbf24',sz:3});
-        checkLvl();
-      }
-    }
-
-    // Portal
-    for(var i=0;i<portals.length;i++){
-      var p=portals[i];
-      if(dist(P.x+P.w/2,P.y+P.h/2,p.x+12,p.y+12)<28) nextFloor();
-    }
-
-    // Particles
-    for(var i=particles.length-1;i>=0;i--){
-      var p=particles[i];
-      p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life--;
-      if(p.life<=0)particles.splice(i,1);
-    }
-    for(var i=dmgNums.length-1;i>=0;i--){
-      dmgNums[i].y-=0.7;dmgNums[i].life--;
-      if(dmgNums[i].life<=0)dmgNums.splice(i,1);
-    }
-
-    // Death
-    if(P.hp<=0){
-      P.hp=0; state='dead';
-      document.getElementById('death-stats').innerHTML='Floor '+floor+'<br>'+totalKills+' defeated • '+rescues+' rescued';
-      document.getElementById('death-screen').style.display='flex';
-    }
-
-    cam.x=P.x+P.w/2-W/2;
-    cam.y=P.y+P.h/2-H/2;
-
-    // HUD
-    document.getElementById('health-bar').style.width=Math.max(0,(P.hp/P.maxHp*100))+'%';
-    document.getElementById('hp-text').textContent=Math.max(0,Math.floor(P.hp));
-    document.getElementById('level-text').textContent=P.lv;
-    document.getElementById('atk-text').textContent=P.atk;
-    document.getElementById('def-text').textContent=P.def;
-    document.getElementById('coin-text').textContent=P.coins;
-    document.getElementById('xp-bar').style.width=(P.xp/P.xpNeed*100)+'%';
-
-    // Cooldown rings
-    document.getElementById('btn-attack').querySelector('.cd-ring').style.display=P.atkCd>0?'block':'none';
-    document.getElementById('btn-skill').querySelector('.cd-ring').style.display=P.skillCd>0?'block':'none';
-    document.getElementById('btn-dodge').querySelector('.cd-ring').style.display=P.dodgeCd>0?'block':'none';
-    document.getElementById('btn-heal').querySelector('.cd-ring').style.display=P.healCd>0?'block':'none';
-  }
-
-  // Render
-  function render(){
-    ctx.fillStyle='#0a0a0f';
-    ctx.fillRect(0,0,W,H);
-    if(state==='start') return;
-
-    ctx.save();
-    var sx=shake>0?(Math.random()-0.5)*shake*2:0;
-    var sy=shake>0?(Math.random()-0.5)*shake*2:0;
-    ctx.translate(-cam.x+sx,-cam.y+sy);
-
-    var x1=Math.max(0,Math.floor(cam.x/TILE));
-    var y1=Math.max(0,Math.floor(cam.y/TILE));
-    var x2=Math.min(MW,Math.ceil((cam.x+W)/TILE)+1);
-    var y2=Math.min(MH,Math.ceil((cam.y+H)/TILE)+1);
-
-    for(var y=y1;y<y2;y++){
-      for(var x=x1;x<x2;x++){
-        if(map[y][x]===1){
-          ctx.fillStyle='#1e1b4b';
-          ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
-          ctx.fillStyle='#2d2a6e';
-          ctx.fillRect(x*TILE+2,y*TILE+2,TILE-4,TILE-4);
-        }else{
-          ctx.fillStyle=(x+y)%2===0?'#16162a':'#1a1a30';
-          ctx.fillRect(x*TILE,y*TILE,TILE,TILE);
-        }
-      }
-    }
-
-    // Portal
-    for(var i=0;i<portals.length;i++){
-      var p=portals[i];
-      var pulse=Math.sin(frame*0.08)*4+12;
-      ctx.beginPath();ctx.arc(p.x+12,p.y+12,pulse,0,6.28);
-      ctx.fillStyle='rgba(251,191,36,0.15)';ctx.fill();
-      ctx.beginPath();ctx.arc(p.x+12,p.y+12,8,0,6.28);
-      ctx.fillStyle='#fbbf24';ctx.fill();
-      ctx.font='14px sans-serif';ctx.fillText('🌟',p.x+4,p.y+18);
-    }
-
-    // Items
-    for(var i=0;i<items.length;i++){
-      var it=items[i]; if(it.got) continue;
-      var bob=Math.sin(frame*0.06+it.x)*2;
-      ctx.font='14px sans-serif';
-      var em=it.type==='coin'?'🪙':it.type==='essence'?'✨':'❤️';
-      ctx.fillText(em,it.x,it.y+14+bob);
-    }
-
-    // NPCs
-    for(var i=0;i<npcs.length;i++){
-      var n=npcs[i]; if(n.saved) continue;
-      var bob=Math.sin(frame*0.05)*2;
-      ctx.font='18px sans-serif';ctx.fillText(n.icon,n.x,n.y+18+bob);
-      ctx.font='bold 12px sans-serif';ctx.fillStyle='#fbbf24';ctx.fillText('❗',n.x+5,n.y-4+bob);
-    }
-
-    // Enemies
-    var emojis={slime:'🟢',skeleton:'💀',shadow:'👾',demon:'👹'};
-    var ecols={slime:'#4ade80',skeleton:'#e2e8f0',shadow:'#7c3aed',demon:'#ef4444'};
-    for(var i=0;i<enemies.length;i++){
-      var e=enemies[i]; if(e.dead) continue;
-      ctx.fillStyle='rgba(0,0,0,0.25)';
-      ctx.beginPath();ctx.ellipse(e.x+e.w/2,e.y+e.h+2,e.w/3,3,0,0,6.28);ctx.fill();
-      if(e.hit>0){ctx.fillStyle='#fff';ctx.fillRect(e.x-1,e.y-1,e.w+2,e.h+2);}
-      ctx.font='18px sans-serif';ctx.fillText(emojis[e.type],e.x+1,e.y+18);
-      if(e.hp<e.maxHp){
-        ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(e.x,e.y-6,e.w,3);
-        ctx.fillStyle=ecols[e.type];ctx.fillRect(e.x,e.y-6,e.w*(e.hp/e.maxHp),3);
-      }
-    }
-
-    // Player
-    ctx.save();
-    if(P.inv>0&&Math.floor(P.inv/3)%2===0) ctx.globalAlpha=0.35;
-    ctx.fillStyle='rgba(0,0,0,0.25)';
-    ctx.beginPath();ctx.ellipse(P.x+P.w/2,P.y+P.h+2,P.w/3,3,0,0,6.28);ctx.fill();
-    ctx.shadowColor='#fbbf24';ctx.shadowBlur=P.dodging?12:6;
-    ctx.font='20px sans-serif';ctx.fillText('⚔️',P.x,P.y+20);
-    ctx.shadowBlur=0;
-    ctx.restore();
-
-    // Particles
-    for(var i=0;i<particles.length;i++){
-      var p=particles[i];
-      ctx.globalAlpha=p.life/p.ml;
-      ctx.fillStyle=p.col;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.sz*(p.life/p.ml),0,6.28);ctx.fill();
-    }
-    ctx.globalAlpha=1;
-
-    // Damage numbers
-    for(var i=0;i<dmgNums.length;i++){
-      var d=dmgNums[i];
-      ctx.globalAlpha=d.life/35;
-      ctx.font='bold 13px monospace';
-      ctx.strokeStyle='#000';ctx.lineWidth=2;
-      ctx.strokeText(d.t,d.x-8,d.y);
-      ctx.fillStyle=d.c;ctx.fillText(d.t,d.x-8,d.y);
-    }
-    ctx.globalAlpha=1;
-    ctx.restore();
-
-    // Minimap
-    mmCtx.fillStyle='rgba(0,0,0,0.8)';mmCtx.fillRect(0,0,70,70);
-    var ms=70/(MW*TILE);
-    for(var y=0;y<MH;y+=2) for(var x=0;x<MW;x+=2){
-      if(map[y]&&map[y][x]===0){mmCtx.fillStyle='#334155';mmCtx.fillRect(x*TILE*ms,y*TILE*ms,2.5,2.5);}
-    }
-    mmCtx.fillStyle='#fbbf24';mmCtx.fillRect(P.x*ms-1,P.y*ms-1,4,4);
-    for(var i=0;i<portals.length;i++){mmCtx.fillStyle='#a855f7';mmCtx.fillRect(portals[i].x*ms-1,portals[i].y*ms-1,4,4);}
-    for(var i=0;i<enemies.length;i++){if(!enemies[i].dead){mmCtx.fillStyle='#ef4444';mmCtx.fillRect(enemies[i].x*ms,enemies[i].y*ms,2,2);}}
-  }
-
-  function loop(){
-    update();
-    render();
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
+// ===== INIT =====
+if (loadGame()) {
+  $('btn-continue').style.display = 'block';
+}
+updateHUD();
 </script>
 </body>
 </html>
-
