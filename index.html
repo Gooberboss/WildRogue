@@ -1,36 +1,28 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Mission Valley v7</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kung Fu Runner</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="title">
-<h1>MISSION VALLEY</h1>
-<p>Christian Missionary Farming RPG</p>
-<button id="playBtn">START GAME</button>
-<div class="ver">v7</div>
+<div id="hud">
+  <div>Health: <span id="health">100</span></div>
+  <div>Score: <span id="score">0</span></div>
+  <div class="version">v3 Jump Kick Update</div>
 </div>
 
 <canvas id="game"></canvas>
 
-<div id="hud">
-<div>🌾 Supplies: <span id="supplies">0</span></div>
-<div>✝ Faith: <span id="faith">0</span></div>
-<div id="msg">Find villagers marked with !</div>
-</div>
-
 <div id="controls">
-<div class="row"><button id="up">▲</button></div>
-<div class="row">
-<button id="left">◀</button>
-<button id="down">▼</button>
-<button id="right">▶</button>
-<button id="action">✝</button>
-</div>
+  <button id="left">◀</button>
+  <button id="jump">⬆</button>
+  <button id="punch">拳</button>
+  <button id="kick">🦶</button>
+  <button id="right">▶</button>
 </div>
 
 <script src="game.js"></script>

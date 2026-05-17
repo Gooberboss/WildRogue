@@ -1,78 +1,55 @@
-html,body{
-margin:0;
-overflow:hidden;
-background:#000;
-font-family:Arial,sans-serif;
-touch-action:none;
+
+* {
+  box-sizing: border-box;
+  touch-action: none;
 }
 
-#title{
-position:fixed;
-inset:0;
-background:linear-gradient(#4c8a4c,#1d381d);
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-color:white;
-z-index:100;
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #111;
+  font-family: Arial, sans-serif;
 }
 
-#playBtn{
-padding:18px 40px;
-font-size:28px;
-border:none;
-border-radius:16px;
-background:gold;
-margin-top:20px;
+canvas {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background: linear-gradient(#6ec6ff, #e3f7ff);
 }
 
-.ver{
-margin-top:16px;
-color:gold;
+#hud {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  color: white;
+  background: rgba(0,0,0,0.5);
+  padding: 12px;
+  border-radius: 12px;
 }
 
-#game{
-position:fixed;
-inset:0;
-width:100vw;
-height:100vh;
-background:#6aac63;
+.version {
+  margin-top: 5px;
+  font-size: 12px;
+  opacity: 0.8;
 }
 
-#hud{
-position:fixed;
-top:10px;
-left:10px;
-background:rgba(0,0,0,0.7);
-padding:12px;
-border-radius:12px;
-color:white;
-width:240px;
-display:none;
-z-index:10;
+#controls {
+  position: fixed;
+  bottom: 14px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 20;
 }
 
-#msg{
-margin-top:10px;
-min-height:60px;
-}
-
-#controls{
-position:fixed;
-bottom:18px;
-width:100%;
-text-align:center;
-display:none;
-z-index:10;
-}
-
-button{
-width:72px;
-height:72px;
-border:none;
-border-radius:18px;
-margin:4px;
-font-size:28px;
-background:rgba(255,255,255,0.92);
+#controls button {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  font-size: 28px;
+  background: rgba(255,255,255,0.9);
 }

@@ -1,172 +1,301 @@
-const canvas=document.getElementById('game');
-const ctx=canvas.getContext('2d');
 
-function resize(){
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-}
-resize();
-window.addEventListener('resize',resize);
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-document.getElementById('playBtn').onclick=()=>{
-document.getElementById('title').style.display='none';
-document.getElementById('hud').style.display='block';
-document.getElementById('controls').style.display='block';
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const gravity = 0.8;
+
+const player = {
+  x: 120,
+  y: 300,
+  w: 50,
+  h: 80,
+  vx: 0,
+  vy: 0,
+  speed: 5,
+  jumping: false,
+  punching: false,
+  kicking: false,
+  jumpKicking: false,
+  facing: 1,
+  health: 100
 };
 
-const world={width:2200,height:1800};
+let score = 0;
+let cameraX = 0;
 
-const player={x:400,y:400,size:34};
+const enemies = [];
 
-let supplies=0;
-let faith=0;
-
-const villagers=[
-{x:700,y:500,helped:false,text:'Thank you for encouraging us.'},
-{x:1200,y:900,helped:false,text:'Our village needed hope.'},
-{x:1700,y:650,helped:false,text:'The mission church helped many people.'}
-];
-
-const crops=[];
-for(let i=0;i<12;i++){
-crops.push({x:500+i*60,y:1400,grown:false});
+for (let i = 0; i < 18; i++) {
+  enemies.push({
+    x: 700 + i * 260,
+    y: 320,
+    alive: true
+  });
 }
 
-const trees=[];
-for(let i=0;i<45;i++){
-trees.push({
-x:Math.random()*world.width,
-y:Math.random()*world.height
-});
-}
-
-function setMessage(t){
-document.getElementById('msg').innerText=t;
-}
-
-function updateHud(){
-document.getElementById('supplies').innerText=supplies;
-document.getElementById('faith').innerText=faith;
-}
-
-function interact(){
-
-let interacted=false;
-
-villagers.forEach(v=>{
-const d=Math.hypot(player.x-v.x,player.y-v.y);
-
-if(d<140){
-interacted=true;
-
-if(!v.helped){
-v.helped=true;
-supplies+=5;
-faith+=5;
-}
-
-setMessage(v.text);
-}
-});
-
-crops.forEach(c=>{
-if(Math.abs(player.x-c.x)<80 &&
-Math.abs(player.y-c.y)<80){
-
-interacted=true;
-
-if(!c.grown){
-c.grown=true;
-supplies+=1;
-setMessage('You planted crops.');
-}else{
-supplies+=2;
-setMessage('You harvested crops.');
-}
-}
-});
-
-if(!interacted){
-setMessage('Move closer to villagers or crops.');
-}
-
-updateHud();
-}
-
-function move(dx,dy){
-player.x+=dx;
-player.y+=dy;
-
-player.x=Math.max(0,Math.min(world.width,player.x));
-player.y=Math.max(0,Math.min(world.height,player.y));
-}
-
-document.getElementById('up').ontouchstart=()=>move(0,-40);
-document.getElementById('down').ontouchstart=()=>move(0,40);
-document.getElementById('left').ontouchstart=()=>move(-40,0);
-document.getElementById('right').ontouchstart=()=>move(40,0);
-
-document.getElementById('action').ontouchstart=(e)=>{
-e.preventDefault();
-interact();
+const keys = {
+  left: false,
+  right: false
 };
 
-function draw(){
-
-const camX=player.x-canvas.width/2;
-const camY=player.y-canvas.height/2;
-
-ctx.fillStyle='#6aac63';
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-ctx.strokeStyle='rgba(0,0,0,0.05)';
-
-for(let x=0;x<world.width;x+=64){
-for(let y=0;y<world.height;y+=64){
-ctx.strokeRect(x-camX,y-camY,64,64);
+function resize() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
 }
+addEventListener("resize", resize);
+
+function attackEnemies(range, points) {
+  enemies.forEach(enemy => {
+    if (!enemy.alive) return;
+
+    const dx = enemy.x - player.x;
+
+    if (Math.abs(dx) < range &&
+        Math.abs(enemy.y - player.y) < 90) {
+      enemy.alive = false;
+      score += points;
+    }
+  });
 }
 
-trees.forEach(t=>{
-ctx.fillStyle='#5b3a1e';
-ctx.fillRect(t.x-camX,t.y-camY,14,28);
+function update() {
 
-ctx.fillStyle='#2f7c2f';
-ctx.beginPath();
-ctx.arc(t.x+7-camX,t.y-camY,28,0,Math.PI*2);
-ctx.fill();
+  player.vx = 0;
+
+  if (keys.left) {
+    player.vx = -player.speed;
+    player.facing = -1;
+  }
+
+  if (keys.right) {
+    player.vx = player.speed;
+    player.facing = 1;
+  }
+
+  if (player.jumpKicking) {
+    player.vx += player.facing * 4;
+  }
+
+  player.x += player.vx;
+
+  player.vy += gravity;
+  player.y += player.vy;
+
+  const ground = canvas.height - 140;
+
+  if (player.y > ground) {
+    player.y = ground;
+    player.vy = 0;
+    player.jumping = false;
+    player.jumpKicking = false;
+  }
+
+  cameraX = player.x - 120;
+
+  enemies.forEach(enemy => {
+    if (!enemy.alive) return;
+
+    const dx = enemy.x - player.x;
+
+    if (Math.abs(dx) < 45 &&
+        Math.abs(enemy.y - player.y) < 60) {
+      player.health -= 0.08;
+    }
+  });
+
+  document.getElementById("health").textContent =
+    Math.max(0, Math.floor(player.health));
+
+  document.getElementById("score").textContent = score;
+}
+
+function drawBackground() {
+
+  ctx.fillStyle = "#4caf50";
+  ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+
+  for (let i = 0; i < 25; i++) {
+
+    const x = (i * 380) - (cameraX * 0.45 % 380);
+
+    ctx.fillStyle = "#7f8c8d";
+    ctx.fillRect(x, canvas.height - 230, 90, 170);
+
+    ctx.fillStyle = "#2ecc71";
+    ctx.beginPath();
+    ctx.arc(x + 45, canvas.height - 245, 80, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawPlayer() {
+
+  ctx.save();
+
+  ctx.translate(player.x - cameraX, player.y);
+  ctx.scale(player.facing, 1);
+
+  ctx.fillStyle = "#111";
+  ctx.fillRect(-15, 0, 30, 50);
+
+  ctx.fillStyle = "#f2c28b";
+  ctx.beginPath();
+  ctx.arc(0, -20, 18, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#ff3333";
+  ctx.lineWidth = 6;
+
+  if (player.punching) {
+    ctx.beginPath();
+    ctx.moveTo(15, 15);
+    ctx.lineTo(48, 0);
+    ctx.stroke();
+  }
+
+  if (player.kicking) {
+    ctx.beginPath();
+    ctx.moveTo(5, 40);
+    ctx.lineTo(55, 28);
+    ctx.stroke();
+  }
+
+  if (player.jumpKicking) {
+    ctx.strokeStyle = "#ffd700";
+
+    ctx.beginPath();
+    ctx.moveTo(0, 20);
+    ctx.lineTo(65, -10);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-10, 5);
+    ctx.lineTo(45, -15);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawEnemies() {
+
+  enemies.forEach(enemy => {
+
+    if (!enemy.alive) return;
+
+    ctx.save();
+    ctx.translate(enemy.x - cameraX, enemy.y);
+
+    ctx.fillStyle = "#8e24aa";
+    ctx.fillRect(-15, 0, 30, 45);
+
+    ctx.fillStyle = "#f2c28b";
+    ctx.beginPath();
+    ctx.arc(0, -18, 16, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+}
+
+function draw() {
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawBackground();
+  drawEnemies();
+  drawPlayer();
+
+  if (player.health <= 0) {
+
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "48px Arial";
+    ctx.fillText("Game Over", canvas.width / 2 - 140, canvas.height / 2);
+  }
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+function bindHold(id, key) {
+
+  const btn = document.getElementById(id);
+
+  btn.addEventListener("touchstart", e => {
+    e.preventDefault();
+    keys[key] = true;
+  });
+
+  btn.addEventListener("touchend", e => {
+    e.preventDefault();
+    keys[key] = false;
+  });
+}
+
+bindHold("left", "left");
+bindHold("right", "right");
+
+document.getElementById("jump").addEventListener("touchstart", e => {
+
+  e.preventDefault();
+
+  if (!player.jumping) {
+    player.vy = -16;
+    player.jumping = true;
+  }
 });
 
-villagers.forEach(v=>{
-ctx.fillStyle=v.helped?'#66ccff':'#ffcc66';
-ctx.fillRect(v.x-camX,v.y-camY,32,32);
+document.getElementById("punch").addEventListener("touchstart", e => {
 
-ctx.fillStyle='black';
-ctx.font='24px Arial';
-ctx.fillText('!',v.x+8-camX,v.y-10-camY);
+  e.preventDefault();
+
+  if (player.punching || player.kicking || player.jumpKicking) return;
+
+  player.punching = true;
+
+  attackEnemies(60, 100);
+
+  setTimeout(() => {
+    player.punching = false;
+  }, 180);
 });
 
-crops.forEach(c=>{
-ctx.fillStyle='#70451f';
-ctx.fillRect(c.x-camX,c.y-camY,42,42);
+document.getElementById("kick").addEventListener("touchstart", e => {
 
-if(c.grown){
-ctx.fillStyle='gold';
-ctx.fillRect(c.x+14-camX,c.y-16-camY,14,20);
-}
+  e.preventDefault();
+
+  if (player.punching || player.kicking || player.jumpKicking) return;
+
+  // Jump Kick
+  if (player.jumping) {
+
+    player.jumpKicking = true;
+
+    attackEnemies(110, 250);
+
+    setTimeout(() => {
+      player.jumpKicking = false;
+    }, 350);
+
+  } else {
+
+    player.kicking = true;
+
+    attackEnemies(90, 150);
+
+    setTimeout(() => {
+      player.kicking = false;
+    }, 240);
+  }
 });
-
-ctx.fillStyle='white';
-ctx.fillRect(canvas.width/2,canvas.height/2,player.size,player.size);
-
-ctx.fillStyle='#8b4513';
-ctx.fillRect(canvas.width/2+10,canvas.height/2-10,12,12);
-}
-
-function loop(){
-draw();
-requestAnimationFrame(loop);
-}
-
-updateHud();
-loop();
