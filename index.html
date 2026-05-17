@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Kung Fu Legends v7</title>
+<title>Kung Fu Legends v8</title>
 <style>
 html,body{
 margin:0;
@@ -12,12 +12,14 @@ background:black;
 touch-action:none;
 font-family:Arial,sans-serif;
 }
+
 canvas{
 display:block;
 width:100vw;
 height:100vh;
 background:#87CEEB;
 }
+
 #hud{
 position:fixed;
 top:10px;
@@ -29,29 +31,38 @@ border-radius:12px;
 color:white;
 font-size:20px;
 }
+
 #controlsLeft{
 position:fixed;
-bottom:20px;
+bottom:8px;
 left:20px;
 display:flex;
 gap:10px;
 z-index:20;
 }
+
 #controlsRight{
 position:fixed;
-bottom:20px;
+bottom:8px;
 right:20px;
 display:flex;
 gap:10px;
 z-index:20;
 }
+
 button{
-width:75px;
-height:75px;
+width:74px;
+height:74px;
 border:none;
 border-radius:50%;
 font-size:30px;
-background:rgba(255,255,255,0.85);
+background:rgba(255,255,255,0.82);
+backdrop-filter:blur(4px);
+}
+
+.small{
+font-size:12px;
+opacity:0.75;
 }
 </style>
 </head>
@@ -62,7 +73,7 @@ background:rgba(255,255,255,0.85);
 <div id="hud">
 <div>❤️ <span id="hp">100</span></div>
 <div>🏆 <span id="score">0</span></div>
-<div style="font-size:12px;">Kung Fu Legends v7</div>
+<div class="small">Kung Fu Legends v8</div>
 </div>
 
 <div id="controlsLeft">
@@ -87,9 +98,15 @@ canvas.height=window.innerHeight;
 resize();
 window.addEventListener("resize",resize);
 
+function ground(){
+return canvas.height-250;
+}
+
+const gravity=0.8;
+
 const player={
 x:150,
-y:0,
+y:ground(),
 vx:0,
 vy:0,
 dir:1,
@@ -98,22 +115,14 @@ attack:"",
 hp:100
 };
 
-const gravity=0.8;
-
-function ground(){
-return canvas.height-140;
-}
-
-player.y=ground();
-
 let score=0;
 let cameraX=0;
 
 const enemies=[];
 
-for(let i=0;i<12;i++){
+for(let i=0;i<14;i++){
 enemies.push({
-x:700+i*250,
+x:700+i*260,
 y:ground(),
 alive:true
 });
@@ -122,6 +131,7 @@ alive:true
 const keys={left:false,right:false};
 
 function hit(range,points){
+
 for(const e of enemies){
 
 if(!e.alive) continue;
@@ -129,10 +139,11 @@ if(!e.alive) continue;
 const dx=Math.abs(e.x-player.x);
 const dy=Math.abs(e.y-player.y);
 
-if(dx<range && dy<80){
+if(dx<range && dy<90){
 e.alive=false;
 score+=points;
 }
+
 }
 }
 
@@ -151,7 +162,7 @@ player.dir=1;
 }
 
 if(player.attack==="jumpkick"){
-player.vx+=player.dir*4;
+player.vx+=player.dir*5;
 }
 
 player.x+=player.vx;
@@ -165,13 +176,13 @@ player.vy=0;
 player.jumping=false;
 }
 
-cameraX=player.x-120;
+cameraX+=(player.x-cameraX-120)*0.08;
 
 for(const e of enemies){
 
 if(!e.alive) continue;
 
-if(Math.abs(e.x-player.x)<40){
+if(Math.abs(e.x-player.x)<45){
 player.hp-=0.03;
 }
 }
@@ -183,7 +194,7 @@ document.getElementById("score").textContent=score;
 function drawBackground(){
 
 const sky=ctx.createLinearGradient(0,0,0,canvas.height);
-sky.addColorStop(0,"#6ec6ff");
+sky.addColorStop(0,"#67c6ff");
 sky.addColorStop(1,"#dff6ff");
 
 ctx.fillStyle=sky;
@@ -191,19 +202,19 @@ ctx.fillRect(0,0,canvas.width,canvas.height);
 
 for(let i=0;i<20;i++){
 
-const x=(i*300)-(cameraX*0.3%300);
+const x=(i*320)-(cameraX*0.25%320);
 
 ctx.fillStyle="#888";
-ctx.fillRect(x,ground()-120,70,120);
+ctx.fillRect(x,ground()-130,80,140);
 
 ctx.beginPath();
-ctx.arc(x+35,ground()-140,65,0,Math.PI*2);
-ctx.fillStyle="#66cc77";
+ctx.arc(x+40,ground()-150,75,0,Math.PI*2);
+ctx.fillStyle="#67c96f";
 ctx.fill();
 }
 
 ctx.fillStyle="#4CAF50";
-ctx.fillRect(0,ground()+45,canvas.width,120);
+ctx.fillRect(0,ground()+55,canvas.width,220);
 }
 
 function drawPlayer(){
@@ -213,11 +224,14 @@ ctx.save();
 ctx.translate(player.x-cameraX,player.y);
 ctx.scale(player.dir,1);
 
-ctx.fillStyle="#111";
-ctx.fillRect(-15,0,30,50);
+ctx.shadowBlur=15;
+ctx.shadowColor="rgba(0,0,0,0.35)";
 
-ctx.fillStyle="#cc2222";
-ctx.fillRect(-20,5,40,18);
+ctx.fillStyle="#111";
+ctx.fillRect(-16,0,32,54);
+
+ctx.fillStyle="#d62828";
+ctx.fillRect(-20,4,40,18);
 
 ctx.beginPath();
 ctx.arc(0,-20,18,0,Math.PI*2);
@@ -230,21 +244,21 @@ ctx.lineWidth=7;
 if(player.attack==="punch"){
 ctx.beginPath();
 ctx.moveTo(15,10);
-ctx.lineTo(55,0);
+ctx.lineTo(58,-2);
 ctx.stroke();
 }
 
 if(player.attack==="kick"){
 ctx.beginPath();
-ctx.moveTo(0,35);
-ctx.lineTo(60,20);
+ctx.moveTo(0,38);
+ctx.lineTo(65,18);
 ctx.stroke();
 }
 
 if(player.attack==="jumpkick"){
 ctx.beginPath();
-ctx.moveTo(-5,15);
-ctx.lineTo(75,-10);
+ctx.moveTo(-5,14);
+ctx.lineTo(78,-12);
 ctx.stroke();
 }
 
@@ -261,11 +275,13 @@ ctx.save();
 
 ctx.translate(e.x-cameraX,e.y);
 
+ctx.shadowBlur=10;
+
 ctx.fillStyle="#7B1FA2";
-ctx.fillRect(-15,0,30,50);
+ctx.fillRect(-16,0,32,52);
 
 ctx.beginPath();
-ctx.arc(0,-18,16,0,Math.PI*2);
+ctx.arc(0,-18,17,0,Math.PI*2);
 ctx.fillStyle="#f2c28b";
 ctx.fill();
 
@@ -322,7 +338,7 @@ document.getElementById("jump").addEventListener("touchstart",e=>{
 e.preventDefault();
 
 if(!player.jumping){
-player.vy=-16;
+player.vy=-17;
 player.jumping=true;
 }
 });
@@ -332,12 +348,12 @@ function doAttack(type){
 player.attack=type;
 
 if(type==="punch") hit(70,100);
-if(type==="kick") hit(100,150);
-if(type==="jumpkick") hit(130,250);
+if(type==="kick") hit(110,160);
+if(type==="jumpkick") hit(140,260);
 
 setTimeout(()=>{
 player.attack="";
-},220);
+},240);
 }
 
 document.getElementById("punch").addEventListener("touchstart",e=>{
