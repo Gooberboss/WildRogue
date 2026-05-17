@@ -1,19 +1,18 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Mission Valley v3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mission Valley v4</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="titleScreen">
   <h1>MISSION VALLEY</h1>
-  <div class="subtitle">Christian Missionary Farming RPG</div>
+  <p>Christian Missionary Farming RPG</p>
   <button id="startBtn">START GAME</button>
-  <div class="version">v3</div>
+  <div class="version">v4</div>
 </div>
 
 <canvas id="game"></canvas>
@@ -25,11 +24,15 @@
 </div>
 
 <div id="controls">
-  <button id="up">▲</button><br>
-  <button id="left">◀</button>
-  <button id="down">▼</button>
-  <button id="right">▶</button>
-  <button id="action">✝</button>
+  <div class="row">
+    <button id="up">▲</button>
+  </div>
+  <div class="row">
+    <button id="left">◀</button>
+    <button id="down">▼</button>
+    <button id="right">▶</button>
+    <button id="action">✝</button>
+  </div>
 </div>
 
 <script src="game.js"></script>
