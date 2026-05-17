@@ -1,26 +1,27 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kung Fu Runner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Kung Fu Side Scroller</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<div id="title">Kung Fu Fighter v4</div>
+
 <div id="hud">
-  <div>Health: <span id="health">100</span></div>
-  <div>Score: <span id="score">0</span></div>
-  <div class="version">v3 Jump Kick Update</div>
+  <span>HP: <span id="hp">100</span></span>
+  <span>Score: <span id="score">0</span></span>
 </div>
 
-<canvas id="game"></canvas>
+<canvas id="gameCanvas"></canvas>
 
 <div id="controls">
   <button id="left">◀</button>
   <button id="jump">⬆</button>
-  <button id="punch">拳</button>
+  <button id="attack">拳</button>
   <button id="kick">🦶</button>
   <button id="right">▶</button>
 </div>
