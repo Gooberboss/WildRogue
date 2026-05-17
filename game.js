@@ -1,62 +1,90 @@
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
 
 function resize(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
 }
 resize();
-addEventListener('resize',resize);
+window.addEventListener('resize',resize);
 
 const player={
-x:200,
+x:120,
 y:0,
 vx:0,
 vy:0,
-w:55,
-h:85,
+w:40,
+h:70,
 dir:1,
-hp:100,
 jumping:false,
 attack:'',
-combo:0
+hp:100
 };
 
 const gravity=0.8;
-const ground=()=>canvas.height-150;
+
+function ground(){
+return canvas.height-150;
+}
 
 player.y=ground();
 
-let cameraX=0;
 let score=0;
+let cameraX=0;
 
 const enemies=[];
 
-for(let i=0;i<18;i++){
+for(let i=0;i<15;i++){
 enemies.push({
-x:700+i*260,
+x:600+i*250,
 y:ground(),
-alive:true,
-flash:0
+alive:true
 });
 }
 
-function hitEnemies(range,points){
-enemies.forEach(e=>{
-if(!e.alive)return;
+const keys={
+left:false,
+right:false
+};
 
-const dx=Math.abs(e.x-player.x);
-const dy=Math.abs(e.y-player.y);
+function attack(range,points){
 
-if(dx<range && dy<100){
-e.flash=6;
-e.alive=false;
+enemies.forEach(enemy=>{
+
+if(!enemy.alive)return;
+
+const dx=Math.abs(enemy.x-player.x);
+const dy=Math.abs(enemy.y-player.y);
+
+if(dx<range && dy<80){
+enemy.alive=false;
 score+=points;
 }
+
 });
+
 }
 
 function update(){
+
+player.vx=0;
+
+if(keys.left){
+player.vx=-6;
+player.dir=-1;
+}
+
+if(keys.right){
+player.vx=6;
+player.dir=1;
+}
+
+if(player.attack==="jumpkick"){
+player.vx+=player.dir*5;
+}
+
+player.x+=player.vx;
 
 player.vy+=gravity;
 player.y+=player.vy;
@@ -67,117 +95,125 @@ player.vy=0;
 player.jumping=false;
 }
 
-player.x+=player.vx;
+cameraX=player.x-120;
 
-cameraX+=(player.x-cameraX-220)*0.08;
+enemies.forEach(enemy=>{
 
-enemies.forEach(e=>{
-if(!e.alive)return;
+if(!enemy.alive)return;
 
-if(Math.abs(e.x-player.x)<50){
+if(Math.abs(enemy.x-player.x)<45){
 player.hp-=0.03;
 }
-if(e.flash>0)e.flash--;
+
 });
 
 document.getElementById('hp').textContent=Math.floor(player.hp);
 document.getElementById('score').textContent=score;
+
 }
 
 function drawBackground(){
 
 const sky=ctx.createLinearGradient(0,0,0,canvas.height);
-sky.addColorStop(0,"#7fc9ff");
+sky.addColorStop(0,"#6ec6ff");
 sky.addColorStop(1,"#dff6ff");
 
 ctx.fillStyle=sky;
 ctx.fillRect(0,0,canvas.width,canvas.height);
 
-for(let i=0;i<12;i++){
+for(let i=0;i<20;i++){
 
-const x=(i*400)-(cameraX*0.3%400);
+const x=(i*320)-(cameraX*0.3%320);
 
-ctx.fillStyle="#7a8ea5";
-ctx.fillRect(x,220,120,260);
+ctx.fillStyle="#777";
+ctx.fillRect(x,ground()-120,80,120);
 
-ctx.fillStyle="#4caf50";
 ctx.beginPath();
-ctx.arc(x+60,190,95,0,Math.PI*2);
+ctx.arc(x+40,ground()-140,70,0,Math.PI*2);
+ctx.fillStyle="#66cc77";
 ctx.fill();
+
 }
 
 ctx.fillStyle="#4CAF50";
-ctx.fillRect(0,ground()+55,canvas.width,120);
+ctx.fillRect(0,ground()+50,canvas.width,120);
+
 }
 
 function drawPlayer(){
 
 ctx.save();
+
 ctx.translate(player.x-cameraX,player.y);
 ctx.scale(player.dir,1);
 
-ctx.shadowBlur=18;
-ctx.shadowColor="rgba(0,0,0,0.35)";
+ctx.fillStyle="#111";
+ctx.fillRect(-16,0,32,50);
 
-ctx.fillStyle="#1b1b1b";
-ctx.fillRect(-18,0,36,55);
-
-ctx.fillStyle="#d22";
-ctx.fillRect(-22,5,44,18);
-
-ctx.beginPath();
-ctx.arc(0,-22,20,0,Math.PI*2);
-ctx.fillStyle="#f2c28b";
-ctx.fill();
-
-ctx.strokeStyle="#ffcc00";
-ctx.lineWidth=8;
-
-if(player.attack==="punch"){
-ctx.beginPath();
-ctx.moveTo(18,12);
-ctx.lineTo(60,-4);
-ctx.stroke();
-}
-
-if(player.attack==="kick"){
-ctx.beginPath();
-ctx.moveTo(5,40);
-ctx.lineTo(65,22);
-ctx.stroke();
-}
-
-if(player.attack==="jumpkick"){
-ctx.beginPath();
-ctx.moveTo(-5,15);
-ctx.lineTo(75,-12);
-ctx.stroke();
-}
-
-ctx.restore();
-}
-
-function drawEnemies(){
-
-enemies.forEach(e=>{
-
-if(!e.alive)return;
-
-ctx.save();
-ctx.translate(e.x-cameraX,e.y);
-
-ctx.shadowBlur=12;
-
-ctx.fillStyle=e.flash>0?"white":"#7b1fa2";
-ctx.fillRect(-18,0,36,52);
+ctx.fillStyle="#cc2222";
+ctx.fillRect(-20,5,40,18);
 
 ctx.beginPath();
 ctx.arc(0,-20,18,0,Math.PI*2);
 ctx.fillStyle="#f2c28b";
 ctx.fill();
 
+ctx.strokeStyle="#ffcc00";
+ctx.lineWidth=7;
+
+if(player.attack==="punch"){
+
+ctx.beginPath();
+ctx.moveTo(15,10);
+ctx.lineTo(55,0);
+ctx.stroke();
+
+}
+
+if(player.attack==="kick"){
+
+ctx.beginPath();
+ctx.moveTo(0,38);
+ctx.lineTo(60,20);
+ctx.stroke();
+
+}
+
+if(player.attack==="jumpkick"){
+
+ctx.beginPath();
+ctx.moveTo(-5,15);
+ctx.lineTo(75,-10);
+ctx.stroke();
+
+}
+
 ctx.restore();
+
+}
+
+function drawEnemies(){
+
+enemies.forEach(enemy=>{
+
+if(!enemy.alive)return;
+
+ctx.save();
+
+ctx.translate(enemy.x-cameraX,enemy.y);
+
+ctx.fillStyle="#7b1fa2";
+ctx.fillRect(-16,0,32,48);
+
+ctx.beginPath();
+ctx.arc(0,-18,17,0,Math.PI*2);
+ctx.fillStyle="#f2c28b";
+ctx.fill();
+
+ctx.restore();
+
 });
+
 }
 
 function draw(){
@@ -189,103 +225,88 @@ drawEnemies();
 drawPlayer();
 
 if(player.hp<=0){
+
 ctx.fillStyle="rgba(0,0,0,0.7)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 
 ctx.fillStyle="white";
 ctx.font="50px Arial";
-ctx.fillText("GAME OVER",canvas.width/2-170,canvas.height/2);
+ctx.fillText("GAME OVER",canvas.width/2-150,canvas.height/2);
+
 }
+
 }
 
 function loop(){
+
 update();
 draw();
+
 requestAnimationFrame(loop);
+
 }
 
 loop();
 
-// JOYSTICK
-const stick=document.getElementById('joystickStick');
-let dragging=false;
+function bindButton(id,key){
 
-function moveStick(x,y){
+const btn=document.getElementById(id);
 
-const rect=document.getElementById('joystickBase').getBoundingClientRect();
+btn.addEventListener('touchstart',e=>{
+e.preventDefault();
+keys[key]=true;
+});
 
-const cx=rect.left+70;
-const cy=rect.top+70;
+btn.addEventListener('touchend',e=>{
+e.preventDefault();
+keys[key]=false;
+});
 
-let dx=x-cx;
-let dy=y-cy;
-
-const dist=Math.sqrt(dx*dx+dy*dy);
-const max=40;
-
-if(dist>max){
-dx=dx/dist*max;
-dy=dy/dist*max;
 }
 
-stick.style.transform=`translate(${dx}px,${dy}px)`;
+bindButton('left','left');
+bindButton('right','right');
 
-player.vx=(dx/max)*7;
+document.getElementById('jump').addEventListener('touchstart',e=>{
 
-if(dx>5)player.dir=1;
-if(dx<-5)player.dir=-1;
+e.preventDefault();
+
+if(!player.jumping){
+player.vy=-16;
+player.jumping=true;
 }
 
-document.getElementById('joystickArea').addEventListener('touchstart',e=>{
-dragging=true;
-moveStick(e.touches[0].clientX,e.touches[0].clientY);
 });
 
-document.addEventListener('touchmove',e=>{
-if(!dragging)return;
-moveStick(e.touches[0].clientX,e.touches[0].clientY);
-});
-
-document.addEventListener('touchend',()=>{
-dragging=false;
-stick.style.transform='translate(0px,0px)';
-player.vx=0;
-});
-
-function attack(type){
+function doAttack(type){
 
 player.attack=type;
 
-if(type==="punch")hitEnemies(80,100);
-if(type==="kick")hitEnemies(110,180);
-if(type==="jumpkick")hitEnemies(140,300);
-
-if(type==="jumpkick"){
-player.vx=player.dir*10;
-}
+if(type==="punch")attack(70,100);
+if(type==="kick")attack(100,160);
+if(type==="jumpkick")attack(130,250);
 
 setTimeout(()=>{
 player.attack='';
 },220);
+
 }
 
-document.getElementById('punch').onclick=()=>{
-attack("punch");
-};
+document.getElementById('punch').addEventListener('touchstart',e=>{
 
-document.getElementById('kick').onclick=()=>{
+e.preventDefault();
+doAttack('punch');
+
+});
+
+document.getElementById('kick').addEventListener('touchstart',e=>{
+
+e.preventDefault();
 
 if(player.jumping){
-attack("jumpkick");
+doAttack('jumpkick');
 }else{
-attack("kick");
+doAttack('kick');
 }
-};
 
-document.getElementById('jump').onclick=()=>{
-
-if(!player.jumping){
-player.vy=-17;
-player.jumping=true;
-}
-};
+});
