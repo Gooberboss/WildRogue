@@ -1,95 +1,108 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #000;
-  font-family: Arial, sans-serif;
-  touch-action: none;
+html,body{
+margin:0;
+overflow:hidden;
+background:#000;
+font-family:Arial,sans-serif;
+touch-action:none;
 }
 
-#game {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  display: none;
-  background: #5ea35e;
+#game{
+position:fixed;
+inset:0;
+display:none;
+width:100vw;
+height:100vh;
+background:#6aac63;
 }
 
-#titleScreen {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(#4c8a4c,#203d20);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  text-align: center;
+#title{
+position:fixed;
+inset:0;
+background:linear-gradient(#4c8a4c,#1d381d);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+z-index:50;
 }
 
-#titleScreen h1 {
-  margin: 0;
-  font-size: 54px;
+#title h1{
+font-size:58px;
+margin:0;
 }
 
-#titleScreen p {
-  font-size: 22px;
+#title p{
+font-size:24px;
 }
 
-#startBtn {
-  margin-top: 25px;
-  padding: 18px 40px;
-  font-size: 26px;
-  border: none;
-  border-radius: 16px;
-  background: gold;
+#playBtn{
+padding:18px 42px;
+font-size:28px;
+border:none;
+border-radius:16px;
+background:gold;
 }
 
-.version {
-  margin-top: 20px;
-  color: gold;
-  font-size: 22px;
+.ver{
+margin-top:20px;
+font-size:24px;
+color:gold;
 }
 
-#hud {
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  background: rgba(0,0,0,0.75);
-  color: white;
-  padding: 12px;
-  border-radius: 12px;
-  width: 220px;
-  z-index: 10;
-  display: none;
+#hud{
+position:fixed;
+top:10px;
+left:10px;
+background:rgba(0,0,0,0.7);
+padding:14px;
+border-radius:14px;
+color:white;
+width:260px;
+display:none;
+z-index:10;
 }
 
-#message {
-  margin-top: 10px;
-  min-height: 50px;
+#msg{
+margin-top:10px;
+min-height:50px;
 }
 
-#controls {
-  position: fixed;
-  bottom: 25px;
-  width: 100%;
-  z-index: 10;
-  display: none;
-  text-align: center;
+#inventory{
+position:fixed;
+top:10px;
+right:10px;
+display:none;
+z-index:10;
 }
 
-.row {
-  margin-top: 5px;
+.slot{
+width:58px;
+height:58px;
+background:rgba(255,255,255,0.85);
+margin-bottom:8px;
+border-radius:12px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
 }
 
-#controls button {
-  width: 72px;
-  height: 72px;
-  margin: 4px;
-  border: none;
-  border-radius: 18px;
-  font-size: 28px;
-  background: rgba(255,255,255,0.88);
+#controls{
+position:fixed;
+bottom:20px;
+width:100%;
+display:none;
+text-align:center;
+z-index:10;
+}
+
+button{
+width:72px;
+height:72px;
+border:none;
+border-radius:18px;
+margin:4px;
+font-size:28px;
+background:rgba(255,255,255,0.9);
 }
