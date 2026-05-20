@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Kung Fu Legends v13</title>
 <style>
 html,body{
@@ -14,27 +14,53 @@ font-family:Arial,sans-serif;
 }
 canvas{display:block;width:100vw;height:100vh;}
 #hud{
-position:fixed;top:10px;left:10px;z-index:20;
-padding:12px;border-radius:14px;
+position:fixed;top:6px;left:6px;z-index:20;
+padding:8px 10px;border-radius:10px;
 background:rgba(0,0,0,0.5);color:white;
-backdrop-filter:blur(6px);font-size:14px;
-line-height:1.6;
+backdrop-filter:blur(6px);font-size:12px;
+line-height:1.4;
+}
+@media (orientation:landscape) and (max-height:500px){
+#hud{
+display:flex;flex-wrap:wrap;gap:0 12px;
+max-width:50vw;
+font-size:11px;padding:5px 8px;
+left:max(6px,env(safe-area-inset-left));
+top:6px;
+}
+#hud>div{white-space:nowrap;}
 }
 #movePad{
-position:fixed;left:18px;bottom:18px;
-width:170px;height:170px;border-radius:50%;
+position:fixed;left:12px;bottom:12px;
+width:130px;height:130px;border-radius:50%;
 background:rgba(255,255,255,0.08);z-index:20;
 }
+@media (orientation:landscape) and (max-height:500px){
+#movePad{width:110px;height:110px;left:max(10px,env(safe-area-inset-left));bottom:10px;}
+#movePad #stick{left:35px;top:35px;width:40px;height:40px;}
+}
 #stick{
-position:absolute;left:55px;top:55px;
+position:absolute;left:35px;top:35px;
 width:60px;height:60px;border-radius:50%;
 background:rgba(255,255,255,0.85);
 }
 #actions{
-position:fixed;right:18px;bottom:18px;
-display:flex;flex-direction:column;gap:12px;z-index:20;
+position:fixed;right:10px;bottom:10px;
+display:flex;flex-direction:column;gap:8px;z-index:20;
 }
-.row{display:flex;gap:12px;justify-content:flex-end;}
+.row{display:flex;gap:8px;justify-content:flex-end;}
+.abtn{
+width:68px;height:68px;border:none;border-radius:50%;
+font-size:26px;background:rgba(255,255,255,0.82);
+box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+.abtn.gold{background:rgba(255,200,0,0.85);}
+.abtn.blue{background:rgba(100,180,255,0.85);}
+@media (orientation:landscape) and (max-height:500px){
+.abtn{width:52px;height:52px;font-size:20px;}
+#actions{gap:5px;right:max(8px,env(safe-area-inset-right));bottom:8px;}
+.row{gap:6px;}
+}
 </style>
 </head>
 <body>
@@ -52,15 +78,15 @@ display:flex;flex-direction:column;gap:12px;z-index:20;
 <div id="movePad"><div id="stick"></div></div>
 <div id="actions">
 <div class="row">
-<button style="width:84px;height:84px;border:none;border-radius:50%;font-size:30px;background:rgba(255,255,255,0.82);box-shadow:0 6px 18px rgba(0,0,0,0.3)" id="jump">⬆</button>
+<button class="abtn" id="jump">⬆</button>
 </div>
 <div class="row">
-<button style="width:84px;height:84px;border:none;border-radius:50%;font-size:30px;background:rgba(255,255,255,0.82);box-shadow:0 6px 18px rgba(0,0,0,0.3)" id="punch">拳</button>
-<button style="width:84px;height:84px;border:none;border-radius:50%;font-size:30px;background:rgba(255,255,255,0.82);box-shadow:0 6px 18px rgba(0,0,0,0.3)" id="kick">🦶</button>
+<button class="abtn" id="punch">拳</button>
+<button class="abtn" id="kick">🦶</button>
 </div>
 <div class="row">
-<button style="width:84px;height:84px;border:none;border-radius:50%;font-size:22px;background:rgba(255,200,0,0.85);box-shadow:0 6px 18px rgba(0,0,0,0.3)" id="special">⚡</button>
-<button style="width:84px;height:84px;border:none;border-radius:50%;font-size:22px;background:rgba(100,180,255,0.85);box-shadow:0 6px 18px rgba(0,0,0,0.3)" id="bolt">🔵</button>
+<button class="abtn gold" id="special">⚡</button>
+<button class="abtn blue" id="bolt">🔵</button>
 </div>
 </div>
 
@@ -87,7 +113,7 @@ const ctx=canvas.getContext("2d");
 function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
 resize();
 addEventListener("resize",resize);
-function ground(){return canvas.height-260;}
+function ground(){return canvas.height<500?canvas.height-140:canvas.height-260;}
 
 // === SOUND ENGINE (Web Audio) ===
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
@@ -1372,10 +1398,10 @@ let padActive=false;
 
 function moveStick(x,y){
 const rect=pad.getBoundingClientRect();
-const cx=rect.left+85,cy=rect.top+85;
+const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
 let dx=x-cx,dy=y-cy;
 const dist=Math.sqrt(dx*dx+dy*dy);
-const max=45;
+const max=rect.width*0.26;
 if(dist>max){dx=(dx/dist)*max;dy=(dy/dist)*max;}
 stick.style.transform=`translate(${dx}px,${dy}px)`;
 moveInput=dx/max;
@@ -1387,9 +1413,9 @@ padActive=true;
 const touch=e.touches[0];
 moveStick(touch.clientX,touch.clientY);
 const rect=pad.getBoundingClientRect();
-const cx=rect.left+85;
+const cx=rect.left+rect.width/2;
 const dx=touch.clientX-cx;
-const tapDir=dx>15?1:dx<-15?-1:0;
+const tapDir=dx>10?1:dx<-10?-1:0;
 if(tapDir!==0){
 const now=Date.now();
 if(tapDir===lastTapDir&&now-lastTapTime<300&&dashCooldown<=0&&dashTimer<=0){
